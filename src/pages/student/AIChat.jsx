@@ -163,7 +163,7 @@ const AIChat = () => {
 
             // Load data in background but keep loader OFF
             setIsTyping(false); 
-            getRequest('/student-activities-analytics', { user_id: userDetails.user_id, filter: '7days' }, async (response) => {
+            getRequest('/student-activities-analytics', { user_id: userDetails.user_id, filter: '2days' }, async (response) => {
                 if (!isMounted) return;
                 const rawData = response.data?.data || response.data;
                 setAnalyticsData(rawData);
@@ -179,7 +179,7 @@ const AIChat = () => {
         try {
             const prompt = `
                 You are an advanced Behavioral & Spiritual AI Coach. 
-                Analyze the following 7-day activity data for ${userDetails.name}:
+                Analyze the following 2-day activity data for ${userDetails.name}:
                 ${JSON.stringify(data || analyticsData)}
 
                 Structure your response precisely:
@@ -234,7 +234,7 @@ const AIChat = () => {
         setIsTyping(true);
         try {
             const systemContext = analyticsData
-                ? `Context - Student's 7-day activity data: ${JSON.stringify(analyticsData)}\n\n`
+                ? `Context - Student's 2-day activity data: ${JSON.stringify(analyticsData)}\n\n`
                 : '';
 
             const chatMessages = [
@@ -348,7 +348,7 @@ const AIChat = () => {
                 {/* Suggestion Chips */}
                 {!isTyping && (
                     <div className="px-4 mb-3 flex gap-2 overflow-x-auto no-scrollbar">
-                        {['Perform Weekly Analysis', 'Best routine?', 'How to improve?'].map(chip => (
+                        {['Perform 2-Day Analysis', 'Best routine?', 'How to improve?'].map(chip => (
                             <button
                                 key={chip}
                                 onClick={() => handleSendMessage(null, chip)}

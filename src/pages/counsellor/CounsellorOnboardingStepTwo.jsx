@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { postRequest, getRequest } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
-import {  AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 const CounsellorOnboardingStepTwo = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const CounsellorOnboardingStepTwo = () => {
     name: '',
     email: '',
     mobile: '',
+    birthday: '',
     templeId: ''
 
   });
@@ -19,6 +21,13 @@ const CounsellorOnboardingStepTwo = () => {
 
   const [userDetails, setUserDetails] = useState(JSON.parse(localStorage.getItem('user_details') || 'null'));
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
+
+  // Inline validation error states
+  const [nameError, setNameError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [mobileError, setMobileError] = useState('');
+  const [birthdayError, setBirthdayError] = useState('');
+  const [templeError, setTempleError] = useState('');
 
   const showToast = (message, type = 'success') => {
     const msg = Array.isArray(message) ? message[0] : message;
@@ -86,12 +95,66 @@ const CounsellorOnboardingStepTwo = () => {
 
   }, []);
 
+  const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Clear the corresponding error when user types
+    if (name === 'name') setNameError('');
+    if (name === 'email') setEmailError('');
+    if (name === 'mobile') setMobileError('');
+    if (name === 'birthday') setBirthdayError('');
+    if (name === 'templeId') setTempleError('');
   };
 
   const handleContinue = async () => {
+    // Basic frontend validation
+    if (!formData.name.trim()) { setNameError('Please enter your name.'); return; }
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(formData.name.trim())) {
+      setNameError('Invalid name format.');
+      setFormData(prev => ({ ...prev, name: '' }));
+      return;
+    }
+    if (!formData.email.trim()) { setEmailError('Please enter your email.'); return; }
+    if (!isValidEmail(formData.email)) {
+      setEmailError('Invalid email format.');
+      setFormData(prev => ({ ...prev, email: '' }));
+      return;
+    }
+    if (!formData.mobile.trim()) { setMobileError('Please enter your mobile number.'); return; }
+    if (!/^[0-9]+$/.test(formData.mobile)) {
+      setMobileError('Invalid mobile number format.');
+      setFormData(prev => ({ ...prev, mobile: '' }));
+      return;
+    }
+    if (formData.mobile.length !== 10) {
+      setMobileError('Mobile number must be 10 digits.');
+      setFormData(prev => ({ ...prev, mobile: '' }));
+      return;
+    }
+    if (formData.birthday) {
+      const currentDate = new Date();
+      const selectedDate = new Date(formData.birthday);
+      if (isNaN(selectedDate.getTime())) {
+        setBirthdayError('Please enter a valid date of birth.'); return;
+      }
+      if (selectedDate > currentDate) {
+        setBirthdayError('Date of birth cannot be in the future.'); return;
+      }
+      let age = currentDate.getFullYear() - selectedDate.getFullYear();
+      const monthDiff = currentDate.getMonth() - selectedDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < selectedDate.getDate())) {
+        age--;
+      }
+      if (age < 5 || age > 120) {
+        setBirthdayError('Age must be between 5 and 120 years.'); return;
+      }
+    }
+    if (!formData.templeId) { setTempleError('Please select a temple.'); return; }
+
     const userRole = userDetails?.userRole || 'counsellor';
     
     const finalData = {
@@ -110,10 +173,10 @@ const CounsellorOnboardingStepTwo = () => {
 
    
     postRequest('/on-boarding', finalData, (response) => {
-      const { message, type } = processResponse(response);
       const res = response.data;
+      const { message } = processResponse(res);
 
-      if (type === 'success') {
+      if (res.status === 1) {
         if (res?.data) {
           const existingDetails = JSON.parse(localStorage.getItem('user_details') || '{}');
           const updatedDetails = {
@@ -124,8 +187,6 @@ const CounsellorOnboardingStepTwo = () => {
           setUserDetails(res.data);
         }
        navigate('/counsellor/dashboard'); 
-        // showToast(message || "Onboarding completed successfully!", "success");
-        // setTimeout(() => navigate('/counsellor/dashboard'), 1500);
       } else {
         showToast(message || "Failed to complete onboarding", "error");
         console.error("Failed to complete onboarding:", message);
@@ -134,85 +195,124 @@ const CounsellorOnboardingStepTwo = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex justify-center font-sans">
-      <div className="w-full max-w-md bg-white flex flex-col relative">
+    <div className="min-h-screen bg-white dark:bg-[#0F172A] flex justify-center font-sans transition-colors duration-300">
+      <div className="w-full max-w-md bg-white dark:bg-[#0F172A] flex flex-col relative transition-colors duration-300">
 
-        <div className="pt-6 pb-2 px-6 flex flex-col gap-4 sticky top-0 bg-white z-10 w-full">
+        <div className="pt-6 pb-2 px-6 flex flex-col gap-4 sticky top-0 bg-white dark:bg-[#0F172A] z-10 w-full transition-colors duration-300">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate(-1)}
-              className="p-1 -ml-1 text-[#0f172a] hover:bg-gray-50 rounded-full transition-colors"
+              className="p-1 -ml-1 text-[#0f172a] dark:text-[#F8FAFC] hover:bg-gray-50 dark:hover:bg-[#1E293B] rounded-full transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </button>
-            <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full bg-gray-200" />
-              <div className="w-8 h-2 rounded-full bg-blue-600" />
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2 h-2 rounded-full bg-gray-200" />
+                <div className="w-8 h-2 rounded-full bg-blue-600" />
+              </div>
+              <ThemeToggle />
             </div>
           </div>
           <div>
-            <h1 className="text-[28px] font-extrabold text-[#0f172a] tracking-tight leading-tight"> Almost there </h1>
-            <p className="text-[15px] font-medium text-[#64748b] mt-1.5 leading-relaxed"> Complete your Counsellor profile </p>
+            <h1 className="text-[28px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight leading-tight transition-colors duration-300"> Almost there </h1>
+            <p className="text-[15px] font-medium text-[#64748b] dark:text-[#CBD5E1] mt-1.5 leading-relaxed transition-colors duration-300"> Complete your Counsellor profile </p>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 pt-6 pb-24 hide-scrollbar">
           <div className="flex flex-col gap-5">
             <div>
-              <label className="block text-[13px] font-bold text-[#475569] uppercase tracking-wider mb-2 ml-1"> Full Name </label>
+              <div className="flex justify-between items-center mb-2 ml-1">
+                <label className="block text-[13px] font-bold text-[#475569] dark:text-[#CBD5E1] uppercase tracking-wider transition-colors duration-300"> Full Name </label>
+                {nameError && (
+                  <span className="text-[13px] font-semibold text-red-600 animate-in fade-in">
+                    {nameError}
+                  </span>
+                )}
+              </div>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Enter your name"
-                className="w-full bg-[#f8fafc] border-2 border-transparent focus:border-blue-500 focus:bg-white text-[#0f172a] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all placeholder:font-medium placeholder:text-gray-400"
+                // {/* This adds a red border if there is a nameError */}
+                className={`w-full bg-[#f8fafc] dark:bg-[#1E293B] border-2 focus:bg-white dark:focus:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all duration-300 placeholder:font-medium placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] ${nameError ? 'border-red-400 focus:border-red-500' : 'border-transparent dark:border-[#475569] focus:border-blue-500'}`}
               />
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-[#475569] uppercase tracking-wider mb-2 ml-1"> Email Address </label>
+              <div className="flex justify-between items-center mb-2 ml-1">
+                <label className="block text-[13px] font-bold text-[#475569] dark:text-[#CBD5E1] uppercase tracking-wider transition-colors duration-300"> Email Address </label>
+                {emailError && (
+                  <span className="text-[13px] font-semibold text-red-600 animate-in fade-in">
+                    {emailError}
+                  </span>
+                )}
+              </div>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Enter your email"
-                className="w-full bg-[#f8fafc] border-2 border-transparent focus:border-blue-500 focus:bg-white text-[#0f172a] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all placeholder:font-medium placeholder:text-gray-400"
+                className={`w-full bg-[#f8fafc] dark:bg-[#1E293B] border-2 focus:bg-white dark:focus:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all duration-300 placeholder:font-medium placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] ${emailError ? 'border-red-400 focus:border-red-500' : 'border-transparent dark:border-[#475569] focus:border-blue-500'}`}
               />
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-[#475569] uppercase tracking-wider mb-2 ml-1"> Mobile Number </label>
+              <div className="flex justify-between items-center mb-2 ml-1">
+                <label className="block text-[13px] font-bold text-[#475569] dark:text-[#CBD5E1] uppercase tracking-wider transition-colors duration-300"> Mobile Number </label>
+                {mobileError && (
+                  <span className="text-[13px] font-semibold text-red-600 animate-in fade-in">
+                    {mobileError}
+                  </span>
+                )}
+              </div>
               <input
                 type="tel"
                 name="mobile"
                 value={formData.mobile}
                 onChange={handleChange}
                 placeholder="Enter your mobile number"
-                className="w-full bg-[#f8fafc] border-2 border-transparent focus:border-blue-500 focus:bg-white text-[#0f172a] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all placeholder:font-medium placeholder:text-gray-400"
+                className={`w-full bg-[#f8fafc] dark:bg-[#1E293B] border-2 focus:bg-white dark:focus:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all duration-300 placeholder:font-medium placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] ${mobileError ? 'border-red-400 focus:border-red-500' : 'border-transparent dark:border-[#475569] focus:border-blue-500'}`}
               />
             </div>
             <div>
-              <label className="block text-[13px] font-bold text-[#475569] uppercase tracking-wider mb-2 ml-1">Birthday </label>
+              <div className="flex justify-between items-center mb-2 ml-1">
+                <label className="block text-[13px] font-bold text-[#475569] dark:text-[#CBD5E1] uppercase tracking-wider transition-colors duration-300">Birthday </label>
+                {birthdayError && (
+                  <span className="text-[13px] font-semibold text-red-600 animate-in fade-in">
+                    {birthdayError}
+                  </span>
+                )}
+              </div>
               <input
                 type="date"
                 name="birthday"
                 value={formData.birthday}
                 onChange={handleChange}
                 placeholder="Enter your Birth Date"
-                className="w-full bg-[#f8fafc] border-2 border-transparent focus:border-blue-500 focus:bg-white text-[#0f172a] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all placeholder:font-medium placeholder:text-gray-400"
+                className={`w-full bg-[#f8fafc] dark:bg-[#1E293B] dark:[color-scheme:dark] border-2 focus:bg-white dark:focus:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] text-[15px] font-semibold px-4 py-3.5 rounded-xl outline-none transition-all duration-300 placeholder:font-medium placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] ${birthdayError ? 'border-red-400 focus:border-red-500' : 'border-transparent dark:border-[#475569] focus:border-blue-500'}`}
               />
             </div>
             <div className="relative">
-              <label className="block text-[13px] font-bold text-[#475569] uppercase tracking-wider mb-2 ml-1"> Temple / Center Name </label>
+              <div className="flex justify-between items-center mb-2 ml-1">
+                <label className="block text-[13px] font-bold text-[#475569] dark:text-[#CBD5E1] uppercase tracking-wider transition-colors duration-300"> Temple / Center Name </label>
+                {templeError && (
+                  <span className="text-[13px] font-semibold text-red-600 animate-in fade-in">
+                    {templeError}
+                  </span>
+                )}
+              </div>
               <div className="relative">
                   <select
                     name="templeId"
                     value={formData.templeId}
                     onChange={handleChange}
                     disabled={isFetchingTemples || temples.length === 0}
-                    className="w-full appearance-none bg-[#f8fafc] border-2 border-transparent focus:border-blue-500 focus:bg-white text-[#0f172a] text-[15px] font-semibold px-4 py-3.5 pr-10 rounded-xl outline-none transition-all disabled:opacity-60"
+                    className={`w-full appearance-none bg-[#f8fafc] dark:bg-[#1E293B] border-2 focus:bg-white dark:focus:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] text-[15px] font-semibold px-4 py-3.5 pr-10 rounded-xl outline-none transition-all duration-300 disabled:opacity-60 ${templeError ? 'border-red-400 focus:border-red-500' : 'border-transparent dark:border-[#475569] focus:border-blue-500'}`}
                   >
                     <option value="" disabled className="text-gray-400">
                       {isFetchingTemples ? "Fetching temples..." : "Select your base temple..."}
@@ -231,11 +331,10 @@ const CounsellorOnboardingStepTwo = () => {
           </div>
         </div>
 
-        <div className="fixed sm:absolute bottom-0 left-0 right-0 p-6 bg-white border-t border-gray-100 z-20">
+        <div className="fixed sm:absolute bottom-0 left-0 right-0 p-6 bg-white dark:bg-[#0F172A] border-t border-gray-100 dark:border-[#1E293B] z-20 transition-colors duration-300">
           <button
             onClick={handleContinue}
-            disabled={!formData.name || !formData.email || !formData.mobile || !formData.templeId}
-            className="w-full bg-[#1a73e8] disabled:bg-gray-300 disabled:shadow-none hover:bg-[#155fc3] text-white font-bold py-4 rounded-xl shadow-[0_4px_14px_rgba(26,115,232,0.3)] transition-all active:scale-[0.98] outline-none"
+            className="w-full bg-[#1a73e8] hover:bg-[#155fc3] text-white font-bold py-4 rounded-xl shadow-[0_4px_14px_rgba(26,115,232,0.3)] transition-all active:scale-[0.98] outline-none"
           >
             Continue to Dashboard
           </button>

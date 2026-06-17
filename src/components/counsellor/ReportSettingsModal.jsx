@@ -208,7 +208,7 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
           initial={{ opacity: 0, y: 100, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 100, scale: 0.95 }}
-          className="relative w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+          className="relative w-full max-w-sm bg-white dark:bg-[#0F172A] rounded-3xl overflow-hidden shadow-2xl flex flex-col transition-colors duration-300"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-[#1a73e8] to-[#2563eb] px-6 py-5 flex items-center justify-between shadow-md z-10">
@@ -253,12 +253,12 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
               <div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-[#0f172a] font-bold">Activity Reminders</h3>
-                    <p className="text-sm text-gray-500">Get notified if you miss Sadhana</p>
+                    <h3 className="text-[#0f172a] dark:text-[#F8FAFC] font-bold">Activity Reminders</h3>
+                    <p className="text-sm text-gray-500 dark:text-[#94A3B8]">Get notified if you miss Sadhana</p>
                   </div>
                   <button
                     type="button"
-                    className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${reminderEnabled ? 'bg-[#f97316]' : 'bg-gray-200'}`}
+                    className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${reminderEnabled ? 'bg-[#f97316]' : 'bg-gray-200 dark:bg-[#334155]'}`}
                     onClick={handleToggleActivityReminders}
                   >
                     <span className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${reminderEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
@@ -275,12 +275,12 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
                       className="overflow-hidden"
                     >
                       <div className="flex items-center justify-between mt-4">
-                        <p className="text-[#0f172a] font-bold text-[13px]">Remind me after missing</p>
+                        <p className="text-[#0f172a] dark:text-[#F8FAFC] font-bold text-[13px]">Remind me after missing</p>
                         <div className="flex items-center gap-2">
-                          <div className="flex items-center bg-[#f8fafc] rounded-xl border-2 border-transparent focus-within:border-[#f97316]/20 overflow-hidden">
+                          <div className="flex items-center bg-[#f8fafc] dark:bg-[#1E293B] rounded-xl border-2 border-transparent focus-within:border-[#f97316]/20 overflow-hidden transition-colors duration-300">
                             <button
                               onClick={() => reminderDays > 1 && setReminderDays(reminderDays - 1)}
-                              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 transition-colors"
+                              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 dark:hover:bg-[#334155] transition-colors"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
                             </button>
@@ -300,11 +300,11 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
                               onBlur={() => {
                                 if (reminderDays === '') setReminderDays(3);
                               }}
-                              className="w-10 text-center bg-transparent text-[#1e293b] font-black text-[13px] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              className="w-10 text-center bg-transparent text-[#1e293b] dark:text-[#F8FAFC] font-black text-[13px] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                             />
                             <button
                               onClick={() => reminderDays < 10 && setReminderDays(reminderDays + 1)}
-                              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 transition-colors"
+                              className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 dark:hover:bg-[#334155] transition-colors"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
                             </button>
@@ -315,19 +315,19 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <div className="h-px w-full bg-gray-100 my-4"></div>
+                <div className="h-px w-full bg-gray-100 dark:bg-[#1E293B] my-4 transition-colors duration-300"></div>
               </div>
             )}
 
             {/* Toggle Switch Area */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-[#0f172a] font-bold">Email Reports</h3>
-                <p className="text-sm text-gray-500">Receive automated CSV mentee logs</p>
+                <h3 className="text-[#0f172a] dark:text-[#F8FAFC] font-bold">Email Reports</h3>
+                <p className="text-sm text-gray-500 dark:text-[#94A3B8]">Receive automated CSV mentee logs</p>
               </div>
               <button
                 type="button"
-                className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${autoReportStatus ? 'bg-[#1a73e8]' : 'bg-gray-200'}`}
+                className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${autoReportStatus ? 'bg-[#1a73e8]' : 'bg-gray-200 dark:bg-[#334155]'}`}
                 onClick={() => setAutoReportStatus(prev => !prev)}
               >
                 <span className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoReportStatus ? 'translate-x-5' : 'translate-x-0'}`} />
@@ -337,15 +337,15 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
             {/* Frequency Selector Area */}
             <div className={`transition-opacity duration-300 ${!autoReportStatus ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-[#0f172a] font-bold">Report Frequency</label>
-                <span className="bg-blue-50 text-blue-600 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
+                <label className="block text-[#0f172a] dark:text-[#F8FAFC] font-bold">Report Frequency</label>
+                <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
                   Active: {reportFrequencyDays} Days
                 </span>
               </div>
               <select
                 value={reportFrequencyDays}
                 onChange={(e) => setReportFrequencyDays(e.target.value)}
-                className="w-full bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none"
+                className="w-full bg-gray-50 dark:bg-[#1E293B] border border-gray-200 dark:border-[#334155] text-gray-900 dark:text-[#F8FAFC] text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none transition-colors duration-300"
               >
                 <option value={3}>Every 3 Days</option>
                 <option value={7}>Weekly (Every 7 Days)</option>

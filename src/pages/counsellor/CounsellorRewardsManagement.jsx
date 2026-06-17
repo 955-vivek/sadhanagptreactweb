@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CounsellorBottomNavigation from '../../components/counsellor/CounsellorBottomNavigation';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 const CounsellorRewardsManagement = () => {
   const navigate = useNavigate();
@@ -44,26 +45,29 @@ const CounsellorRewardsManagement = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans pb-32 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0F172A] font-sans pb-32 relative overflow-x-hidden transition-colors duration-300">
       <div className="w-full max-w-md mx-auto relative h-full">
         
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-10 pb-6 bg-[#f8fafc] sticky top-0 z-10 w-full">
+        <div className="flex items-center justify-between px-6 pt-10 pb-6 bg-[#f8fafc] dark:bg-[#0F172A] sticky top-0 z-10 w-full transition-colors duration-300">
           <button 
             onClick={() => navigate(-1)} 
-            className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[#0f172a] hover:bg-gray-50 active:scale-95 transition-all"
+            className="w-12 h-12 rounded-full bg-white dark:bg-[#1E293B] shadow-sm flex items-center justify-center text-[#0f172a] dark:text-[#F8FAFC] hover:bg-gray-50 dark:hover:bg-[#334155] active:scale-95 transition-all"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
           </button>
           
-          <h1 className="text-[20px] font-extrabold text-[#0f172a] tracking-tight">Rewards Management</h1>
+          <h1 className="text-[20px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight transition-colors duration-300">Rewards Management</h1>
           
-          <button 
-            className="relative w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[#0f172a] hover:bg-gray-50 active:scale-95 transition-all"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-            <span className="absolute top-3 right-3 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 border-2 border-white"></span>
-          </button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <button 
+              className="relative w-12 h-12 rounded-full bg-white dark:bg-[#1E293B] shadow-sm flex items-center justify-center text-[#0f172a] dark:text-[#F8FAFC] hover:bg-gray-50 dark:hover:bg-[#334155] active:scale-95 transition-all"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+              <span className="absolute top-3 right-3 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 border-2 border-white dark:border-[#1E293B]"></span>
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Content */}

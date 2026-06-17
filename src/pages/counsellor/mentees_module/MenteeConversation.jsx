@@ -155,25 +155,25 @@ const MenteeConversation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28 font-sans">
-      <div className="bg-white border-b border-gray-100 sticky top-0 z-10 px-6 py-6 flex items-center justify-between">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-800">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0F172A] pb-28 font-sans transition-colors duration-300">
+      <div className="bg-white dark:bg-[#1E293B] border-b border-gray-100 dark:border-[#334155] sticky top-0 z-10 px-6 py-6 flex items-center justify-between transition-colors duration-300">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#334155] flex items-center justify-center text-gray-800 dark:text-[#F8FAFC] transition-colors">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
         </button>
-        <h1 className="text-lg font-black text-gray-800">Conversation Logs</h1>
+        <h1 className="text-lg font-black text-gray-800 dark:text-[#F8FAFC]">Conversation Logs</h1>
         <div className="w-10 h-10" />
       </div>
 
       <div className="max-w-md mx-auto px-6 py-8">
         
         {/* Header Info */}
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-lg">
+        <div className="bg-white dark:bg-[#1E293B] p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-[#334155] mb-6 flex items-center gap-4 transition-colors duration-300">
+          <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-lg">
             {studentInfo.name.charAt(0)}
           </div>
           <div>
-            <h2 className="font-bold text-gray-800">{studentInfo.name}</h2>
-            <p className="text-xs font-bold text-gray-400">Log new discussion</p>
+            <h2 className="font-bold text-gray-800 dark:text-[#F8FAFC]">{studentInfo.name}</h2>
+            <p className="text-xs font-bold text-gray-400 dark:text-[#94A3B8]">Log new discussion</p>
           </div>
         </div>
 
@@ -189,22 +189,22 @@ const MenteeConversation = () => {
             type="date" 
             value={date} 
             onChange={e => setDate(e.target.value)}
-            className="w-full bg-white p-4 rounded-2xl border border-gray-100 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-gray-800 transition-all"
+            className="w-full bg-white dark:bg-[#1E293B] p-4 rounded-2xl border border-gray-100 dark:border-[#334155] focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 outline-none font-bold text-gray-800 dark:text-[#F8FAFC] [color-scheme:light] dark:[color-scheme:dark] transition-all"
           />
 
           <div>
             <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 ml-2">Notes</label>
             
             {/* Custom Simple Editor Container */}
-            <div className="bg-white rounded-2xl border border-gray-100 focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all overflow-hidden flex flex-col">
+            <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-gray-100 dark:border-[#334155] focus-within:border-indigo-500 dark:focus-within:border-indigo-400 focus-within:ring-4 focus-within:ring-indigo-500/10 transition-all overflow-hidden flex flex-col">
               
               {/* Toolbar */}
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border-b border-gray-100">
-                <button onClick={() => handleFormat('bold')} className="p-2 hover:bg-gray-200 rounded-lg text-gray-700 font-bold">B</button>
-                <button onClick={() => handleFormat('italic')} className="p-2 hover:bg-gray-200 rounded-lg text-gray-700 italic">I</button>
-                <button onClick={() => handleFormat('underline')} className="p-2 hover:bg-gray-200 rounded-lg text-gray-700 underline">U</button>
-                <div className="w-px h-4 bg-gray-300 mx-1"></div>
-                <button onClick={() => handleFormat('insertUnorderedList')} className="p-2 hover:bg-gray-200 rounded-lg text-gray-700">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 dark:bg-[#334155] border-b border-gray-100 dark:border-[#475569] transition-colors">
+                <button onClick={() => handleFormat('bold')} className="p-2 hover:bg-gray-200 dark:hover:bg-[#475569] rounded-lg text-gray-700 dark:text-[#F8FAFC] font-bold transition-colors">B</button>
+                <button onClick={() => handleFormat('italic')} className="p-2 hover:bg-gray-200 dark:hover:bg-[#475569] rounded-lg text-gray-700 dark:text-[#F8FAFC] italic transition-colors">I</button>
+                <button onClick={() => handleFormat('underline')} className="p-2 hover:bg-gray-200 dark:hover:bg-[#475569] rounded-lg text-gray-700 dark:text-[#F8FAFC] underline transition-colors">U</button>
+                <div className="w-px h-4 bg-gray-300 dark:bg-[#475569] mx-1 transition-colors"></div>
+                <button onClick={() => handleFormat('insertUnorderedList')} className="p-2 hover:bg-gray-200 dark:hover:bg-[#475569] rounded-lg text-gray-700 dark:text-[#F8FAFC] transition-colors">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
               </div>
@@ -213,7 +213,7 @@ const MenteeConversation = () => {
               <div 
                 ref={editorRef}
                 contentEditable={true}
-                className="w-full min-h-[150px] p-4 outline-none font-medium text-gray-700 prose prose-sm max-w-none"
+                className="w-full min-h-[150px] p-4 outline-none font-medium text-gray-700 dark:text-[#F8FAFC] prose prose-sm dark:prose-invert max-w-none transition-colors"
                 placeholder="Type your meeting notes here..."
               />
             </div>
@@ -234,20 +234,20 @@ const MenteeConversation = () => {
 
         {/* Past Logs List */}
         <div>
-          <h3 className="text-sm font-black text-gray-800 mb-4 px-2">Past Conversations</h3>
+          <h3 className="text-sm font-black text-gray-800 dark:text-[#F8FAFC] mb-4 px-2">Past Conversations</h3>
           
           {isLoading ? (
             <div className="flex justify-center py-10">
               <div className="w-6 h-6 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
           ) : notesList.length === 0 ? (
-            <div className="text-center py-10 bg-white rounded-3xl border border-dashed border-gray-200">
-              <p className="text-gray-400 font-bold text-sm">No logs found.</p>
+            <div className="text-center py-10 bg-white dark:bg-[#1E293B] rounded-3xl border border-dashed border-gray-200 dark:border-[#334155] transition-colors duration-300">
+              <p className="text-gray-400 dark:text-[#94A3B8] font-bold text-sm">No logs found.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {notesList.map((note) => (
-                <div key={note.id || note.note_id} className="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 group">
+                <div key={note.id || note.note_id} className="bg-white dark:bg-[#1E293B] p-5 rounded-3xl shadow-sm border border-gray-100 dark:border-[#334155] group transition-colors duration-300">
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
                       {formatDateLabel(note.meeting_date)}
@@ -262,7 +262,7 @@ const MenteeConversation = () => {
                     </div>
                   </div>
                   <div 
-                    className="text-sm font-medium text-gray-700 prose prose-sm max-w-none leading-relaxed"
+                    className="text-sm font-medium text-gray-700 dark:text-[#F8FAFC] prose prose-sm dark:prose-invert max-w-none leading-relaxed transition-colors"
                     dangerouslySetInnerHTML={{ __html: note.note_text }}
                   />
                 </div>

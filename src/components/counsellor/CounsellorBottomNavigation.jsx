@@ -52,7 +52,7 @@ const BottomNavigation = () => {
 
   return (
     <div className="fixed bottom-0 w-full left-0 right-0 flex justify-center z-50">
-      <div className="w-full max-w-md bg-white rounded-t-[32px] shadow-[0_-10px_40px_rgba(0,0,0,0.05)] border-t border-gray-100 px-6 py-4 flex justify-between items-center">
+      <div className="w-full max-w-md bg-white dark:bg-[#1E293B] rounded-t-[32px] shadow-[0_-8px_30px_rgba(15,23,42,0.12)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-200 dark:border-[#334155] px-6 py-4 flex justify-between items-center">
         {navItems.map((item) => {
           const active = isActive(item.path);
           return (
@@ -60,7 +60,7 @@ const BottomNavigation = () => {
               key={item.name}
               onClick={() => navigate(item.path)}
               className={`flex flex-col items-center transition-colors ${
-                active ? 'text-[#1a73e8]' : 'text-[#94a3b8] hover:text-[#64748b]'
+                active ? 'text-[#1a73e8]' : 'text-[#94a3b8] hover:text-[#64748b] dark:hover:text-[#CBD5E1]'
               }`}
             >
               {item.icon}

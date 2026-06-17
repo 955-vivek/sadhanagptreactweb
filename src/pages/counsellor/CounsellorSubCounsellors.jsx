@@ -3,6 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import CounsellorBottomNavigation from '../../components/counsellor/CounsellorBottomNavigation';
 import { getRequest } from '../../services/api';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 const CounsellorSubCounsellors = () => {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ const CounsellorSubCounsellors = () => {
   const selectedSCName = subCounsellorList.find(sc => sc.user_id === selectedSubCounsellor)?.name || '';
 
   return (
-    <div className="min-h-screen bg-white font-sans relative">
+    <div className="min-h-screen bg-white dark:bg-[#0F172A] font-sans relative transition-colors duration-300">
 
       {/* Toast */}
       <AnimatePresence>
@@ -98,7 +99,7 @@ const CounsellorSubCounsellors = () => {
             exit={{ opacity: 0, y: -20 }}
             className="fixed top-6 left-4 right-4 z-[100] flex justify-center"
           >
-            <div className={`px-6 py-3 rounded-2xl shadow-xl font-bold text-sm text-white ${toast.type === 'error' ? 'bg-red-500' : 'bg-gray-900'}`}>
+            <div className={`px-6 py-3 rounded-2xl shadow-xl font-bold text-sm text-white ${toast.type === 'error' ? 'bg-red-500' : 'bg-gray-900 dark:bg-[#1E293B]'}`}>
               {toast.msg}
             </div>
           </motion.div>
@@ -107,10 +108,12 @@ const CounsellorSubCounsellors = () => {
 
       <div className="w-full max-w-md mx-auto pb-[100px]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-10 pb-4 sticky top-0 bg-white z-20 border-b border-gray-100">
-          <button onClick={() => navigate(-1)} className="text-[#64748b] font-bold text-[16px]">Back</button>
-          <h1 className="text-[18px] font-extrabold text-[#0f172a]">Sub Counsellors</h1>
-          <div className="w-10" />
+        <div className="flex items-center justify-between px-6 pt-10 pb-4 sticky top-0 bg-white dark:bg-[#0F172A] z-20 border-b border-gray-100 dark:border-[#1E293B] transition-colors duration-300">
+          <button onClick={() => navigate(-1)} className="text-[#64748b] dark:text-[#CBD5E1] font-bold text-[16px]">Back</button>
+          <h1 className="text-[18px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC]">Sub Counsellors</h1>
+          <div className="flex items-center">
+            <ThemeToggle />
+          </div>
         </div>
 
         {/* Search */}
@@ -120,7 +123,7 @@ const CounsellorSubCounsellors = () => {
             placeholder="Search by group name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#f8fafc] rounded-full py-3.5 px-6 text-[15px] font-medium text-[#0f172a] placeholder:text-[#94a3b8] outline-none"
+            className="w-full bg-[#f8fafc] dark:bg-[#1E293B] rounded-full py-3.5 px-6 text-[15px] font-medium text-[#0f172a] dark:text-[#F8FAFC] placeholder:text-[#94a3b8] outline-none transition-colors duration-300"
           />
         </div>
 
@@ -131,7 +134,7 @@ const CounsellorSubCounsellors = () => {
               value={selectedSubCounsellor}
               onChange={(e) => setSelectedSubCounsellor(e.target.value)}
               className={`w-full appearance-none font-bold text-[14px] rounded-2xl py-4 pl-5 pr-10 border-2 outline-none transition-all cursor-pointer ${
-                selectedSubCounsellor ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-lg shadow-blue-500/20' : 'bg-[#f1f5f9] border-transparent text-[#0f172a]'
+                selectedSubCounsellor ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-lg shadow-blue-500/20' : 'bg-[#f1f5f9] dark:bg-[#1E293B] border-transparent text-[#0f172a] dark:text-[#F8FAFC]'
               }`}
             >
               <option value="">All Sub-Counsellors</option>
@@ -139,7 +142,7 @@ const CounsellorSubCounsellors = () => {
                 <option key={sc.user_id} value={sc.user_id}>{sc.name}</option>
               ))}
             </select>
-            <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none ${selectedSubCounsellor ? 'text-white' : 'text-[#64748b]'}`}>
+            <div className={`absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none ${selectedSubCounsellor ? 'text-white' : 'text-[#64748b] dark:text-[#94A3B8]'}`}>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
             </div>
           </div>
@@ -162,11 +165,11 @@ const CounsellorSubCounsellors = () => {
         <div className="px-2 mt-2">
           {!selectedSubCounsellor ? (
             <div className="text-center py-20">
-              <div className="w-20 h-20 bg-blue-50 rounded-[28px] flex items-center justify-center mx-auto mb-5">
+              <div className="w-20 h-20 bg-blue-50 dark:bg-[#1E293B] rounded-[28px] flex items-center justify-center mx-auto mb-5 transition-colors duration-300">
                 <svg className="w-10 h-10 text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm-7 9a7 7 0 1 1 14 0H5z"/></svg>
               </div>
-              <p className="font-black text-gray-800 text-lg">Select a Sub-Counsellor</p>
-              <p className="text-gray-400 font-bold text-sm mt-2">Choose from the dropdown above<br/>to view their assigned groups</p>
+              <p className="font-black text-gray-800 dark:text-[#F8FAFC] text-lg transition-colors duration-300">Select a Sub-Counsellor</p>
+              <p className="text-gray-400 dark:text-[#94A3B8] font-bold text-sm mt-2 transition-colors duration-300">Choose from the dropdown above<br/>to view their assigned groups</p>
             </div>
           ) : isLoading && groups.length === 0 ? (
             <div className="text-center py-16">
@@ -190,7 +193,7 @@ const CounsellorSubCounsellors = () => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: idx * 0.04 }}
-                className="flex items-center px-4 py-4 border-b border-gray-50 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex items-center px-4 py-4 border-b border-gray-50 dark:border-[#1E293B] hover:bg-gray-50 dark:hover:bg-[#1E293B] transition-colors cursor-pointer"
               >
                 {/* Avatar */}
                 <img
@@ -200,9 +203,9 @@ const CounsellorSubCounsellors = () => {
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-extrabold text-[16px] text-[#0f172a] truncate">{g.name || g.center_name || '—'}</h3>
+                  <h3 className="font-extrabold text-[16px] text-[#0f172a] dark:text-[#F8FAFC] truncate transition-colors duration-300">{g.name || g.center_name || '—'}</h3>
                   <div className="flex gap-2 mt-1.5 flex-wrap">
-                    <span className="text-[12px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-xl flex items-center gap-1.5">
+                    <span className="text-[12px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-xl flex items-center gap-1.5 transition-colors duration-300">
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                       {g.total_student ?? 0} students
                     </span>

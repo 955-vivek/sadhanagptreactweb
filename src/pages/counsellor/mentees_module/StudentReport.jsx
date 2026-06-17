@@ -197,31 +197,31 @@ const StudentReport = () => {
   const studentInfo = reportData?.student || location.state?.student || { name: 'Loading...' };
 
   return (
-    <div className="min-h-screen bg-white pb-28">
+    <div className="min-h-screen bg-white dark:bg-[#0F172A] pb-28 transition-colors duration-300">
       <AnimatePresence>{toastMessage && (<motion.div initial={{ y: -20 }} animate={{ y: 0 }} exit={{ y: -20 }} className="fixed top-24 left-0 right-0 z-50 flex justify-center"><div className="bg-gray-800 text-white px-6 py-3 rounded-full shadow-xl font-bold text-sm">{toastMessage}</div></motion.div>)}</AnimatePresence>
-      <div className="flex items-center justify-between px-6 py-6 border-b border-gray-50">
-        <button onClick={() => navigate(-1)}><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></button>
-        <h1 className="font-black text-lg">Mentee Report</h1>
+      <div className="flex items-center justify-between px-6 py-6 border-b border-gray-50 dark:border-[#1E293B]">
+        <button onClick={() => navigate(-1)} className="text-[#0f172a] dark:text-[#F8FAFC]"><svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></button>
+        <h1 className="font-black text-lg text-[#0f172a] dark:text-[#F8FAFC]">Mentee Report</h1>
         <div className="w-6" />
       </div>
       <div className="px-6 py-8 max-w-md mx-auto">
         <div className="flex flex-col items-center mb-8">
           <img src={studentInfo.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentInfo.name)}&background=random&color=fff&bold=true`} className="w-24 h-24 rounded-full border-4 border-blue-50 mb-4 shadow-md" />
-          <h2 className="text-2xl font-black text-center">{studentInfo.name}</h2>
+          <h2 className="text-2xl font-black text-center text-[#0f172a] dark:text-[#F8FAFC]">{studentInfo.name}</h2>
           <p className="text-blue-500 font-bold text-sm mt-1 mb-5">{studentInfo.center_name || 'No Group'} • {studentInfo.label_name || 'No Label'}</p>
 
           <div className="grid grid-cols-3 gap-2 w-full">
-            <div className="bg-gray-50 rounded-2xl p-3 flex flex-col items-center text-center">
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Label</span>
-              <span className="text-[13px] font-black text-gray-800 leading-tight">{studentInfo.label_name || '—'}</span>
+            <div className="bg-gray-50 dark:bg-[#1E293B] rounded-2xl p-3 flex flex-col items-center text-center transition-colors duration-300">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-[#64748b] mb-1">Label</span>
+              <span className="text-[13px] font-black text-gray-800 dark:text-[#F8FAFC] leading-tight">{studentInfo.label_name || '—'}</span>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-3 flex flex-col items-center text-center">
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Birthday</span>
-              <span className="text-[13px] font-black text-gray-800 leading-tight">{formatDateSnippet(studentInfo.birthday)}</span>
+            <div className="bg-gray-50 dark:bg-[#1E293B] rounded-2xl p-3 flex flex-col items-center text-center transition-colors duration-300">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-[#64748b] mb-1">Birthday</span>
+              <span className="text-[13px] font-black text-gray-800 dark:text-[#F8FAFC] leading-tight">{formatDateSnippet(studentInfo.birthday)}</span>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-3 flex flex-col items-center text-center">
-              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-1">Joined</span>
-              <span className="text-[13px] font-black text-gray-800 leading-tight">{formatDateSnippet(studentInfo.created_at)}</span>
+            <div className="bg-gray-50 dark:bg-[#1E293B] rounded-2xl p-3 flex flex-col items-center text-center transition-colors duration-300">
+              <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 dark:text-[#64748b] mb-1">Joined</span>
+              <span className="text-[13px] font-black text-gray-800 dark:text-[#F8FAFC] leading-tight">{formatDateSnippet(studentInfo.created_at)}</span>
             </div>
           </div>
 
@@ -230,13 +230,13 @@ const StudentReport = () => {
             <span>{studentInfo.email || 'N/A'}</span>
           </div>
         </div>
-        <div className="flex p-1 bg-gray-50 rounded-full mb-8">
-          {['7 Days', 'Month', 'Custom'].map(t => <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 rounded-full font-bold text-sm transition-all ${activeTab === t ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400'}`}>{t}</button>)}
+        <div className="flex p-1 bg-gray-50 dark:bg-[#1E293B] rounded-full mb-8 transition-colors duration-300">
+          {['7 Days', 'Month', 'Custom'].map(t => <button key={t} onClick={() => setActiveTab(t)} className={`flex-1 py-2 rounded-full font-bold text-sm transition-all ${activeTab === t ? 'bg-white dark:bg-[#0F172A] text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-[#94A3B8]'}`}>{t}</button>)}
         </div>
         {activeTab === 'Custom' && (
           <div className="flex gap-4 mb-8">
-            <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className="flex-1 p-3 bg-gray-50 rounded-xl" />
-            <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className="flex-1 p-3 bg-gray-50 rounded-xl" />
+            <input type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} className="flex-1 p-3 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] [color-scheme:light] dark:[color-scheme:dark] rounded-xl outline-none" />
+            <input type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} className="flex-1 p-3 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] [color-scheme:light] dark:[color-scheme:dark] rounded-xl outline-none" />
           </div>
         )}
         {isLoading ? <div className="text-center py-20 font-bold text-gray-400">Loading analysis...</div> : (
@@ -244,8 +244,8 @@ const StudentReport = () => {
             {reportData?.activities_analytics?.map(act => (
               <div key={act.activity_id}>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-black">{act.name}</span>
-                  <span className="text-xs font-bold text-gray-400">{act.label}: {formatValue(act.value)}</span>
+                  <span className="font-black text-[#0f172a] dark:text-[#F8FAFC]">{act.name}</span>
+                  <span className="text-xs font-bold text-gray-400 dark:text-[#94A3B8]">{act.label}: {formatValue(act.value)}</span>
                 </div>
                 {act.daily_data && act.daily_data.length > 0 ? (
                   <MiniChart
@@ -262,7 +262,7 @@ const StudentReport = () => {
           </div>
         )}
       </div>
-      <div className="fixed bottom-[80px] left-0 right-0 px-6 py-4 max-w-md mx-auto bg-white/80 backdrop-blur-md flex gap-3">
+      <div className="fixed bottom-[80px] left-0 right-0 px-6 py-4 max-w-md mx-auto bg-white/80 dark:bg-[#0F172A]/80 border-t border-transparent dark:border-[#1E293B] backdrop-blur-md flex gap-3 transition-colors duration-300">
         <button onClick={() => navigate(`/counsellor/mentee/${id}/conversation`, { state: { student: studentInfo } })} className="flex-1 py-4 bg-indigo-600 rounded-2xl font-black text-sm text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center gap-2">
           Counselling Notes
         </button>
@@ -274,14 +274,14 @@ const StudentReport = () => {
       <AnimatePresence>
         {isNotificationModalOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm" onClick={() => setIsNotificationModalOpen(false)}>
-            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="bg-white w-full max-w-md p-8 rounded-t-3xl shadow-2xl relative" onClick={(e) => e.stopPropagation()}>
-              <button onClick={() => setIsNotificationModalOpen(false)} className="absolute top-6 right-6 p-2 bg-gray-50 text-gray-400 rounded-full hover:bg-gray-100 hover:text-gray-600 transition-colors">
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="bg-white dark:bg-[#1E293B] w-full max-w-md p-8 rounded-t-3xl shadow-2xl relative transition-colors duration-300" onClick={(e) => e.stopPropagation()}>
+              <button onClick={() => setIsNotificationModalOpen(false)} className="absolute top-6 right-6 p-2 bg-gray-50 dark:bg-[#334155] text-gray-400 dark:text-[#94A3B8] rounded-full hover:bg-gray-100 dark:hover:bg-[#475569] hover:text-gray-600 dark:hover:text-[#F8FAFC] transition-colors">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
-              <h2 className="text-xl font-black mb-6 pr-10">Send Notification</h2>
-              <textarea value={notificationDesc} onChange={e => setNotificationDesc(e.target.value)} placeholder="Message..." rows={4} className="w-full p-4 bg-gray-50 rounded-xl mb-6 outline-none border border-transparent focus:border-blue-100" />
+              <h2 className="text-xl font-black mb-6 pr-10 text-[#0f172a] dark:text-[#F8FAFC]">Send Notification</h2>
+              <textarea value={notificationDesc} onChange={e => setNotificationDesc(e.target.value)} placeholder="Message..." rows={4} className="w-full p-4 bg-gray-50 dark:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] rounded-xl mb-6 outline-none border border-transparent focus:border-blue-100 dark:focus:border-blue-500/50 transition-colors duration-300" />
               <button onClick={handleSendNotification} disabled={isSending} className="w-full bg-blue-600 text-white py-4 rounded-2xl font-black shadow-lg shadow-blue-600/20">{isSending ? 'Sending...' : 'Send Now'}</button>
-              <button onClick={() => setIsNotificationModalOpen(false)} className="w-full py-4 text-gray-400 font-bold">Cancel</button>
+              <button onClick={() => setIsNotificationModalOpen(false)} className="w-full py-4 text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] font-bold transition-colors">Cancel</button>
             </motion.div>
           </motion.div>
         )}

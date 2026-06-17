@@ -27,6 +27,9 @@ import IrregularMentees from '../pages/counsellor/mentees_module/IrregularMentee
 import CounsellorOnboardingStepTwo from '../pages/counsellor/CounsellorOnboardingStepTwo';
 import GoogleCallback from '../pages/GoogleCallback';
 import AuthGuard from '../components/shared/AuthGuard';
+import MarkingScheme from '../pages/counsellor/MarkingScheme';
+import DefaultSchemeDetail from '../pages/counsellor/DefaultSchemeDetail';
+
 
 const AppRoutes = () => {
   return (
@@ -52,6 +55,9 @@ const AppRoutes = () => {
           <Route path="/counsellor/personal-analytics" element={<PersonalSadhanaAnalytics />} />
 
           <Route path="/counsellor/rewards" element={<UnderConstruction />} />
+          <Route path="/counsellor/marking-scheme" element={<MarkingScheme />} />
+          <Route path="/counsellor/marking-scheme/default" element={<DefaultSchemeDetail />} />
+          <Route path="/counsellor/marking-scheme/custom" element={<UnderConstruction />} />
 
           {/* <Route path="/counsellor/rewards" element={<CounsellorRewardsManagement />} /> */}
           <Route path="/counsellor/mentees" element={<MenteesList />} />

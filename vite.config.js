@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
         // Proxies /api/* to your backend during development.
         // e.g. fetch('/api/students') → http://localhost:5000/api/students
         '/api': {
-          target: env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:5000',
+          target: env.VITE_API_BASE_URL?.replace('/api', '') || 'http://localhost:2424',
           changeOrigin: true,
           secure: false,
         }

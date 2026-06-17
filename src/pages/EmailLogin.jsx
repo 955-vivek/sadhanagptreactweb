@@ -4,6 +4,7 @@ import LogoIcon from '../components/shared/LogoIcon';
 import FooterNote from '../components/shared/FooterNote';
 import { postRequest } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
+import ThemeToggle from '../components/shared/ThemeToggle';
 
 const EmailLogin = () => {
   const navigate = useNavigate();
@@ -74,16 +75,19 @@ const EmailLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#eef2f6] font-sans px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#eef2f6] dark:from-[#0F172A] dark:via-[#0F172A] dark:to-[#0F172A] font-sans px-6 transition-colors duration-300 relative">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
       <LogoIcon />
-      <h1 className="text-[32px] font-bold text-[#0f172a] mb-4 tracking-tight text-center">
+      <h1 className="text-[32px] font-bold text-[#0f172a] dark:text-[#F8FAFC] mb-4 tracking-tight text-center transition-colors duration-300">
         Hare Krishna
       </h1>
-      <p className="text-[16px] text-[#64748b] text-center mb-12 font-medium">
+      <p className="text-[16px] text-[#64748b] dark:text-[#CBD5E1] text-center mb-12 font-medium transition-colors duration-300">
         "Chant and be happy"
       </p>
 
-      <div className="w-full max-w-[340px] bg-white p-6 rounded-[20px] shadow-sm border border-gray-100 flex flex-col items-center">
+      <div className="w-full max-w-[340px] bg-white dark:bg-[#1E293B] p-6 rounded-[20px] shadow-sm border border-gray-100 dark:border-[#334155] flex flex-col items-center transition-colors duration-300">
         <AnimatePresence mode="wait">
           {step === 'enterEmail' ? (
             <motion.div
@@ -94,13 +98,13 @@ const EmailLogin = () => {
               className="w-full space-y-4"
             >
               <div className="space-y-1 text-left w-full">
-                <label className="text-[13px] font-bold text-gray-700 ml-1">Email Address</label>
+                <label className="text-[13px] font-bold text-gray-700 dark:text-[#CBD5E1] ml-1 transition-colors duration-300">Email Address</label>
                 <input
                   type="email"
                   placeholder="name@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-800 placeholder:text-gray-400"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-200 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8]"
                   disabled={loading}
                 />
               </div>
@@ -126,18 +130,18 @@ const EmailLogin = () => {
               className="w-full space-y-4"
             >
               <div className="text-center space-y-1 mb-2">
-                <p className="text-[13px] text-gray-500">OTP sent to</p>
-                <p className="font-bold text-gray-800">{email}</p>
+                <p className="text-[13px] text-gray-500 dark:text-[#CBD5E1] transition-colors duration-300">OTP sent to</p>
+                <p className="font-bold text-gray-800 dark:text-[#F8FAFC] transition-colors duration-300">{email}</p>
               </div>
               <div className="space-y-1 text-left w-full">
-                <label className="text-[13px] font-bold text-gray-700 ml-1">Verification Code</label>
+                <label className="text-[13px] font-bold text-gray-700 dark:text-[#CBD5E1] ml-1 transition-colors duration-300">Verification Code</label>
                 <input
                   type="text"
-                  placeholder="Enter 6-digit code"
+                  placeholder="Enter 4-digit code"
                   value={otp}
                   onChange={e => setOtp(e.target.value)}
-                  maxLength={6}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-center text-xl tracking-[8px] font-bold text-gray-800 placeholder:text-gray-400 placeholder:tracking-normal placeholder:text-sm"
+                  maxLength={4}
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-200 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-center text-xl tracking-[8px] font-bold text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] placeholder:tracking-normal placeholder:text-sm"
                   disabled={loading}
                 />
               </div>
@@ -155,8 +159,15 @@ const EmailLogin = () => {
                   ) : 'Verify & Login'}
                 </button>
                 <button
+                  onClick={handleSendOtp}
+                  disabled={loading}
+                  className="w-full text-[13px] font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors disabled:opacity-50 mt-2 mb-1"
+                >
+                  Resend OTP
+                </button>
+                <button
                   onClick={() => setStep('enterEmail')}
-                  className="w-full text-[13px] font-medium text-gray-500 hover:text-gray-700 transition-colors"
+                  className="w-full text-[13px] font-medium text-blue-600 hover:text-blue-800 hover:underline transition-colors disabled:opacity-50 mt-2 mb-1"
                 >
                   Use a different email
                 </button>

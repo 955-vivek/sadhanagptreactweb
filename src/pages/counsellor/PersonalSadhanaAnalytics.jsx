@@ -4,6 +4,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import NotificationsPanel from '../../components/shared/NotificationsPanel';
 import CounsellorBottomNavigation from '../../components/counsellor/CounsellorBottomNavigation';
 import { getRequest } from '../../services/api';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 // Helper to convert time string (05:00 AM) to numeric minutes for graphing
 const timeToMinutes = (timeStr) => {
@@ -289,7 +290,7 @@ const PersonalSadhanaAnalytics = () => {
   const navigate = useNavigate();
   const { userDetails } = useOutletContext();
   const [showNotifications, setShowNotifications] = useState(false);
-  const [activeTab, setActiveTab] = useState('Weekly');
+  const [activeTab, setActiveTab] = useState('7 Days');
   
   const todayDate = new Date().toISOString().split('T')[0];
   const lastWeekDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -299,14 +300,14 @@ const PersonalSadhanaAnalytics = () => {
   const [activitiesData, setActivitiesData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const tabs = ['Weekly', '30 Days', 'Custom'];
+  const tabs = ['7 Days', '30 Days', 'Custom'];
   
   const fetchAnalytics = () => {
     if (!userDetails?.user_id) return;
     setIsLoading(true);
     
     const filterMap = {
-      'Weekly': '7days',
+      '7 Days': '7days',
       '30 Days': '30days',
       'Custom': 'custom'
     };
@@ -361,7 +362,7 @@ const PersonalSadhanaAnalytics = () => {
             resolvedColor = '#06b6d4';
             resolvedLabel = 'Time';
           } else if (n.includes('chant')) { resolvedColor = '#1a73e8'; resolvedLabel = 'Rounds'; }
-          else if (n.includes('read')) { resolvedColor = '#a855f7'; resolvedLabel = 'Pages'; }
+          else if (n.includes('read')) { resolvedColor = '#a855f7'; resolvedLabel = 'Mins'; }
           else if (n.includes('meditat') || n.includes('hear') || l.includes('min')) { resolvedColor = '#20c997'; resolvedLabel = 'Mins'; }
           else if (t === 'numb' || t === 'count') { resolvedColor = '#f59e0b'; resolvedLabel = 'Count'; }
           else if (t === 'boolean' || t === 'yes/no' || t === 'yes_no') { resolvedColor = '#10b981'; resolvedLabel = 'Times'; }
@@ -372,6 +373,10 @@ const PersonalSadhanaAnalytics = () => {
             displayVal = minutesToTime(timeToMinutes(String(displayVal)));
           } else if (String(displayVal).includes(':')) {
             displayVal = String(displayVal).split('.')[0]; // Handle HH:mm:ss.ms
+          }
+
+          if (!resolvedLabel.startsWith('Avg.')) {
+            resolvedLabel = `Avg. ${resolvedLabel}`;
           }
 
           return {
@@ -396,33 +401,36 @@ const PersonalSadhanaAnalytics = () => {
   }, [activeTab, fromDate, toDate, userDetails]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] font-sans pb-28 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0F172A] font-sans pb-28 relative overflow-x-hidden transition-colors duration-300">
       <div className="w-full max-w-md mx-auto">
         
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-10 pb-6">
           <button 
             onClick={() => navigate('/counsellor/dashboard')}
-            className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[#0f172a] active:scale-95 transition-all"
+            className="w-12 h-12 rounded-full bg-white dark:bg-[#1E293B] shadow-sm flex items-center justify-center text-[#0f172a] dark:text-[#F8FAFC] active:scale-95 transition-all"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
           
           <div className="flex flex-col items-center">
-            <h1 className="text-[20px] font-extrabold text-[#0f172a] tracking-tight mt-1">My Sadhana</h1>
+            <h1 className="text-[20px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight mt-1 transition-colors duration-300">My Sadhana</h1>
           </div>
           
-          <button 
-            onClick={() => setShowNotifications(true)}
-            className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[#0f172a] active:scale-95 transition-all relative"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button 
+              onClick={() => setShowNotifications(true)}
+              className="w-12 h-12 rounded-full bg-white dark:bg-[#1E293B] shadow-sm flex items-center justify-center text-[#0f172a] dark:text-[#F8FAFC] active:scale-95 transition-all relative"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+            </button>
+          </div>
         </div>
 
         {/* Tabs / Segmented Control */}
         <div className="px-6 mb-6">
-          <div className="bg-white p-1.5 rounded-[24px] shadow-sm flex items-center justify-between">
+          <div className="bg-white dark:bg-[#1E293B] p-1.5 rounded-[24px] shadow-sm flex items-center justify-between transition-colors duration-300">
             {tabs.map((tab) => (
               <button
                 key={tab}
@@ -430,7 +438,7 @@ const PersonalSadhanaAnalytics = () => {
                 className={`flex-1 py-3 rounded-[20px] text-[15px] font-bold transition-all ${
                   activeTab === tab 
                     ? 'bg-[#1a73e8] text-white shadow-md shadow-blue-500/20' 
-                    : 'text-gray-400 hover:text-gray-600'
+                    : 'text-gray-400 dark:text-[#94A3B8] hover:text-gray-600 dark:hover:text-[#CBD5E1]'
                 }`}
               >
                 {tab}
@@ -448,18 +456,18 @@ const PersonalSadhanaAnalytics = () => {
               exit={{ height: 0, opacity: 0 }}
               className="px-6 mb-8 overflow-hidden"
             >
-              <div className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-50 flex items-center gap-4">
+              <div className="bg-white dark:bg-[#1E293B] p-6 rounded-[32px] shadow-sm border border-blue-200 dark:border-[#334155] flex flex-col items-stretch gap-4">
                 <div className="flex-1 space-y-1.5">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">From</label>
                   <input 
                     type="date" 
                     value={fromDate}
                     onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full bg-[#f8fafc] text-[#0f172a] font-bold text-[14px] rounded-2xl py-3 px-4 outline-none border border-transparent focus:border-blue-100 transition-all cursor-pointer"
+                    className="w-full bg-[#f8fafc] dark:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] font-bold text-[14px] rounded-2xl py-3 px-4 outline-none border border-transparent focus:border-blue-100 dark:focus:border-blue-500/50 transition-all cursor-pointer [color-scheme:light] dark:[color-scheme:dark]"
                   />
                 </div>
-                <div className="text-gray-300 pt-5">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                <div className="text-gray-300 dark:text-gray-500 flex justify-center -my-1">
+                  <svg className="w-5 h-5 rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </div>
                 <div className="flex-1 space-y-1.5">
                   <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">To</label>
@@ -467,7 +475,7 @@ const PersonalSadhanaAnalytics = () => {
                     type="date" 
                     value={toDate}
                     onChange={(e) => setToDate(e.target.value)}
-                    className="w-full bg-[#f8fafc] text-[#0f172a] font-bold text-[14px] rounded-2xl py-3 px-4 outline-none border border-transparent focus:border-blue-100 transition-all cursor-pointer"
+                    className="w-full bg-[#f8fafc] dark:bg-[#0F172A] text-[#0f172a] dark:text-[#F8FAFC] font-bold text-[14px] rounded-2xl py-3 px-4 outline-none border border-transparent focus:border-blue-100 dark:focus:border-blue-500/50 transition-all cursor-pointer [color-scheme:light] dark:[color-scheme:dark]"
                   />
                 </div>
               </div>
@@ -478,8 +486,8 @@ const PersonalSadhanaAnalytics = () => {
         {/* Date Range Label (Shown when not in custom mode or as header) */}
         {activeTab !== 'Custom' && (
           <div className="text-center mb-8">
-            <span className="text-[16px] font-bold text-gray-400">
-               {activeTab === 'Weekly' ? 'Last 7 Days' : 'Last 30 Days'}
+            <span className="text-[16px] font-bold text-gray-400 dark:text-[#64748b]">
+               {activeTab === '7 Days' ? 'Last 7 Days' : 'Last 30 Days'}
             </span>
           </div>
         )}
@@ -498,7 +506,7 @@ const PersonalSadhanaAnalytics = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 flex flex-col relative overflow-visible group"
+              className="bg-white dark:bg-[#1E293B] rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-blue-200 dark:border-[#334155] flex flex-col relative overflow-visible group transition-colors duration-300"
             >
               {/* Badge */}
               <div className="absolute top-8 right-8">
@@ -515,12 +523,12 @@ const PersonalSadhanaAnalytics = () => {
               </div>
 
               <div className="mb-2">
-                <span className="text-[12px] font-black text-gray-300 uppercase tracking-[0.14em]">{activity.name}</span>
+                <span className="text-[12px] font-black text-gray-300 dark:text-[#64748b] uppercase tracking-[0.14em]">{activity.name}</span>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className={`${String(activity.value).length > 6 ? 'text-[32px]' : 'text-[48px]'} font-black text-[#0f172a] leading-none tracking-tight`}>
+                  <span className={`${String(activity.value).length > 6 ? 'text-[32px]' : 'text-[48px]'} font-black text-[#0f172a] dark:text-[#F8FAFC] leading-none tracking-tight`}>
                     {activity.value}
                   </span>
-                  <span className="text-[17px] font-bold text-gray-400">{activity.label}</span>
+                  <span className="text-[17px] font-bold text-gray-400 dark:text-[#94A3B8]">{activity.label}</span>
                 </div>
               </div>
 

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import LogoIcon from '../components/shared/LogoIcon';
 import GoogleButton from '../components/shared/GoogleButton';
 import FooterNote from '../components/shared/FooterNote';
+import ThemeToggle from '../components/shared/ThemeToggle';
 import { useEffect, useState } from 'react';
 import { postRequest } from '../services/api';
 import { processResponse } from '../utils/apiUtils';
@@ -77,34 +78,37 @@ const Login = () => {
     }
   }, [navigate]);
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#eef2f6] font-sans px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#eef2f6] dark:from-[#0F172A] dark:via-[#0F172A] dark:to-[#0F172A] font-sans px-6 transition-colors duration-300 relative">
+      <div className="absolute top-6 right-6">
+        <ThemeToggle />
+      </div>
 
       <LogoIcon />
 
-      <h1 className="text-[32px] font-bold text-[#0f172a] mb-4 tracking-tight text-center">
+      <h1 className="text-[32px] font-bold text-[#0f172a] dark:text-[#F8FAFC] mb-4 tracking-tight text-center transition-colors duration-300">
         Hare Krishna
       </h1>
 
-      <p className="text-[16px] text-[#64748b] text-center mb-12 font-medium">
+      <p className="text-[16px] text-[#64748b] dark:text-[#CBD5E1] text-center mb-12 font-medium transition-colors duration-300">
         Track your habits, stay consistent
       </p>
 
       <GoogleButton />
 
       <div className="w-full flex items-center gap-3 my-6">
-        <div className="flex-1 h-[1px] bg-slate-200"></div>
-        <span className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">or</span>
-        <div className="flex-1 h-[1px] bg-slate-200"></div>
+        <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-700 transition-colors duration-300"></div>
+        <span className="text-[12px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-300">or</span>
+        <div className="flex-1 h-[1px] bg-slate-200 dark:bg-slate-700 transition-colors duration-300"></div>
       </div>
 
       <button
         onClick={() => navigate('/email-login')}
-        className="w-full py-4 px-6 bg-white border-2 border-orange-100 rounded-2xl flex items-center justify-center gap-3 hover:bg-orange-50 hover:border-orange-200 transition-all active:scale-[0.98] group"
+        className="w-full py-4 px-6 bg-white dark:bg-[#1E293B] border-2 border-orange-100 dark:border-[#475569] rounded-2xl flex items-center justify-center gap-3 hover:bg-orange-50 dark:hover:bg-[#334155] hover:border-orange-200 dark:hover:border-[#64748b] transition-all duration-300 active:scale-[0.98] group"
       >
-        <svg className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-orange-500 dark:text-orange-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
-        <span className="text-[15px] font-bold text-[#7c2d12]">Login with Email</span>
+        <span className="text-[15px] font-bold text-[#7c2d12] dark:text-[#F8FAFC] transition-colors duration-300">Login with Email</span>
       </button>
 
       <FooterNote />

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import CounsellorBottomNavigation from '../../components/counsellor/CounsellorBottomNavigation';
 import { getRequest, postRequest, postRequestWithFile } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
+import ThemeToggle from '../../components/shared/ThemeToggle';
 
 const CounsellorAddContent = () => {
   const navigate = useNavigate();
@@ -221,25 +222,28 @@ const CounsellorAddContent = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] font-sans pb-28">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0F172A] font-sans pb-28 transition-colors duration-300">
       {/* Container holding the mobile width cleanly if opened on desktop */}
-      <div className="w-full max-w-md mx-auto relative bg-white min-h-screen shadow-sm">
+      <div className="w-full max-w-md mx-auto relative bg-white dark:bg-[#0F172A] min-h-screen shadow-sm transition-colors duration-300">
 
         {/* Header */}
-        <div className="bg-white sticky top-0 z-20 border-b border-gray-100 px-6 py-6">
+        <div className="bg-white dark:bg-[#0F172A] sticky top-0 z-20 border-b border-gray-100 dark:border-[#1E293B] px-6 py-6 transition-colors duration-300">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-[24px] font-black text-[#0f172a] tracking-tight">Content Hub</h1>
-            <div className="flex bg-gray-100/80 p-1 rounded-2xl">
+            <div className="flex items-center gap-2">
+              <h1 className="text-[24px] font-black text-[#0f172a] dark:text-[#F8FAFC] tracking-tight transition-colors duration-300">Content Hub</h1>
+              <ThemeToggle />
+            </div>
+            <div className="flex bg-gray-100/80 dark:bg-[#1E293B] p-1 rounded-2xl transition-colors duration-300">
               <button
                 onClick={() => setActiveTab('Add')}
-                className={`px-5 py-2 rounded-xl text-[13px] font-black transition-all ${activeTab === 'Add' ? 'bg-white text-[#1a73e8] shadow-sm' : 'text-gray-500 hover:text-[#0f172a]'
+                className={`px-5 py-2 rounded-xl text-[13px] font-black transition-all ${activeTab === 'Add' ? 'bg-white dark:bg-[#0F172A] text-[#1a73e8] dark:text-[#60A5FA] shadow-sm' : 'text-gray-500 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC]'
                   }`}
               >
                 Create
               </button>
               <button
                 onClick={() => setActiveTab('View')}
-                className={`px-5 py-2 rounded-xl text-[13px] font-black transition-all ${activeTab === 'View' ? 'bg-white text-[#1a73e8] shadow-sm' : 'text-gray-500 hover:text-[#0f172a]'
+                className={`px-5 py-2 rounded-xl text-[13px] font-black transition-all ${activeTab === 'View' ? 'bg-white dark:bg-[#0F172A] text-[#1a73e8] dark:text-[#60A5FA] shadow-sm' : 'text-gray-500 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC]'
                   }`}
               >
                 Library
@@ -262,7 +266,7 @@ const CounsellorAddContent = () => {
               {/* Content Type Selector */}
               <div className="mb-8">
                 <h2 className="text-[12px] font-bold text-[#64748b] tracking-wider mb-3">CONTENT TYPE</h2>
-                <div className="flex gap-3 overflow-x-auto hide-scrollbar pb-2 pt-1 -ml-1 pl-1">
+                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 pt-1 px-5 -mx-5 whitespace-nowrap">
                   {contentTypes.map((type) => {
                     const isActive = contentType === type.id;
                     return (
@@ -271,11 +275,11 @@ const CounsellorAddContent = () => {
                         onClick={() => setContentType(type.id)}
                         className={`flex-shrink-0 relative flex flex-col items-center justify-center w-[100px] h-[100px] rounded-full transition-all duration-200 border-2 active:scale-95 ${isActive
                           ? 'bg-[#1a73e8] border-[#1a73e8] shadow-[0_4px_16px_rgba(26,115,232,0.4)] text-white'
-                          : 'bg-white border-gray-100 text-[#64748b] hover:border-gray-200 shadow-sm'
+                          : 'bg-white dark:bg-[#1E293B] border-gray-100 dark:border-[#334155] text-[#64748b] dark:text-[#94A3B8] hover:border-gray-200 dark:hover:border-[#475569] shadow-sm'
                           }`}
                       >
                         <div className="mb-2">{type.icon}</div>
-                        <span className={`text-[12px] font-semibold ${isActive ? 'text-white' : 'text-[#64748b]'}`}>
+                        <span className={`text-[12px] font-semibold ${isActive ? 'text-white' : 'text-[#64748b] dark:text-[#94A3B8]'}`}>
                           {type.title}
                         </span>
                         {isActive && (
@@ -294,17 +298,17 @@ const CounsellorAddContent = () => {
                 </h2>
 
                 {contentType === 'quote' && (
-                  <div className="border border-gray-200 rounded-[28px] overflow-hidden shadow-sm bg-white focus-within:border-[#1a73e8] focus-within:ring-1 focus-within:ring-[#1a73e8] transition-all">
+                  <div className="border border-gray-200 dark:border-[#475569] rounded-[28px] overflow-hidden shadow-sm bg-white dark:bg-[#1E293B] focus-within:border-[#1a73e8] focus-within:ring-1 focus-within:ring-[#1a73e8] transition-all">
                     {/* Formatting Toolbar Mock */}
-                    <div className="flex items-center gap-2 p-3 border-b border-gray-100 bg-gray-50/50">
-                      <button className="w-8 h-8 rounded hover:bg-white hover:shadow-sm text-gray-500 flex items-center justify-center transition-all font-serif font-bold">B</button>
-                      <button className="w-8 h-8 rounded hover:bg-white hover:shadow-sm text-gray-500 flex items-center justify-center transition-all font-serif italic">I</button>
-                      <button className="w-8 h-8 rounded hover:bg-white hover:shadow-sm text-gray-500 flex items-center justify-center transition-all underline">U</button>
-                      <div className="w-px h-5 bg-gray-300 mx-1"></div>
-                      <button className="w-8 h-8 rounded hover:bg-white hover:shadow-sm text-gray-500 flex items-center justify-center transition-all">
+                    <div className="flex items-center gap-2 p-3 border-b border-gray-100 dark:border-[#334155] bg-gray-50/50 dark:bg-[#0F172A]/50">
+                      <button className="w-8 h-8 rounded hover:bg-white dark:hover:bg-[#1E293B] hover:shadow-sm text-gray-500 dark:text-[#CBD5E1] flex items-center justify-center transition-all font-serif font-bold">B</button>
+                      <button className="w-8 h-8 rounded hover:bg-white dark:hover:bg-[#1E293B] hover:shadow-sm text-gray-500 dark:text-[#CBD5E1] flex items-center justify-center transition-all font-serif italic">I</button>
+                      <button className="w-8 h-8 rounded hover:bg-white dark:hover:bg-[#1E293B] hover:shadow-sm text-gray-500 dark:text-[#CBD5E1] flex items-center justify-center transition-all underline">U</button>
+                      <div className="w-px h-5 bg-gray-300 dark:bg-[#475569] mx-1"></div>
+                      <button className="w-8 h-8 rounded hover:bg-white dark:hover:bg-[#1E293B] hover:shadow-sm text-gray-500 dark:text-[#CBD5E1] flex items-center justify-center transition-all">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z" /></svg>
                       </button>
-                      <button className="w-8 h-8 rounded hover:bg-white hover:shadow-sm text-gray-500 flex items-center justify-center transition-all">
+                      <button className="w-8 h-8 rounded hover:bg-white dark:hover:bg-[#1E293B] hover:shadow-sm text-gray-500 dark:text-[#CBD5E1] flex items-center justify-center transition-all">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" /></svg>
                       </button>
                     </div>
@@ -315,7 +319,7 @@ const CounsellorAddContent = () => {
                           if (e.target.value.length <= 500) setQuoteContent(e.target.value);
                         }}
                         placeholder="Type the inspirational quote here..."
-                        className="w-full min-h-[140px] p-5 text-[16px] text-[#0f172a] placeholder-[#94a3b8] focus:outline-none resize-none bg-transparent"
+                        className="w-full min-h-[140px] p-5 text-[16px] text-[#0f172a] dark:text-[#F8FAFC] placeholder-[#94a3b8] focus:outline-none resize-none bg-transparent"
                       />
                       <div className="absolute bottom-3 right-5 text-[12px] font-medium text-[#c0cbd8]">
                         {quoteContent.length}/500
@@ -327,7 +331,7 @@ const CounsellorAddContent = () => {
                 {contentType === 'Image' && (
                   <div
                     onClick={() => document.getElementById('imageInput').click()}
-                    className="relative w-full min-h-[200px] border-2 border-dashed border-[#cbd5e1] rounded-[28px] bg-[#f8fafc] flex flex-col items-center justify-center hover:bg-[#f1f5f9] hover:border-[#94a3b8] transition-all cursor-pointer group overflow-hidden"
+                    className="relative w-full min-h-[200px] border-2 border-dashed border-[#cbd5e1] dark:border-[#475569] rounded-[28px] bg-[#f8fafc] dark:bg-[#1E293B] flex flex-col items-center justify-center hover:bg-[#f1f5f9] dark:hover:bg-[#334155] hover:border-[#94a3b8] transition-all cursor-pointer group overflow-hidden"
                   >
                     <input
                       id="imageInput"
@@ -352,12 +356,12 @@ const CounsellorAddContent = () => {
                       </div>
                     ) : (
                       <>
-                        <div className="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center text-[#1a73e8] mb-3 group-hover:scale-110 transition-transform">
+                        <div className="w-14 h-14 rounded-full bg-white dark:bg-[#0F172A] shadow-sm flex items-center justify-center text-[#1a73e8] dark:text-[#60A5FA] mb-3 group-hover:scale-110 transition-transform">
                           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                         </div>
-                        <p className="text-[14px] font-bold text-[#0f172a]">Click to upload image</p>
+                        <p className="text-[14px] font-bold text-[#0f172a] dark:text-[#F8FAFC]">Click to upload image</p>
                         <p className="text-[12px] text-[#94a3b8] mt-1">PNG, JPG or WEBP (max. 5MB)</p>
                       </>
                     )}
@@ -376,7 +380,7 @@ const CounsellorAddContent = () => {
                       value={youtubeLink}
                       onChange={(e) => setYoutubeLink(e.target.value)}
                       placeholder="Paste YouTube link here..."
-                      className="w-full p-5 pl-14 border border-gray-200 rounded-[28px] text-[16px] text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] transition-all bg-white shadow-sm"
+                      className="w-full p-5 pl-14 border border-gray-200 dark:border-[#475569] rounded-[28px] text-[16px] text-[#0f172a] dark:text-[#F8FAFC] placeholder-[#94a3b8] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] transition-all bg-white dark:bg-[#1E293B] shadow-sm"
                     />
                   </div>
                 )}
@@ -393,7 +397,7 @@ const CounsellorAddContent = () => {
                       value={urlLink}
                       onChange={(e) => setUrlLink(e.target.value)}
                       placeholder="Paste website URL here..."
-                      className="w-full p-5 pl-14 border border-gray-200 rounded-[28px] text-[16px] text-[#0f172a] placeholder-[#94a3b8] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] transition-all bg-white shadow-sm"
+                      className="w-full p-5 pl-14 border border-gray-200 dark:border-[#475569] rounded-[28px] text-[16px] text-[#0f172a] dark:text-[#F8FAFC] placeholder-[#94a3b8] focus:outline-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] transition-all bg-white dark:bg-[#1E293B] shadow-sm"
                     />
                   </div>
                 )}
@@ -575,14 +579,14 @@ const CounsellorAddContent = () => {
           ) : (
             <div className="space-y-8">
               {/* Library Filters */}
-              <div className="bg-blue-50 rounded-[32px] p-6 border border-blue-100 shadow-sm">
+              <div className="bg-blue-50 dark:bg-[#1E293B] rounded-[32px] p-6 border border-blue-100 dark:border-[#334155] shadow-sm transition-colors duration-300">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full bg-[#1a73e8] flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
                   </div>
                   <div>
-                    <h3 className="text-[15px] font-black text-[#0f172a]">Filter Library</h3>
-                    <p className="text-[12px] font-bold text-blue-600/60 uppercase racking-wider">By target audience</p>
+                    <h3 className="text-[15px] font-black text-[#0f172a] dark:text-[#F8FAFC]">Filter Library</h3>
+                    <p className="text-[12px] font-bold text-blue-600/60 dark:text-blue-400/80 uppercase tracking-wider">By target audience</p>
                   </div>
                 </div>
 
@@ -597,7 +601,7 @@ const CounsellorAddContent = () => {
                         setViewFilterLabel('All');
                         if (e.target.value !== 'All') fetchLabelsForGroup(e.target.value);
                       }}
-                      className="w-full bg-white border-2 border-transparent focus:border-blue-200 p-4 rounded-2xl text-[14px] font-bold text-[#0f172a] shadow-sm outline-none transition-all"
+                      className="w-full bg-white dark:bg-[#0F172A] border-2 border-transparent focus:border-blue-200 dark:focus:border-blue-500 p-4 rounded-2xl text-[14px] font-bold text-[#0f172a] dark:text-[#F8FAFC] shadow-sm outline-none transition-all"
                     >
                       <option value="All">All Groups</option>
                       {centers.map(c => <option key={c.center_id} value={c.center_id}>{c.name}</option>)}
@@ -616,7 +620,7 @@ const CounsellorAddContent = () => {
                         <select
                           value={viewFilterLabel}
                           onChange={(e) => setViewFilterLabel(e.target.value)}
-                          className="w-full bg-white border-2 border-transparent focus:border-blue-200 p-4 rounded-2xl text-[14px] font-bold text-[#0f172a] shadow-sm outline-none transition-all"
+                          className="w-full bg-white dark:bg-[#0F172A] border-2 border-transparent focus:border-blue-200 dark:focus:border-blue-500 p-4 rounded-2xl text-[14px] font-bold text-[#0f172a] dark:text-[#F8FAFC] shadow-sm outline-none transition-all"
                         >
                           <option value="All">All Labels</option>
                           {(currentGroupLabels[viewFilterGroup] || []).map(l => (
@@ -633,7 +637,7 @@ const CounsellorAddContent = () => {
                     <select
                       value={viewFilterType}
                       onChange={(e) => setViewFilterType(e.target.value)}
-                      className="w-full bg-white border-2 border-transparent focus:border-blue-200 p-4 rounded-2xl text-[14px] font-bold text-[#0f172a] shadow-sm outline-none transition-all"
+                      className="w-full bg-white dark:bg-[#0F172A] border-2 border-transparent focus:border-blue-200 dark:focus:border-blue-500 p-4 rounded-2xl text-[14px] font-bold text-[#0f172a] dark:text-[#F8FAFC] shadow-sm outline-none transition-all"
                     >
                       <option value="All">All Types</option>
                       <option value="quote">Quotes / Text</option>
@@ -664,7 +668,7 @@ const CounsellorAddContent = () => {
                       >
                         {/* Quote / Text Format - Only if NOT a YouTube link */}
                         {(item.content_type === 'quote' || item.content_type === 'text' || item.content_type === '') && !extractYouTubeId(item.content) && (
-                          <div className="bg-white rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 border-l-8 border-l-blue-500">
+                          <div className="bg-white dark:bg-[#1E293B] rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 dark:border-[#334155] border-l-8 border-l-blue-500 transition-colors duration-300">
                             <div className="flex items-center justify-between mb-4">
                               <div className="opacity-20">
                                 <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" /></svg>
@@ -673,11 +677,11 @@ const CounsellorAddContent = () => {
                                 {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                               </span>
                             </div>
-                            <h2 className="text-[18px] font-bold text-[#1e293b] leading-relaxed italic mb-6">
+                            <h2 className="text-[18px] font-bold text-[#1e293b] dark:text-[#E2E8F0] leading-relaxed italic mb-6">
                               {item.content}
                             </h2>
-                            <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-                              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-lg">Published Quote</span>
+                            <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-[#334155]">
+                              <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-500/10 px-2 py-1 rounded-lg">Published Quote</span>
                               <p className="text-[11px] font-extrabold text-[#1a73e8]">View Details</p>
                             </div>
                           </div>
@@ -685,7 +689,7 @@ const CounsellorAddContent = () => {
 
                         {/* Image Format */}
                         {(item.content_type === 'image' || item.content_type === 'image_quote') && (
-                          <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50">
+                          <div className="bg-white dark:bg-[#1E293B] rounded-[40px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 dark:border-[#334155] transition-colors duration-300">
                             <div className="relative aspect-[4/5]">
                               <img
                                 src={item.content.startsWith('http')
@@ -701,7 +705,7 @@ const CounsellorAddContent = () => {
                               </div>
                             </div>
                             <div className="p-6 flex items-center justify-between">
-                              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest bg-blue-50 px-2 py-1 rounded-lg">Published Image</span>
+                              <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest bg-blue-50 dark:bg-blue-500/10 px-2 py-1 rounded-lg">Published Image</span>
                               <p className="text-[11px] font-extrabold text-[#1a73e8]">View Details</p>
                             </div>
                           </div>
@@ -709,7 +713,7 @@ const CounsellorAddContent = () => {
 
                         {/* YouTube Format - Catch by type OR by link detection */}
                         {(item.content_type === 'youtube' || item.content_type === 'video' || extractYouTubeId(item.content)) && (
-                          <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50">
+                          <div className="bg-white dark:bg-[#1E293B] rounded-[40px] overflow-hidden shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 dark:border-[#334155] transition-colors duration-300">
                             <div className="aspect-video bg-black">
                               {extractYouTubeId(item.content) ? (
                                 <iframe
@@ -728,7 +732,7 @@ const CounsellorAddContent = () => {
                             </div>
                             <div className="p-6">
                               <div className="flex items-center justify-between mb-4">
-                                <span className="text-[10px] font-black text-red-600 uppercase tracking-widest bg-red-50 px-2 py-1 rounded-lg flex items-center gap-2">
+                                <span className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest bg-red-50 dark:bg-red-500/10 px-2 py-1 rounded-lg flex items-center gap-2">
                                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></div>
                                   YouTube Post
                                 </span>
@@ -736,7 +740,7 @@ const CounsellorAddContent = () => {
                                   {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </span>
                               </div>
-                              <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                              <div className="flex items-center justify-between pt-4 border-t border-gray-50 dark:border-[#334155]">
                                 <p className="text-[11px] font-medium text-gray-400 truncate max-w-[200px]">{item.content}</p>
                                 <p className="text-[11px] font-extrabold text-[#1a73e8] shrink-0 ml-4">View Details</p>
                               </div>
@@ -748,14 +752,14 @@ const CounsellorAddContent = () => {
                         {(item.content_type === 'url') && (
                           <div
                             onClick={() => window.open(item.content, '_blank')}
-                            className="bg-white rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 flex items-center gap-6 cursor-pointer active:scale-[0.98] transition-all"
+                            className="bg-white dark:bg-[#1E293B] rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.03)] border border-gray-50 dark:border-[#334155] flex items-center gap-6 cursor-pointer active:scale-[0.98] transition-all"
                           >
-                            <div className="w-14 h-14 rounded-[20px] bg-blue-50 flex items-center justify-center text-blue-600 flex-shrink-0">
+                            <div className="w-14 h-14 rounded-[20px] bg-blue-50 dark:bg-[#0F172A] flex items-center justify-center text-blue-600 dark:text-blue-400 flex-shrink-0">
                               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between mb-1">
-                                <h3 className="text-[15px] font-black text-[#1e293b]">Published Link</h3>
+                                <h3 className="text-[15px] font-black text-[#1e293b] dark:text-[#F8FAFC]">Published Link</h3>
                                 <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">
                                   {new Date(item.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </span>

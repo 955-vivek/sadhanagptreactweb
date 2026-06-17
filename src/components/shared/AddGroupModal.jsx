@@ -52,22 +52,22 @@ const AddGroupModal = ({ isOpen, onClose, onSave }) => {
                 handleClose();
               }
             }}
-            className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto bg-white rounded-t-[32px] z-50 px-6 pb-8 pt-4 shadow-2xl"
+            className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto bg-white dark:bg-[#1E293B] rounded-t-[32px] z-50 px-6 pb-8 pt-4 shadow-2xl"
           >
             {/* Drag Handle Base - clickable area */}
             <div 
               onClick={handleClose}
               className="w-full h-6 absolute top-0 left-0 flex items-center justify-center cursor-pointer cursor-grab active:cursor-grabbing"
             >
-              <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
+              <div className="w-12 h-1.5 bg-gray-200 dark:bg-[#334155] rounded-full" />
             </div>
 
             {/* Header */}
             <div className="flex justify-between items-center mb-6 mt-4">
-              <h2 className="text-[20px] font-bold text-[#0f172a] tracking-tight">Add New Group</h2>
+              <h2 className="text-[20px] font-bold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight">Add New Group</h2>
               <button 
                 onClick={handleClose}
-                className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-8 h-8 rounded-full bg-gray-50 dark:bg-[#334155] flex items-center justify-center text-gray-400 dark:text-[#CBD5E1] hover:text-gray-600 dark:hover:text-[#F8FAFC] transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
@@ -76,7 +76,7 @@ const AddGroupModal = ({ isOpen, onClose, onSave }) => {
             {/* Form */}
             <div className="space-y-4">
               <div>
-                <label className="block text-[14px] font-medium text-[#1e293b] mb-2">Group Name</label>
+                <label className="block text-[14px] font-medium text-[#1e293b] dark:text-[#CBD5E1] mb-2">Group Name</label>
                 <input
                   type="text"
                   value={groupName}
@@ -85,21 +85,21 @@ const AddGroupModal = ({ isOpen, onClose, onSave }) => {
                     if (e.target.value.trim()) setError('');
                   }}
                   placeholder="Enter group name"
-                  className={`w-full border ${error && !groupName.trim() ? 'border-red-200 focus:border-red-400 focus:ring-red-400' : 'border-[#e2e8f0] focus:border-[#1a73e8] focus:ring-[#1a73e8]'} rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-400 focus:ring-1 outline-none transition-all`}
+                  className={`w-full border ${error && !groupName.trim() ? 'border-red-200 dark:border-red-900/50 focus:border-red-400 focus:ring-red-400' : 'border-[#e2e8f0] dark:border-[#334155] focus:border-[#1a73e8] dark:focus:border-blue-500 focus:ring-[#1a73e8] dark:focus:ring-blue-500'} bg-white dark:bg-[#0F172A] rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-1 outline-none transition-all`}
                 />
               </div>
 
               <div>
-                <label className="block text-[14px] font-medium text-[#1e293b] mb-2">
+                <label className="block text-[14px] font-medium text-[#1e293b] dark:text-[#CBD5E1] mb-2">
                   City
-                  <span className="ml-1 text-[12px] font-normal text-gray-400">(optional)</span>
+                  <span className="ml-1 text-[12px] font-normal text-gray-400 dark:text-[#94a3b8]">(optional)</span>
                 </label>
                 <input
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="Enter city"
-                  className="w-full border border-[#e2e8f0] focus:border-[#1a73e8] focus:ring-[#1a73e8] rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-400 focus:ring-1 outline-none transition-all"
+                  className="w-full border border-[#e2e8f0] dark:border-[#334155] focus:border-[#1a73e8] dark:focus:border-blue-500 focus:ring-[#1a73e8] dark:focus:ring-blue-500 bg-white dark:bg-[#0F172A] rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-1 outline-none transition-all"
                 />
               </div>
 
@@ -131,7 +131,7 @@ const AddGroupModal = ({ isOpen, onClose, onSave }) => {
               </button>
               <button 
                 onClick={handleClose}
-                className="w-full py-4 rounded-full text-[#475569] font-bold text-[16px] hover:bg-gray-50 active:scale-95 transition-all"
+                className="w-full py-4 rounded-full text-[#475569] dark:text-[#CBD5E1] font-bold text-[16px] hover:bg-gray-50 dark:hover:bg-[#334155] active:scale-95 transition-all"
               >
                 Cancel
               </button>
