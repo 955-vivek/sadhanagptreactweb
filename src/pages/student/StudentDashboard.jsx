@@ -11,6 +11,7 @@ import { getRequest, postRequest } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
 import ReminderPopup from '../../components/shared/ReminderPopup';
 import ReminderPermissionCard from '../../components/shared/ReminderPermissionCard';
+import DailyScoreIndicator from '../../components/shared/DailyScoreIndicator';
 
 // Dummy data for notifications (Shared with Student view)
 const dummyNotifications = [
@@ -58,6 +59,9 @@ const StudentDashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const [dailyScore, setDailyScore] = useState(null);
+  const [isScoreLoading, setIsScoreLoading] = useState(true);
+
   const [toastState, setToastState] = useState({ show: false, message: '', type: 'success' });
   const showToast = (message, type = 'success') => {
     const msg = Array.isArray(message) ? message[0] : message;
@@ -102,11 +106,10 @@ const StudentDashboard = () => {
           const reports = res.data.daily_reports;
           setActivities(prev => (prev || []).map(act => {
             const report = reports.find(r => String(r.activity_id) === String(act.id));
-            const count = report ? report.count : 0;
-
             const isTimeType = act.type === 'TIME' || act.type === 'time';
             const target = act.target || (isTimeType ? '05:00 AM' : 10);
             const isBoolean = act.type === 'YES/NO' || act.type === 'boolean';
+            const count = report ? report.count : 0;
 
             let newProgress = '';
             let newStatus = 'Pending';
@@ -208,9 +211,32 @@ const StudentDashboard = () => {
   };
 
   const hasFetchedNotif = useRef(false);
+
+  const fetchDailyScore = (targetDate) => {
+    if (!userDetails?.user_id) return;
+    setIsScoreLoading(true);
+    // Find the currently active date in the ribbon if a targetDate isn't explicitly passed
+    const activeDateObj = targetDate || dates.find(d => d.active)?.fullDate || new Date();
+
+    // Format to YYYY-MM-DD to safely send to backend
+    const yyyy = activeDateObj.getFullYear();
+    const mm = String(activeDateObj.getMonth() + 1).padStart(2, '0');
+    const dd = String(activeDateObj.getDate()).padStart(2, '0');
+    const formattedDate = `${yyyy}-${mm}-${dd}`;
+
+    // Pass the formattedDate in the payload!
+    getRequest('/daily-score', { user_id: userDetails.user_id, activity_date: formattedDate }, (response) => {
+      if (response?.data?.status === 1) {
+        setDailyScore(response.data.data);
+      }
+      setIsScoreLoading(false);
+    });
+  };
+
   useEffect(() => {
     if (userDetails?.user_id && !hasFetchedNotif.current) {
       fetchActivities();
+      fetchDailyScore();
 
       // Initial notification check for badge
       hasFetchedNotif.current = true;
@@ -257,6 +283,10 @@ const StudentDashboard = () => {
 
   const handleProgressUpdate = (id, newProps) => {
     setActivities(prev => prev.map(act => act.id === id ? { ...act, ...newProps } : act));
+    // Re-fetch daily score slightly delayed to allow DB save
+    setTimeout(() => {
+      fetchDailyScore();
+    }, 500);
   };
 
   const handleDateSelect = (id) => {
@@ -265,6 +295,8 @@ const StudentDashboard = () => {
       const selected = newDates.find(d => d.active);
       if (selected) {
         fetchDailyReport(selected.fullDate);
+        // Add this line so the circle indicator fetches the newly selected date!
+        fetchDailyScore(selected.fullDate);
       }
       return newDates;
     });
@@ -403,28 +435,44 @@ const StudentDashboard = () => {
               <p className="text-gray-500 dark:text-gray-400 font-medium">Loading activities...</p>
             </div>
           ) : activities?.length > 0 ? (
-            activities.map((act) => {
-              if (!act) return null;
-              const activeDateObj = dates?.find(d => d.active)?.fullDate || new Date();
-              const yyyy = activeDateObj.getFullYear();
-              const mm = String(activeDateObj.getMonth() + 1).padStart(2, '0');
-              const dd = String(activeDateObj.getDate()).padStart(2, '0');
-              const formattedDate = `${yyyy}-${mm}-${dd}`;
+            <>
+              {activities.map((act) => {
+                if (!act) return null;
+                const activeDateObj = dates?.find(d => d.active)?.fullDate || new Date();
+                const yyyy = activeDateObj.getFullYear();
+                const mm = String(activeDateObj.getMonth() + 1).padStart(2, '0');
+                const dd = String(activeDateObj.getDate()).padStart(2, '0');
+                const formattedDate = `${yyyy}-${mm}-${dd}`;
 
-              return (
-                <ActivityCard
-                  key={act.id}
-                  activity={act}
-                  onProgressUpdate={handleProgressUpdate}
-                  onEdit={handleEditClick}
-                  selectedDate={formattedDate}
-                />
-              );
-            })
+                return (
+                  <ActivityCard
+                    key={act.id}
+                    activity={act}
+                    onProgressUpdate={handleProgressUpdate}
+                    onEdit={handleEditClick}
+                    selectedDate={formattedDate}
+                  />
+                );
+              })}
+
+              <button
+                onClick={() => setIsNewActivityOpen(true)}
+                className="w-full max-w-md mx-auto mt-2 mb-4 py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                Add Log
+              </button>
+            </>
           ) : (
-            <div className="text-center pt-10">
-              <p className="text-gray-500 dark:text-[#CBD5E1] font-medium text-lg">No activities found</p>
-              <p className="text-gray-400 dark:text-[#94a3b8] text-sm">Tap the + button to add one</p>
+            <div className="text-center pt-10 flex flex-col items-center">
+              <p className="text-gray-500 dark:text-[#CBD5E1] font-medium text-lg mb-4">No activities found</p>
+              <button
+                onClick={() => setIsNewActivityOpen(true)}
+                className="w-full max-w-md mx-auto py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                Add Log
+              </button>
             </div>
           )}
         </div>
@@ -484,12 +532,10 @@ const StudentDashboard = () => {
         onDelete={handleDeleteActivity}
       />
 
-      <button
-        onClick={() => setIsNewActivityOpen(true)}
-        className="fixed bottom-[100px] right-[calc(50%-180px)] lg:right-10 w-[64px] h-[64px] bg-[#1a73e8] hover:bg-[#155fc3] text-white rounded-full flex items-center justify-center shadow-xl shadow-[#1a73e8]/30 transition-transform active:scale-90 z-40 lg:ml-auto"
-      >
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-      </button>
+      {/* Floating Action Button (FAB) Replaced by Score Indicator */}
+      <div onClick={() => setIsNewActivityOpen(true)}>
+        <DailyScoreIndicator scoreData={dailyScore} isLoading={isScoreLoading} />
+      </div>
 
       <BottomNavigation />
 

@@ -1,0 +1,96 @@
+Created At: 2026-06-20T09:23:34Z
+Completed At: 2026-06-20T09:23:35Z
+File Path: `file:///d:/SadhnaGPT/sadhanagptreactweb/src/pages/counsellor/ActivitiesManagement.jsx`
+Total Lines: 712
+Total Bytes: 37600
+Showing lines 1 to 100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: import React, { useState, useEffect } from 'react';
+2: import { useNavigate } from 'react-router-dom';
+3: import ThemeToggle from '../../components/shared/ThemeToggle';
+4: import { getRequest } from '../../services/api';
+5: import { useOutletContext } from 'react-router-dom';
+6: 
+7: 
+8: // Mock API functions for Bulk Assignment
+9: const mockFetchGroups = async () => {
+10:   return new Promise(resolve => setTimeout(() => {
+11:     resolve([
+12:       { id: 'g1', name: 'Morning Batch A' },
+13:       { id: 'g2', name: 'Evening Batch B' },
+14:       { id: 'g3', name: 'Weekend Scholars' }
+15:     ]);
+16:   }, 400));
+17: };
+18: 
+19: const mockFetchLabels = async (groupId) => {
+20:   return new Promise(resolve => setTimeout(() => {
+21:     if (groupId === 'g1') resolve([{ id: 'l1', name: 'Beginners' }, { id: 'l2', name: 'Intermediate' }]);
+22:     else if (groupId === 'g2') resolve([{ id: 'l3', name: 'Seniors' }]);
+23:     else resolve([]);
+24:   }, 400));
+25: };
+26: 
+27: const mockAssignActivities = async (payload) => {
+28:   return new Promise((resolve, reject) => setTimeout(() => {
+29:     // 90% success rate
+30:     if (Math.random() > 0.1) resolve({ success: true });
+31:     else reject(new Error('Network failure'));
+32:   }, 800));
+33: };
+34: 
+35: // Mocking Marking Scheme Points
+36: const ACTIVITY_POINTS = {
+37:   sleep_time: 25,
+38:   wake_up_time: 25,
+39:   japa_completion: 25,
+40:   japa_rounds: 25,
+41:   rest_day: 25,
+42:   reading_sp_books: 20, // Distributing or assigning points for new flat structure
+43:   reading_misc_books: 20,
+44:   hearing_
+<truncated 311 bytes>
+Time', icon: 'ti-clock', sub: 'Time chanting was completed', badge: 'Japa' },
+59:       { id: 'japa_rounds', name: 'Japa Number of Rounds', icon: 'ti-repeat', sub: 'Rounds completed daily', badge: 'Japa' }
+60:     ]
+61:   },
+62:   {
+63:     id: 'morning',
+64:     name: 'MORNING',
+65:     color: '#EF9F27',
+66:     items: [
+67:       { id: 'mangal_aarti', name: 'Mangal Aarti Attended', icon: 'ti-flame', sub: 'Morning prayer attendance', badge: 'Morning' }
+68:     ]
+69:   },
+70:   {
+71:     id: 'reading',
+72:     name: 'READING',
+73:     color: '#AFA9EC',
+74:     items: [
+75:       { id: 'reading_sp_books', name: 'Reading SP Books', icon: 'ti-book-2', sub: 'Srila Prabhupada books (mins)', badge: 'Reading' },
+76:       { id: 'reading_misc_books', name: 'Reading Misc. Books', icon: 'ti-books', sub: 'Other spiritual books (mins)', badge: 'Reading' }
+77:     ]
+78:   },
+79:   {
+80:     id: 'hearing',
+81:     name: 'HEARING',
+82:     color: '#5DCAA5',
+83:     items: [
+84:       { id: 'hearing_sm', name: 'Hearing Spiritual Master', icon: 'ti-user-heart', sub: 'Lectures by Spiritual Master (mins)', badge: 'Hearing' },
+85:       { id: 'hearing_sp', name: 'Hearing Srila Prabhupada', icon: 'ti-star', sub: 'Srila Prabhupada lectures (mins)', badge: 'Hearing' },
+86:       { id: 'hearing_misc', name: 'Hearing Miscellaneous', icon: 'ti-headphones', sub: 'Other spiritual audio (mins)', badge: 'Hearing' }
+87:     ]
+88:   },
+89:   {
+90:     id: 'seva',
+91:     name: 'SEVA & STUDY',
+92:     color: '#D4537E',
+93:     items: [
+94:       { id: 'seva_menial', name: 'Menial Services', icon: 'ti-tools', sub: 'Seva / service duration (mins)', badge: 'Seva' },
+95:       { id: 'seva_shloka', name: 'Shloka Memorisation', icon: 'ti-writing', sub: 'Weekly — mins memorising', badge: 'Weekly' }
+96:     ]
+97:   },
+98:   {
+99:     id: 'rest',
+100:     name: 'REST',
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.

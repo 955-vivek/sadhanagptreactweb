@@ -196,11 +196,11 @@ const CounsellorAnalytics = () => {
           </div>
         </div>
 
-        {/* Two smaller cards block - Rewards and Labels */}
-        <div className="px-6 flex gap-4 mb-8">
+        {/* 2x2 Quick Action Grid */}
+        <div className="px-6 grid grid-cols-2 gap-4 mb-8">
           <div
             onClick={() => navigate('/counsellor/rewards')}
-            className="flex-1 bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
+            className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
           >
             <div className="w-12 h-12 rounded-full bg-orange-50 dark:bg-orange-900/30 flex items-center justify-center mb-3">
               <svg className="w-6 h-6 text-orange-500" fill="currentColor" viewBox="0 0 24 24">
@@ -212,7 +212,7 @@ const CounsellorAnalytics = () => {
 
           <div
             onClick={() => setIsLabelsModalOpen(true)}
-            className="flex-1 bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
+            className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
           >
             <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center mb-3">
               <svg className="w-6 h-6 text-indigo-500 dark:text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
@@ -221,18 +221,31 @@ const CounsellorAnalytics = () => {
             </div>
             <span className="font-bold text-[#0f172a] dark:text-[#F8FAFC]">Manage Labels</span>
           </div>
+          
           <div
             onClick={() => navigate('/counsellor/marking-scheme')}
-            className="flex-1 bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
+            className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
           >
             <div className="w-12 h-12 rounded-full bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center mb-3">
               <svg className="w-6 h-6 text-teal-500 dark:text-teal-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 3H14.82C14.4 1.84 13.3 1 12 1S9.6 1.84 9.18 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3M12 3C12.55 3 13 3.45 13 4S12.55 5 12 5 11 4.55 11 4 11.45 3 12 3M7 7H17V9H7V7M14 13H7V11H14V13M17 17H7V15H17V17Z" />
               </svg>
+            </div>
+            <span className="font-bold text-[#0f172a] dark:text-[#F8FAFC]">Marking Scheme</span>
           </div>
-          <span className="font-bold text-[#0f172a] dark:text-[#F8FAFC]">Marking Scheme</span>
+
+          <div
+            onClick={() => navigate('/counsellor/activities')}
+            className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 shadow-sm border border-gray-100 dark:border-[#475569] flex flex-col items-center justify-center cursor-pointer active:scale-[0.98] transition-transform min-h-[140px]"
+          >
+            <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-3">
+              <svg className="w-6 h-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <span className="font-bold text-[#0f172a] dark:text-[#F8FAFC]">Manage Custom Activities</span>
+          </div>
         </div>
-      </div>
         
 
         {/* Full Width Card - Irregular Mentees Alert - ONLY SHOW IF COUNT > 0 */}

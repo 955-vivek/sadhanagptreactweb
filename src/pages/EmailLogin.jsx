@@ -103,6 +103,11 @@ const EmailLogin = () => {
                   type="email"
                   placeholder="name@example.com"
                   value={email}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSendOtp();
+                    }
+                  }}
                   onChange={e => setEmail(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-200 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8]"
                   disabled={loading}
@@ -139,6 +144,11 @@ const EmailLogin = () => {
                   type="text"
                   placeholder="Enter 4-digit code"
                   value={otp}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleVerifyOtp();
+                    }
+                  }}
                   onChange={e => setOtp(e.target.value)}
                   maxLength={4}
                   className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-200 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-center text-xl tracking-[8px] font-bold text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] placeholder:tracking-normal placeholder:text-sm"

@@ -29,6 +29,9 @@ import GoogleCallback from '../pages/GoogleCallback';
 import AuthGuard from '../components/shared/AuthGuard';
 import MarkingScheme from '../pages/counsellor/MarkingScheme';
 import DefaultSchemeDetail from '../pages/counsellor/DefaultSchemeDetail';
+import SchemeDetail from '../pages/counsellor/SchemeDetail';
+import ActivitiesManagement from '../pages/counsellor/ActivitiesManagement';
+import CustomActivities from '../pages/counsellor/mentees_module/CustomActivities';
 
 
 const AppRoutes = () => {
@@ -57,7 +60,8 @@ const AppRoutes = () => {
           <Route path="/counsellor/rewards" element={<UnderConstruction />} />
           <Route path="/counsellor/marking-scheme" element={<MarkingScheme />} />
           <Route path="/counsellor/marking-scheme/default" element={<DefaultSchemeDetail />} />
-          <Route path="/counsellor/marking-scheme/custom" element={<UnderConstruction />} />
+          <Route path="/counsellor/marking-scheme/:id" element={<SchemeDetail />} />
+          <Route path="/counsellor/activities" element={<CustomActivities />} />
 
           {/* <Route path="/counsellor/rewards" element={<CounsellorRewardsManagement />} /> */}
           <Route path="/counsellor/mentees" element={<MenteesList />} />
