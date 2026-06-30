@@ -6,6 +6,8 @@ import { postRequest } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from '../components/shared/ThemeToggle';
 
+// Show OTP on UI for Testing
+
 const EmailLogin = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -13,11 +15,12 @@ const EmailLogin = () => {
   const [step, setStep] = useState('enterEmail'); // 'enterEmail' | 'enterOtp'
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-
+  
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
     setTimeout(() => setToast(prev => ({ ...prev, show: false })), 4000);
   };
+  const [generatedOtp, setGeneratedOtp] = useState(null);
 
   const handleSendOtp = async () => {
     if (!email || !email.includes('@')) {
@@ -30,6 +33,7 @@ const EmailLogin = () => {
       const data = response?.data;
       if (data?.status === 1) {
         showToast(data.message || 'OTP sent to your email.', 'success');
+        setGeneratedOtp(data.otp); 
         setStep('enterOtp');
       } else {
         const errorMsg = Array.isArray(data?.message) ? data.message[0] : (data?.message || 'Failed to send OTP.');
@@ -138,6 +142,7 @@ const EmailLogin = () => {
                 <p className="text-[13px] text-gray-500 dark:text-[#CBD5E1] transition-colors duration-300">OTP sent to</p>
                 <p className="font-bold text-gray-800 dark:text-[#F8FAFC] transition-colors duration-300">{email}</p>
               </div>
+              <label className="text-[13px] font-bold text-gray-700 dark:text-[#CBD5E1] ml-1 transition-colors duration-300">OTP is : {generatedOtp}</label>
               <div className="space-y-1 text-left w-full">
                 <label className="text-[13px] font-bold text-gray-700 dark:text-[#CBD5E1] ml-1 transition-colors duration-300">Verification Code</label>
                 <input
