@@ -166,7 +166,7 @@ const CounsellorAiChat = () => {
   return (
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0F172A] font-sans pb-40 transition-colors duration-300 flex flex-col">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md border-b border-gray-100 dark:border-[#1E293B] flex items-center justify-between px-6 py-4 transition-all duration-300">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0F172A]/80 backdrop-blur-md border-b border-gray-300 dark:border-[#1E293B] flex items-center justify-between px-6 py-4 transition-all duration-300">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)}
@@ -203,7 +203,7 @@ const CounsellorAiChat = () => {
               </div>
 
               {/* Message Bubble */}
-              <div className={`p-4 shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' : 'bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-gray-800 rounded-2xl rounded-tl-sm'}`}>
+              <div className={`p-4 shadow-sm ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm' : 'bg-white dark:bg-[#1E293B] border border-gray-300 dark:border-gray-800 rounded-2xl rounded-tl-sm'}`}>
                 {msg.role === 'user' ? (
                   <p className="text-[14px] font-medium leading-relaxed">{msg.text}</p>
                 ) : (
@@ -220,7 +220,7 @@ const CounsellorAiChat = () => {
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shrink-0">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" /></svg>
               </div>
-              <div className="bg-white dark:bg-[#1E293B] p-4 rounded-2xl rounded-tl-sm border border-gray-100 dark:border-gray-800 flex items-center gap-2 shadow-sm">
+              <div className="bg-white dark:bg-[#1E293B] p-4 rounded-2xl rounded-tl-sm border border-gray-400/70 dark:border-gray-800 flex items-center gap-2 shadow-sm">
                 <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1 }} className="w-1.5 h-1.5 rounded-full bg-indigo-500"></motion.span>
                 <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.2 }} className="w-1.5 h-1.5 rounded-full bg-indigo-500"></motion.span>
                 <motion.span animate={{ opacity: [0.3, 1, 0.3] }} transition={{ repeat: Infinity, duration: 1, delay: 0.4 }} className="w-1.5 h-1.5 rounded-full bg-indigo-500"></motion.span>
@@ -241,7 +241,7 @@ const CounsellorAiChat = () => {
                 key={prompt}
                 onClick={() => handleSendMessage(prompt)}
                 disabled={isAnalyzing}
-                className="whitespace-nowrap px-4 py-2 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-full text-[12px] font-bold text-gray-600 dark:text-gray-300 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm active:scale-95 disabled:opacity-50"
+                className="whitespace-nowrap px-4 py-2 bg-white dark:bg-[#1E293B] border border-gray-300 dark:border-gray-700 rounded-full text-[12px] font-bold text-gray-600 dark:text-gray-300 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-all shadow-sm active:scale-95 disabled:opacity-50"
               >
                 {prompt}
               </button>
@@ -255,7 +255,7 @@ const CounsellorAiChat = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="w-full bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-2xl py-4 pl-5 pr-14 text-[14px] font-bold text-[#0f172a] dark:text-[#F8FAFC] shadow-sm outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+              className="w-full bg-white dark:bg-[#1E293B] border border-gray-300 dark:border-gray-700 rounded-2xl py-4 pl-5 pr-14 text-[14px] font-bold text-[#0f172a] dark:text-[#F8FAFC] shadow-sm outline-none focus:border-blue-500 dark:focus:border-blue-500 transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
             <button 
               onClick={() => handleSendMessage()}

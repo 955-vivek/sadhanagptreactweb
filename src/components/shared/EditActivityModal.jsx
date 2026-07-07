@@ -272,7 +272,7 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
               </div>
 
               {/* Bottom Delete Button */}
-              <div className="w-full pt-4 mt-2 mb-2 flex justify-center border-t border-gray-100 dark:border-[#334155]">
+              <div className="w-full pt-4 mt-2 mb-2 flex justify-center border-t border-gray-300 dark:border-[#334155]">
                 <button 
                   onClick={() => {
                     if (onDelete) onDelete(activityToEdit?.id);

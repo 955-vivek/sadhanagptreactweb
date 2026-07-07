@@ -331,7 +331,7 @@ const CounsellorOnboardingStepTwo = () => {
           </div>
         </div>
 
-        <div className="fixed sm:absolute bottom-0 left-0 right-0 p-6 bg-white dark:bg-[#0F172A] border-t border-gray-100 dark:border-[#1E293B] z-20 transition-colors duration-300">
+        <div className="fixed sm:absolute bottom-0 left-0 right-0 p-6 bg-white dark:bg-[#0F172A] border-t border-gray-300 dark:border-[#1E293B] z-20 transition-colors duration-300">
           <button
             onClick={handleContinue}
             className="w-full bg-[#1a73e8] hover:bg-[#155fc3] text-white font-bold py-4 rounded-xl shadow-[0_4px_14px_rgba(26,115,232,0.3)] transition-all active:scale-[0.98] outline-none"

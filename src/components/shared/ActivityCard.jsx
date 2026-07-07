@@ -57,10 +57,10 @@ const ActivityCard = ({ activity, onProgressUpdate, onEdit, selectedDate }) => {
       const parts = progStr.split('/');
       return timeToMinutesOffset(parts[0] || '');
     }
-    if (!progStr) return 0;
+    if (!progStr) return -1;
     const parts = progStr.split('/');
-    if (parts.length > 0) return parseFloat(parts[0]) || 0;
-    return 0;
+    if (parts.length > 0) return parseFloat(parts[0]) || -1;
+    return -1;
   };
 
   const extractSuffix = (progStr) => {
@@ -258,10 +258,10 @@ const ActivityCard = ({ activity, onProgressUpdate, onEdit, selectedDate }) => {
     cardControls.start({ x: 0, transition: { type: 'spring', stiffness: 300, damping: 20 } });
   };
 
-  let displayPercentage = isCompleted && !isTimeType ? 100 : (maxVal > 0 ? (currentVal / maxVal) * 100 : 0);
+  let displayPercentage = isCompleted && !isTimeType ? 100 : (maxVal > 0 ? (Math.max(currentVal, 0) / maxVal) * 100 : 0);
   if (isBoolean && !isCompleted) displayPercentage = 0;
   if (isBoolean && isCompleted) displayPercentage = 100;
-  if (isTimeType) displayPercentage = (currentVal / 1440) * 100;
+  if (isTimeType) displayPercentage = (Math.max(currentVal, 0) / 1440) * 100;
 
   return (
     <div className="relative w-full max-w-md mx-auto mb-4 rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(15,23,42,0.06),0_8px_24px_rgba(15,23,42,0.04)] hover:shadow-[0_4px_12px_rgba(15,23,42,0.08),0_12px_28px_rgba(15,23,42,0.06)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.25)] dark:hover:shadow-[0_6px_24px_rgba(0,0,0,0.35)] border border-blue-200 dark:border-[#475569] bg-white dark:bg-[#1E293B] hover:-translate-y-[1px] transition-all duration-300 group">

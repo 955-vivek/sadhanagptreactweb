@@ -108,7 +108,7 @@ const CounsellorSubCounsellors = () => {
 
       <div className="w-full max-w-md mx-auto pb-[100px]">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 pt-10 pb-4 sticky top-0 bg-white dark:bg-[#0F172A] z-20 border-b border-gray-100 dark:border-[#1E293B] transition-colors duration-300">
+        <div className="flex items-center justify-between px-6 pt-10 pb-4 sticky top-0 bg-white dark:bg-[#0F172A] z-20 border-b border-gray-300 dark:border-[#1E293B] transition-colors duration-300">
           <button onClick={() => navigate(-1)} className="text-[#64748b] dark:text-[#CBD5E1] font-bold text-[16px]">Back</button>
           <h1 className="text-[18px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC]">Sub Counsellors</h1>
           <div className="flex items-center">

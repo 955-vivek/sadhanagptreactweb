@@ -91,7 +91,7 @@ const EmailLogin = () => {
         "Chant and be happy"
       </p>
 
-      <div className="w-full max-w-[340px] bg-white dark:bg-[#1E293B] p-6 rounded-[20px] shadow-sm border border-gray-100 dark:border-[#334155] flex flex-col items-center transition-colors duration-300">
+      <div className="w-full max-w-[340px] bg-white dark:bg-[#1E293B] p-6 rounded-[20px] shadow-sm border border-gray-400/70 dark:border-[#334155] flex flex-col items-center transition-colors duration-300">
         <AnimatePresence mode="wait">
           {step === 'enterEmail' ? (
             <motion.div
@@ -113,7 +113,7 @@ const EmailLogin = () => {
                     }
                   }}
                   onChange={e => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-200 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8]"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-300 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8]"
                   disabled={loading}
                 />
               </div>
@@ -156,7 +156,7 @@ const EmailLogin = () => {
                   }}
                   onChange={e => setOtp(e.target.value)}
                   maxLength={4}
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-200 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-center text-xl tracking-[8px] font-bold text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] placeholder:tracking-normal placeholder:text-sm"
+                  className="w-full px-4 py-3 bg-gray-50 dark:bg-[#0F172A] border border-gray-300 dark:border-[#475569] rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-300 text-center text-xl tracking-[8px] font-bold text-gray-800 dark:text-[#F8FAFC] placeholder:text-gray-400 dark:placeholder:text-[#94A3B8] placeholder:tracking-normal placeholder:text-sm"
                   disabled={loading}
                 />
               </div>

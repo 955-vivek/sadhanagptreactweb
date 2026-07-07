@@ -36,7 +36,10 @@ const CounsellorProfile = () => {
     email: '',
     profile_image: '',
     reminder_enabled: false,
-    reminder_days: 3
+    reminder_days: 3,
+    dob: '',
+    group_name: '',
+    sub_group_name: ''
   });
 
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
@@ -206,9 +209,12 @@ const CounsellorProfile = () => {
           name: profile.name || '',
           mobile: profile.mobile || profile.phone || '',
           email: profile.email || '',
+          dob: profile.dob || '',
           profile_image: profile.profile || "",
           reminder_enabled: profile.reminder_enabled === 1 || profile.reminder_enabled === true,
-          reminder_days: profile.reminder_days || 3
+          reminder_days: profile.reminder_days || 3,
+          group_name: profile.center_name || '',
+          sub_group_name: profile.label_name || ''
         });
 
         if (Array.isArray(resData.data.mentors)) setMentors(resData.data.mentors);
@@ -329,7 +335,7 @@ const CounsellorProfile = () => {
             {/* Counsellor Profile Identity */}
             <div className="flex flex-col items-center mb-10">
               <div className="relative group">
-                <div 
+                <div
                   className="w-40 h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white ring-8 ring-white/50 relative cursor-pointer group-hover:ring-[#f97316]/30 transition-all duration-300"
                   onClick={() => setIsProfileModalOpen(true)}
                 >
@@ -343,12 +349,12 @@ const CounsellorProfile = () => {
                     <span className="text-white text-xs font-bold uppercase tracking-wider">View</span>
                   </div>
                 </div>
-                <input 
-                  type="file" 
-                  className="hidden" 
-                  ref={fileInputRef} 
-                  accept="image/png, image/jpeg, image/jpg, image/webp" 
-                  onChange={handleImageUpload} 
+                <input
+                  type="file"
+                  className="hidden"
+                  ref={fileInputRef}
+                  accept="image/png, image/jpeg, image/jpg, image/webp"
+                  onChange={handleImageUpload}
                 />
               </div>
               <div className="flex items-center gap-3 mt-5">
@@ -368,8 +374,37 @@ const CounsellorProfile = () => {
                 </button>
               </div>
               <div className="bg-white dark:bg-[#1E293B] rounded-[40px] p-8 shadow-[0_15px_40px_rgba(0,0,0,0.02)] border border-blue-200 dark:border-[#475569] space-y-8 transition-colors duration-300">
+                {/* Name Section */}
                 <div className="flex items-center gap-5">
                   <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400 transition-colors duration-300">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[11px] font-black text-gray-300 dark:text-[#CBD5E1] uppercase tracking-widest mb-1 transition-colors duration-300">Name</p>
+                    <p className="text-[16px] font-bold text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300">{userInfo.name || 'Not set'}</p>
+                  </div>
+                </div>
+
+                <div className="w-full h-px bg-gray-50 dark:bg-[#334155] transition-colors duration-300"></div>
+
+                {/* DOB Section */}
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400 transition-colors duration-300">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7v-5z" /></svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-[11px] font-black text-gray-300 dark:text-[#CBD5E1] uppercase tracking-widest mb-1 transition-colors duration-300">Date of Birth</p>
+                    <p className="text-[16px] font-bold text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300">
+                      {userInfo.dob ? new Date(userInfo.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not set'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="w-full h-px bg-gray-50 dark:bg-[#334155] transition-colors duration-300"></div>
+
+                {/* Email Section */}
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
                   </div>
                   <div className="flex-1">
@@ -380,8 +415,9 @@ const CounsellorProfile = () => {
 
                 <div className="w-full h-px bg-gray-50 dark:bg-[#334155] transition-colors duration-300"></div>
 
+                {/* Phone Section */}
                 <div className="flex items-center gap-5">
-                  <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400 transition-colors duration-300">
+                  <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
                   </div>
                   <div className="flex-1">
@@ -389,8 +425,36 @@ const CounsellorProfile = () => {
                     <p className="text-[16px] font-bold text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300">{userInfo.mobile}</p>
                   </div>
                 </div>
+
+                {/* Group Section */}
+                <div className="h-px w-full bg-gray-100 dark:bg-slate-700/50 transition-colors duration-300" />
+
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" /></svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-[#94a3b8] mb-1 transition-colors duration-300">Group</div>
+                    <div className="text-[#0f172a] dark:text-white font-bold text-[15px] capitalize transition-colors duration-300">{userInfo.group_name || 'Not assigned'}</div>
+                  </div>
+                </div>
+
+                {/* Sub-Group Section */}
+                <div className="h-px w-full bg-gray-100 dark:bg-slate-700/50 transition-colors duration-300" />
+
+                <div className="flex items-center gap-5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" /></svg>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-[11px] font-black uppercase tracking-widest text-[#94a3b8] mb-1 transition-colors duration-300">Sub-Group</div>
+                    <div className="text-[#0f172a] dark:text-white font-bold text-[15px] capitalize transition-colors duration-300">{userInfo.sub_group_name || 'Not assigned'}</div>
+                  </div>
+                </div>
               </div>
             </section>
+
+
 
             {/* My Mentors */}
             <section className="px-8 pb-10">
@@ -443,81 +507,81 @@ const CounsellorProfile = () => {
 
             {/* Notification Preferences */}
             {isPushEnabled && (
-            <section className="px-8 mb-10">
-              <div className="flex items-center justify-between mb-4 px-2">
-                <h3 className="text-[13px] font-black text-gray-400 dark:text-[#CBD5E1] uppercase tracking-widest transition-colors duration-300">Notification Preferences</h3>
-              </div>
-              <div className="bg-white dark:bg-[#1E293B] rounded-[40px] p-6 shadow-[0_15px_40px_rgba(0,0,0,0.02)] border border-blue-200 dark:border-[#475569] flex flex-col gap-6 transition-colors duration-300">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h4 className="text-[16px] font-black text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300">Activity Reminders</h4>
-                    <p className="text-[13px] font-bold text-gray-400 dark:text-[#94A3B8] mt-1 transition-colors duration-300">Get notified if you miss your Sadhana activities</p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      const newEnabled = !userInfo.reminder_enabled;
-                      handleSavePreferences(newEnabled, userInfo.reminder_days || 3);
-                    }}
-                    className={`w-12 h-6 rounded-full flex items-center transition-colors px-1 ${userInfo.reminder_enabled ? 'bg-[#f97316]' : 'bg-gray-200'}`}
-                  >
-                    <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${userInfo.reminder_enabled ? 'translate-x-6' : 'translate-x-0'}`} />
-                  </button>
+              <section className="px-8 mb-10">
+                <div className="flex items-center justify-between mb-4 px-2">
+                  <h3 className="text-[13px] font-black text-gray-400 dark:text-[#CBD5E1] uppercase tracking-widest transition-colors duration-300">Notification Preferences</h3>
                 </div>
-
-                <AnimatePresence>
-                  {userInfo.reminder_enabled && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="overflow-hidden"
+                <div className="bg-white dark:bg-[#1E293B] rounded-[40px] p-6 shadow-[0_15px_40px_rgba(0,0,0,0.02)] border border-blue-200 dark:border-[#475569] flex flex-col gap-6 transition-colors duration-300">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="text-[16px] font-black text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300">Activity Reminders</h4>
+                      <p className="text-[13px] font-bold text-gray-400 dark:text-[#94A3B8] mt-1 transition-colors duration-300">Get notified if you miss your Sadhana activities</p>
+                    </div>
+                    <button
+                      onClick={() => {
+                        const newEnabled = !userInfo.reminder_enabled;
+                        handleSavePreferences(newEnabled, userInfo.reminder_days || 3);
+                      }}
+                      className={`w-12 h-6 rounded-full flex items-center transition-colors px-1 ${userInfo.reminder_enabled ? 'bg-[#f97316]' : 'bg-gray-200'}`}
                     >
-                      <div className="h-px bg-gray-50 w-full mb-6"></div>
-                      <div className="flex items-center justify-between">
-                        <p className="text-[14px] font-bold text-[#1e293b]">Remind me after missing</p>
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center bg-[#f8fafc] rounded-xl border-2 border-transparent focus-within:border-[#f97316]/20 overflow-hidden">
-                            <button
-                              onClick={() => userInfo.reminder_days > 1 && handleSavePreferences(userInfo.reminder_enabled, userInfo.reminder_days - 1)}
-                              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 transition-colors"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
-                            </button>
-                            <input
-                              type="number"
-                              min="1"
-                              max="10"
-                              value={userInfo.reminder_days}
-                              onChange={(e) => {
-                                if (e.target.value === '') {
-                                  setUserInfo(prev => ({ ...prev, reminder_days: '' }));
-                                  return;
-                                }
-                                const val = parseInt(e.target.value);
-                                if (!isNaN(val) && val > 0 && val <= 10) handleSavePreferences(!!userInfo.reminder_enabled, val);
-                              }}
-                              onBlur={() => {
-                                if (userInfo.reminder_days === '' || userInfo.reminder_days < 1) {
-                                  handleSavePreferences(!!userInfo.reminder_enabled, 3);
-                                }
-                              }}
-                              className="w-12 text-center bg-transparent text-[#1e293b] font-black text-[14px] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                            />
-                            <button
-                              onClick={() => userInfo.reminder_days < 10 && handleSavePreferences(userInfo.reminder_enabled, userInfo.reminder_days + 1)}
-                              className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 transition-colors"
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
-                            </button>
+                      <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-transform ${userInfo.reminder_enabled ? 'translate-x-6' : 'translate-x-0'}`} />
+                    </button>
+                  </div>
+
+                  <AnimatePresence>
+                    {userInfo.reminder_enabled && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="h-px bg-gray-50 w-full mb-6"></div>
+                        <div className="flex items-center justify-between">
+                          <p className="text-[14px] font-bold text-[#1e293b]">Remind me after missing</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center bg-[#f8fafc] rounded-xl border-2 border-transparent focus-within:border-[#f97316]/20 overflow-hidden">
+                              <button
+                                onClick={() => userInfo.reminder_days > 1 && handleSavePreferences(userInfo.reminder_enabled, userInfo.reminder_days - 1)}
+                                className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 transition-colors"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M20 12H4" /></svg>
+                              </button>
+                              <input
+                                type="number"
+                                min="1"
+                                max="10"
+                                value={userInfo.reminder_days}
+                                onChange={(e) => {
+                                  if (e.target.value === '') {
+                                    setUserInfo(prev => ({ ...prev, reminder_days: '' }));
+                                    return;
+                                  }
+                                  const val = parseInt(e.target.value);
+                                  if (!isNaN(val) && val > 0 && val <= 10) handleSavePreferences(!!userInfo.reminder_enabled, val);
+                                }}
+                                onBlur={() => {
+                                  if (userInfo.reminder_days === '' || userInfo.reminder_days < 1) {
+                                    handleSavePreferences(!!userInfo.reminder_enabled, 3);
+                                  }
+                                }}
+                                className="w-12 text-center bg-transparent text-[#1e293b] font-black text-[14px] outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                              />
+                              <button
+                                onClick={() => userInfo.reminder_days < 10 && handleSavePreferences(userInfo.reminder_enabled, userInfo.reminder_days + 1)}
+                                className="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-[#f97316] hover:bg-gray-100 transition-colors"
+                              >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                              </button>
+                            </div>
+                            <span className="text-[14px] font-bold text-gray-400">days</span>
                           </div>
-                          <span className="text-[14px] font-bold text-gray-400">days</span>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </section>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </section>
             )}
 
             {/* App Feedback Section */}
@@ -582,16 +646,16 @@ const CounsellorProfile = () => {
               onClick={() => setIsProfileModalOpen(false)}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             ></motion.div>
-            
+
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
               className="relative w-[95%] sm:w-[90%] max-w-md md:max-w-lg lg:max-w-xl bg-white dark:bg-[#1E293B] rounded-3xl shadow-2xl overflow-hidden z-10 flex flex-col max-h-[90vh]"
             >
-              <div className="flex-shrink-0 flex justify-between items-center p-5 border-b border-gray-100 dark:border-[#334155] bg-white dark:bg-[#1E293B]">
+              <div className="flex-shrink-0 flex justify-between items-center p-5 border-b border-gray-300 dark:border-[#334155] bg-white dark:bg-[#1E293B]">
                 <h3 className="text-lg font-black text-slate-800 dark:text-[#F8FAFC] tracking-tight">Profile Picture</h3>
-                <button 
+                <button
                   onClick={() => setIsProfileModalOpen(false)}
                   className="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#334155] text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-[#475569] flex items-center justify-center transition-colors"
                 >
@@ -600,7 +664,7 @@ const CounsellorProfile = () => {
               </div>
 
               <div className="p-6 md:p-8 flex flex-col items-center overflow-y-auto">
-                <div className="w-full max-w-full h-[280px] sm:h-[320px] md:h-[380px] lg:h-[450px] rounded-2xl shadow-inner border border-gray-100 dark:border-[#334155] overflow-hidden mb-6 relative bg-[#f8fafc] dark:bg-[#0F172A] flex items-center justify-center p-2">
+                <div className="w-full max-w-full h-[280px] sm:h-[320px] md:h-[380px] lg:h-[450px] rounded-2xl shadow-inner border border-gray-400/70 dark:border-[#334155] overflow-hidden mb-6 relative bg-[#f8fafc] dark:bg-[#0F172A] flex items-center justify-center p-2">
                   <img
                     src={getImageUrl(userInfo.profile_image) || `https://ui-avatars.com/api/?name=${encodeURIComponent(userInfo.name || userInfo.email || userDetails?.email || 'User')}&background=1a73e8&color=fff&size=400`}
                     className="w-full h-full object-contain rounded-xl"
@@ -614,7 +678,7 @@ const CounsellorProfile = () => {
                 </div>
 
                 <div className="w-full space-y-3">
-                  <button 
+                  <button
                     onClick={() => !isUploadingImage && fileInputRef.current?.click()}
                     disabled={isUploadingImage}
                     className="w-full py-3.5 bg-[#f97316] hover:bg-[#ea580c] text-white rounded-xl font-bold text-[15px] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
@@ -624,7 +688,7 @@ const CounsellorProfile = () => {
                   </button>
 
                   {userInfo.profile_image && (
-                    <button 
+                    <button
                       onClick={() => setIsRemoveConfirmOpen(true)}
                       disabled={isUploadingImage}
                       className="w-full py-3.5 bg-red-50 dark:bg-red-500/10 hover:bg-red-100 dark:hover:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-bold text-[15px] transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -647,7 +711,7 @@ const CounsellorProfile = () => {
         onSave={handleSaveInfo}
       />
 
-      <ConfirmModal 
+      <ConfirmModal
         isOpen={isRemoveConfirmOpen}
         onClose={() => setIsRemoveConfirmOpen(false)}
         onConfirm={handleImageRemove}
@@ -659,7 +723,7 @@ const CounsellorProfile = () => {
         isLoading={isUploadingImage}
       />
 
-      <MentorDetailsModal 
+      <MentorDetailsModal
         isOpen={!!selectedMentorDetails}
         onClose={() => setSelectedMentorDetails(null)}
         mentor={selectedMentorDetails}
@@ -675,8 +739,8 @@ const CounsellorProfile = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border ${toast.type === 'error'
-                ? 'bg-red-50 border-red-100 text-red-700'
-                : 'bg-green-50 border-green-100 text-green-700'
+              ? 'bg-red-50 border-red-100 text-red-700'
+              : 'bg-green-50 border-green-100 text-green-700'
               }`}
           >
             {toast.type === 'error' ? (

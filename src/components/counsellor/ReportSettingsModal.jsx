@@ -345,7 +345,7 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast }) => {
               <select
                 value={reportFrequencyDays}
                 onChange={(e) => setReportFrequencyDays(e.target.value)}
-                className="w-full bg-gray-50 dark:bg-[#1E293B] border border-gray-200 dark:border-[#334155] text-gray-900 dark:text-[#F8FAFC] text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none transition-colors duration-300"
+                className="w-full bg-gray-50 dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] text-gray-900 dark:text-[#F8FAFC] text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none transition-colors duration-300"
               >
                 <option value={3}>Every 3 Days</option>
                 <option value={7}>Weekly (Every 7 Days)</option>

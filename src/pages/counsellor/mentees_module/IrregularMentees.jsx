@@ -76,7 +76,7 @@ const IrregularMentees = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                     onClick={() => navigate(`/counsellor/mentee/${mentee.user_id}`)}
-                    className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-50 flex items-center gap-4 active:scale-[0.98] transition-all cursor-pointer group"
+                    className="bg-white rounded-[24px] p-5 shadow-sm border border-gray-400/70 flex items-center gap-4 active:scale-[0.98] transition-all cursor-pointer group"
                   >
                     <div className="relative">
                       <img

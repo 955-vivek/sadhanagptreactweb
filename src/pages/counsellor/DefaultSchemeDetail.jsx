@@ -326,7 +326,7 @@ const SchemeTable = ({ activityKey, data, isEditing, onMaxChange, onRowMarkChang
 
                   {/* Inline Dropdown */}
                   {openDropdownIdx === idx && canEdit && (
-                    <div className="absolute top-[100%] right-0 sm:left-6 mt-1 w-[80px] bg-white dark:bg-[#112240] border border-gray-200 dark:border-[rgba(255,255,255,0.1)] rounded-lg shadow-xl z-50 py-1 overflow-hidden">
+                    <div className="absolute top-[100%] right-0 sm:left-6 mt-1 w-[80px] bg-white dark:bg-[#112240] border border-gray-400/70 dark:border-[rgba(255,255,255,0.1)] rounded-lg shadow-xl z-50 py-1 overflow-hidden">
                       {options.map(opt => (
                         <div
                           key={opt}

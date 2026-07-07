@@ -79,7 +79,7 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
             className="fixed inset-y-0 right-0 w-full max-w-[340px] bg-white dark:bg-[#1E293B] shadow-2xl z-[70] flex flex-col"
           >
             {/* Panel Header */}
-            <div className="px-6 py-8 border-b border-gray-100 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#1E293B] relative">
+            <div className="px-6 py-8 border-b border-gray-300 dark:border-[#334155] flex items-center justify-between bg-white dark:bg-[#1E293B] relative">
               <div>
                 <h2 className="text-[22px] font-black text-[#0f172a] dark:text-[#F8FAFC] tracking-tight">Updates</h2>
                 <div className="flex items-center gap-1.5 mt-1">
@@ -151,7 +151,7 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
                        <button 
                          onClick={loadMore}
                          disabled={isFetchingMore}
-                         className="px-8 py-3 bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-[#334155] rounded-full text-[12px] font-black text-[#1a73e8] dark:text-blue-400 shadow-sm hover:border-[#1a73e8]/20 dark:hover:border-blue-500/20 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
+                         className="px-8 py-3 bg-white dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] rounded-full text-[12px] font-black text-[#1a73e8] dark:text-blue-400 shadow-sm hover:border-[#1a73e8]/20 dark:hover:border-blue-500/20 active:scale-95 transition-all flex items-center gap-2 disabled:opacity-50"
                        >
                          {isFetchingMore ? (
                            <div className="w-3.5 h-3.5 border-2 border-[#1a73e8] border-t-transparent rounded-full animate-spin"></div>

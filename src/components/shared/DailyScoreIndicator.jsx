@@ -45,9 +45,9 @@ const DailyScoreIndicator = ({ scoreData, isLoading }) => {
       </div>
 
       {/* Circular Indicator */}
-      <div className={`w-[68px] h-[68px] lg:w-[76px] lg:h-[76px] rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center bg-white dark:bg-[#1E293B] border border-gray-100 dark:border-[#334155] relative overflow-hidden active:scale-95 transition-transform`}>
+      <div className={`w-[68px] h-[68px] lg:w-[76px] lg:h-[76px] rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] flex items-center justify-center bg-white dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] relative overflow-hidden active:scale-95 transition-transform`}>
         {isLoading ? (
-          <div className="w-6 h-6 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
         ) : (
           <>
             {/* Background Circle SVG */}

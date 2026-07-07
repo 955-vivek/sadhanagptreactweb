@@ -188,7 +188,7 @@ const MarkingScheme = () => {
     return (
       <div className="bg-gray-50 dark:bg-[rgba(0,0,0,0.2)] rounded-[8px] p-[10px] mb-[16px]">
         {activities.map((act, idx) => (
-          <div key={act.id} className={`flex justify-between items-center ${idx < activities.length - 1 ? 'border-b border-gray-200 dark:border-[rgba(255,255,255,0.05)] pb-2 mb-2' : ''}`}>
+          <div key={act.id} className={`flex justify-between items-center ${idx < activities.length - 1 ? 'border-b border-gray-300 dark:border-[rgba(255,255,255,0.05)] pb-2 mb-2' : ''}`}>
             <div className="flex items-center gap-2">
               <span className="text-[12px]">{act.icon}</span>
               <span className="text-[11px] font-normal text-gray-500 dark:text-[#8899bb]">{act.title}</span>
@@ -244,7 +244,7 @@ const MarkingScheme = () => {
     <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0b1628] font-sans pb-28 transition-colors duration-300 flex flex-col">
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#0b1628]/80 backdrop-blur-md border-b border-gray-100 dark:border-[#112240] flex items-center justify-between px-6 py-4 transition-all duration-300">
+      <header className="sticky top-0 z-50 bg-white/80 dark:bg-[#0b1628]/80 backdrop-blur-md border-b border-gray-300 dark:border-[#112240] flex items-center justify-between px-6 py-4 transition-all duration-300">
         <div className="flex items-center gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -319,7 +319,7 @@ const MarkingScheme = () => {
                 </div>
 
                 {/* Application Chip Row */}
-                <div className="flex items-center justify-between bg-slate-50 dark:bg-[rgba(255,255,255,0.03)] border border-slate-100 dark:border-[rgba(255,255,255,0.05)] rounded-[8px] p-[8px] mb-[16px]">
+                <div className="flex items-center justify-between bg-slate-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-300 dark:border-[rgba(255,255,255,0.05)] rounded-[8px] p-[8px] mb-[16px]">
                   <div className={`flex items-center gap-2 ${scheme.isSystemDefault ? 'text-teal-600 dark:text-[#1de9b6]' : 'text-slate-500 dark:text-[#6b7a99]'}`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                     <span className="text-[12px] font-semibold">Applied to {scheme.appliedGroupCount || 0} groups</span>

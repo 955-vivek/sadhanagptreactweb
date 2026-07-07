@@ -52,7 +52,7 @@ const BottomNavigation = () => {
 
   return (
     <div className="fixed bottom-0 w-full left-0 right-0 flex justify-center z-50">
-      <div className="w-full max-w-md bg-white dark:bg-[#1E293B] rounded-t-[32px] shadow-[0_-8px_30px_rgba(15,23,42,0.12)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-200 dark:border-[#334155] px-6 py-4 flex justify-between items-center">
+      <div className="w-full max-w-md bg-white dark:bg-[#1E293B] rounded-t-[32px] shadow-[0_-8px_30px_rgba(15,23,42,0.12)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-gray-400/70 dark:border-[#334155] px-6 py-4 flex justify-between items-center">
         {navItems.map((item) => {
           const active = isActive(item.path);
           return (

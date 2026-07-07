@@ -273,7 +273,7 @@ export const getActivities = async () => {
                 },
         {
                 "id": 106,
-                "title": "Day Best Duration",
+                "title": "Day Rest Duration",
                 "icon": "⏱️",
                 "activityType": "Daily",
                 "maxMarks": 25,

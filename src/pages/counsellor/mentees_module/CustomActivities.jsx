@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import CounsellorBottomNavigation from '../../../components/counsellor/CounsellorBottomNavigation';
+import AiAnalysisModals from '../../../components/AiAnalysis/AiAnalysisModals';
 import { getRequest, postRequest } from '../../../services/api';
 import { processResponse } from '../../../utils/apiUtils';
 
@@ -42,40 +43,6 @@ const MenteesList = () => {
     };
 
     const [isAiAnalysisModalOpen, setIsAiAnalysisModalOpen] = useState(false);
-    const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-    const [previewData, setPreviewData] = useState(null);
-    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
-    const [aiRangeType, setAiRangeType] = useState('LAST_2_DAYS');
-    const [aiDateFrom, setAiDateFrom] = useState(() => calculateDateStr(2));
-    const [aiDateTo, setAiDateTo] = useState(() => calculateDateStr(1));
-
-    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-    const [historyList, setHistoryList] = useState([]);
-    const [isFetchingHistory, setIsFetchingHistory] = useState(false);
-    const handleAiRangeChange = (range) => {
-        setAiRangeType(range);
-        if (range === 'CUSTOM') return;
-
-        switch (range) {
-            case 'LAST_2_DAYS':
-                setAiDateFrom(calculateDateStr(2));
-                setAiDateTo(calculateDateStr(1));
-                break;
-            case 'LAST_7_DAYS':
-                setAiDateFrom(calculateDateStr(7));
-                setAiDateTo(calculateDateStr(1));
-                break;
-            case 'LAST_30_DAYS':
-                setAiDateFrom(calculateDateStr(30));
-                setAiDateTo(calculateDateStr(1));
-                break;
-            case 'LAST_90_DAYS':
-                setAiDateFrom(calculateDateStr(90));
-                setAiDateTo(calculateDateStr(1));
-                break;
-            default: break;
-        }
-    };
 
     const SELECTION_LIMIT = 50;
     const observerTarget = useRef(null);
@@ -301,8 +268,8 @@ const MenteesList = () => {
                 {successMessage && (<motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="fixed top-24 left-0 right-0 z-[100] flex justify-center"><div className="bg-green-50 text-green-700 px-6 py-3 rounded-2xl shadow-lg font-bold text-sm border border-green-100">{successMessage}</div></motion.div>)}
             </AnimatePresence>
 
-            <div className="w-full max-w-md border-0 sm:border border-gray-200 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] flex-1 sm:rounded-[40px] overflow-y-auto hide-scrollbar shadow-none sm:shadow-2xl relative">
-                <div className="flex items-center justify-between px-6 pt-6 pb-4 sticky top-0 bg-white dark:bg-[#0F172A] z-20 border-b border-gray-100 dark:border-[#1E293B] transition-colors duration-300">
+            <div className="w-full max-w-md border-0 sm:border border-gray-400/70 dark:border-[#1E293B] bg-white dark:bg-[#0F172A] flex-1 sm:rounded-[40px] overflow-y-auto hide-scrollbar shadow-none sm:shadow-2xl relative">
+                <div className="flex items-center justify-between px-6 pt-6 pb-4 sticky top-0 bg-white dark:bg-[#0F172A] z-20 border-b border-gray-300 dark:border-[#1E293B] transition-colors duration-300">
                     <button onClick={() => navigate(-1)} className="text-[#64748b] dark:text-[#CBD5E1] font-bold">Back</button>
                     <h1 className="text-[18px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC]">All Activities</h1>
                     <button onClick={() => selectedStudents.length > 0 ? setSelectedStudents([]) : setSelectedStudents(students.slice(0, SELECTION_LIMIT).map(s => s.id))} className="text-[#1a73e8] dark:text-[#60A5FA] font-bold">{selectedStudents.length > 0 ? 'Clear' : 'Select'}</button>
@@ -310,7 +277,7 @@ const MenteesList = () => {
 
                 <div className="px-6 pt-5 pb-4 text-[12px] font-black uppercase text-gray-400 dark:text-[#64748b] tracking-wide">already added activities</div>
 
-                <div className="px-6 pb-6 border-b border-gray-100 dark:border-[#1E293B]">
+                <div className="px-6 pb-6 border-b border-gray-300 dark:border-[#1E293B]">
                     <div className="flex flex-wrap gap-2.5">
                         {students.filter(s => s.status === 1).map(student => (
                             <div key={student.id} className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#22c55e] bg-[#22c55e]/10 text-[#22c55e] cursor-pointer hover:bg-[#22c55e]/20 transition-colors">
@@ -351,14 +318,24 @@ const MenteesList = () => {
 
                 <div className="px-2">
                     {students.filter(s => s.status !== 1).map(student => (
-                        <div key={student.id} onClick={() => toggleStudent(student.id)} className="flex items-center px-4 py-3 border-b border-gray-50 dark:border-[#1E293B] cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] transition-colors">
-                            <img src={student.avatar} className="w-11 h-11 rounded-full mr-4 border border-gray-100 dark:border-[#334155]" />
-                            <div className="flex-1">
-                                <h3 className="font-bold text-[16px] text-[#0f172a] dark:text-[#F8FAFC]">{student.name}</h3>
+                        <div key={student.id} className="flex items-center px-4 py-3 border-b border-gray-50 dark:border-[#1E293B] hover:bg-gray-50 dark:hover:bg-[#1E293B] transition-colors">
+                            <img 
+                                src={student.avatar} 
+                                onClick={(e) => { e.stopPropagation(); navigate(`/counsellor/mentee/${student.id}`, { state: { student } }); }}
+                                className="w-11 h-11 rounded-full mr-4 border-2 border-transparent hover:border-white cursor-pointer transition-all duration-300" 
+                            />
+                            <div className="flex-1 min-w-0">
+                                <h3 
+                                    onClick={(e) => { e.stopPropagation(); navigate(`/counsellor/mentee/${student.id}`, { state: { student } }); }}
+                                    className="font-bold text-[16px] text-[#0f172a] dark:text-[#F8FAFC] hover:underline cursor-pointer inline-block truncate max-w-full">
+                                    {student.name}
+                                </h3>
                             </div>
-                            <div className="flex items-center gap-2 shrink-0">
-
-                                <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${selectedStudents.includes(student.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-200'}`}>
+                            <div className="flex items-center gap-2 shrink-0 ml-auto">
+                                <button onClick={(e) => { e.stopPropagation(); navigate(`/counsellor/mentee/${student.id}`, { state: { student } }); }} className="p-2 text-gray-400 hover:text-blue-600 transition-colors"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg></button>
+                                <div 
+                                    onClick={(e) => { e.stopPropagation(); toggleStudent(student.id); }}
+                                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all cursor-pointer ${selectedStudents.includes(student.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300 dark:border-gray-600'}`}>
                                     {selectedStudents.includes(student.id) && <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
                                 </div>
                             </div>
@@ -415,242 +392,12 @@ const MenteesList = () => {
                     </motion.div>
                 )}
 
-                {isAiAnalysisModalOpen && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md flex items-end justify-center">
-                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
-                            <h2 className="text-2xl font-black mb-2 text-[#0f172a] dark:text-[#F8FAFC]">AI Analysis Setup</h2>
-                            <p className="text-gray-400 dark:text-[#94A3B8] font-bold mb-6">Analyzing {selectedStudents.length} students</p>
-
-                            <div className="flex gap-2 overflow-x-auto pb-4 mb-6 hide-scrollbar">
-                                {students.filter(s => selectedStudents.includes(s.id)).map(s => (
-                                    <div key={s.id} className="flex flex-col items-center min-w-[60px]">
-                                        <img src={s.avatar} className="w-10 h-10 rounded-full border border-gray-100 dark:border-[#334155]" />
-                                        <span className="text-[10px] font-bold mt-1 text-gray-400 dark:text-[#94A3B8] truncate w-full text-center">{s.name.split(' ')[0]}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className="flex flex-wrap gap-2 mb-6">
-                                {[
-                                    { label: '2 Days', value: 'LAST_2_DAYS' },
-                                    { label: '7 Days', value: 'LAST_7_DAYS' },
-                                    { label: '30 Days', value: 'LAST_30_DAYS' },
-                                    { label: '90 Days', value: 'LAST_90_DAYS' },
-                                    { label: 'Custom', value: 'CUSTOM' }
-                                ].map(preset => (
-                                    <button
-                                        key={preset.value}
-                                        onClick={() => handleAiRangeChange(preset.value)}
-                                        className={`px-4 py-2 rounded-full font-bold text-[12px] transition-colors duration-300 ${aiRangeType === preset.value ? 'bg-blue-600 text-white' : 'bg-gray-100 dark:bg-[#1E293B] text-gray-500 dark:text-[#94A3B8] hover:bg-gray-200 dark:hover:bg-[#334155]'}`}
-                                    >
-                                        {preset.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            <div className="space-y-6">
-                                <div><label className="text-[10px] font-black uppercase text-gray-400 dark:text-[#64748b] mb-2 block tracking-widest">Date From</label><input type="date" value={aiDateFrom} disabled={aiRangeType !== 'CUSTOM'} onChange={e => setAiDateFrom(e.target.value)} className={`w-full p-4 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold border-none outline-none [color-scheme:light] dark:[color-scheme:dark] transition-opacity ${aiRangeType !== 'CUSTOM' ? 'opacity-50 cursor-not-allowed' : ''}`} /></div>
-                                <div><label className="text-[10px] font-black uppercase text-gray-400 dark:text-[#64748b] mb-2 block tracking-widest">Date To</label><input type="date" value={aiDateTo} disabled={aiRangeType !== 'CUSTOM'} onChange={e => setAiDateTo(e.target.value)} className={`w-full p-4 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold border-none outline-none [color-scheme:light] dark:[color-scheme:dark] transition-opacity ${aiRangeType !== 'CUSTOM' ? 'opacity-50 cursor-not-allowed' : ''}`} /></div>
-                                <div className="space-y-3">
-                                    <button onClick={handleAiAnalysis} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl">Generate AI Insights</button>
-                                    {selectedStudents.length === 1 && (
-                                        <button onClick={() => fetchAiHistory(selectedStudents[0])} className="w-full bg-gray-100 dark:bg-[#1E293B] text-gray-500 dark:text-[#94A3B8] py-4 rounded-2xl font-black shadow-sm hover:bg-gray-200 dark:hover:bg-[#334155] transition-colors">View AI History</button>
-                                    )}
-                                </div>
-                                <button onClick={() => setIsAiAnalysisModalOpen(false)} className="w-full py-4 text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] font-bold transition-colors">Close</button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                {isBulkAssignOpen && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md flex items-end justify-center" onClick={() => setIsBulkAssignOpen(false)}>
-                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
-                            <h2 className="text-2xl font-black mb-8 text-[#0f172a] dark:text-[#F8FAFC]">Bulk Assignment</h2>
-                            <div className="space-y-6">
-                                <select value={bulkGroup} onChange={e => setBulkGroup(e.target.value)} className="w-full p-5 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold outline-none border-none">
-                                    <option value="">Select Group</option>
-                                    {centers.map(c => <option key={c.center_id} value={c.center_id}>{c.name}</option>)}
-                                </select>
-                                <select value={bulkLabel} onChange={e => setBulkLabel(e.target.value)} className="w-full p-5 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold outline-none border-none" disabled={!bulkGroup}>
-                                    <option value="">Select Label</option>
-                                    {bulkLabelsList.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                                </select>
-                                <button onClick={handleBulkAssign} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl">Update {selectedStudents.length} Students</button>
-                                <button onClick={() => setIsBulkAssignOpen(false)} className="w-full py-4 text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] font-bold transition-colors">Cancel</button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                {editingStudent && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md flex items-end justify-center" onClick={() => setEditingStudent(null)}>
-                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
-                            <h2 className="text-2xl font-black mb-2 text-[#0f172a] dark:text-[#F8FAFC]">{editingStudent.name}</h2>
-                            <p className="text-gray-400 dark:text-[#94A3B8] font-bold mb-8">Edit Student Assignment</p>
-                            <div className="space-y-6">
-                                <select value={editGroup} onChange={e => setEditGroup(e.target.value)} className="w-full p-5 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold border-none outline-none">
-                                    <option value="">Select Group</option>
-                                    {centers.map(c => <option key={c.center_id} value={c.center_id}>{c.name}</option>)}
-                                </select>
-                                <select value={editLabel} onChange={e => setEditLabel(e.target.value)} className="w-full p-5 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold border-none outline-none" disabled={!editGroup}>
-                                    <option value="">Select Label</option>
-                                    {editLabelsList.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
-                                </select>
-                                <button onClick={handleSingleAssign} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl">Save Changes</button>
-                                <button onClick={() => setEditingStudent(null)} className="w-full py-4 text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] font-bold transition-colors">Cancel</button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                {isDownloadModalOpen && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsDownloadModalOpen(false)} className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center">
-                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
-                            <h2 className="text-2xl font-black mb-8 text-[#0f172a] dark:text-[#F8FAFC]">Export Students</h2>
-                            <div className="space-y-3">
-                                {['Excel (.xls)', 'CSV (.csv)', 'Print PDF'].map(f => (
-                                    <button key={f} className="w-full p-5 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold flex items-center justify-between group hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
-                                        <span className="group-hover:text-blue-600 dark:group-hover:text-blue-400">{f}</span>
-                                        <svg className="w-5 h-5 text-gray-400 dark:text-[#94A3B8]" fill="currentColor" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,9V3.5L18.5,9H13Z" /></svg>
-                                    </button>
-                                ))}
-                                <button onClick={() => setIsDownloadModalOpen(false)} className="w-full py-6 text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] font-bold transition-colors">Close</button>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                {isPreviewModalOpen && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-md flex items-center justify-center p-4">
-                        <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white dark:bg-[#0F172A] w-full max-w-lg rounded-[2rem] transition-colors duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl p-6 sm:p-8">
-                            <div className="flex justify-between items-center mb-8 border-b border-gray-100 dark:border-gray-800 pb-4">
-                                <div>
-                                    <h2 className="text-2xl font-black text-[#0f172a] dark:text-[#F8FAFC]">AI Student Analysis</h2>
-                                    <p className="text-sm font-bold text-gray-400 mt-1">Generated: {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                                </div>
-                                <button onClick={() => setIsPreviewModalOpen(false)} className="text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] p-2 bg-gray-50 dark:bg-[#1E293B] rounded-full">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                                </button>
-                            </div>
-
-                            {isGeneratingAI ? (
-                                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                                    <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin"></div>
-                                    <p className="font-bold text-gray-500 dark:text-gray-400 animate-pulse">Generating AI Analysis...</p>
-                                </div>
-                            ) : (previewData && previewData.kpis && previewData.aiAnalysis) ? (<div className="space-y-8">
-                                {/* Overall Status */}
-                                <div>
-                                    <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Overall Status</h3>
-                                    <div className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                                        {previewData.aiAnalysis.overallStatus || "Analysis Unavailable."}
-                                    </div>
-                                </div>
-
-                                {/* Strengths */}
-                                {previewData.aiAnalysis.strengths?.length > 0 && (
-                                    <div>
-                                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Strengths</h3>
-                                        <div className="space-y-3">
-                                            {previewData.aiAnalysis.strengths.map((str, i) => (
-                                                <div key={i} className="flex gap-3 text-sm text-gray-800 dark:text-gray-200">
-                                                    <span className="text-green-500 font-bold shrink-0">✓</span>
-                                                    <p>{str}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Laggings */}
-                                {previewData.aiAnalysis.laggings?.length > 0 && (
-                                    <div>
-                                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Laggings</h3>
-                                        <div className="space-y-3">
-                                            {previewData.aiAnalysis.laggings.map((lag, i) => (
-                                                <div key={i} className="flex gap-3 text-sm text-gray-800 dark:text-gray-200">
-                                                    <span className="text-orange-500 font-bold shrink-0">⚠</span>
-                                                    <p>{lag}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Recommendations */}
-                                {previewData.aiAnalysis.recommendations?.length > 0 && (
-                                    <div>
-                                        <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Recommendations</h3>
-                                        <div className="space-y-3">
-                                            {previewData.aiAnalysis.recommendations.map((rec, i) => (
-                                                <div key={i} className="flex gap-3 text-sm text-gray-800 dark:text-gray-200">
-                                                    <span className="text-yellow-500 font-bold shrink-0">💡</span>
-                                                    <p>{rec}</p>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                <div className="pt-6 border-t border-gray-100 dark:border-gray-800 space-y-1">
-                                    <p className="text-xs font-bold text-gray-400">Generated Using: GPT OSS 120B</p>
-                                    <p className="text-xs font-bold text-gray-400">Generated At: {new Date().toLocaleString('en-GB')}</p>
-                                </div>
-                            </div>
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                                    <div className="text-red-500 font-bold">Failed to load analysis.</div>
-                                </div>
-                            )}
-                        </motion.div>
-                    </motion.div>
-                )}
-
-                {isHistoryModalOpen && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md flex items-end justify-center">
-                        <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300 max-h-[85vh] overflow-y-auto custom-scrollbar">
-                            <div className="flex justify-between items-center mb-6">
-                                <h2 className="text-2xl font-black text-[#0f172a] dark:text-[#F8FAFC]">AI History</h2>
-                                <button onClick={() => setIsHistoryModalOpen(false)} className="text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] p-2 bg-gray-50 dark:bg-[#1E293B] rounded-full">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
-                                </button>
-                            </div>
-
-                            {isFetchingHistory ? (
-                                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                                    <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-500 rounded-full animate-spin"></div>
-                                    <p className="font-bold text-gray-500 dark:text-gray-400">Loading history...</p>
-                                </div>
-                            ) : historyList.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <p className="font-bold text-gray-400">No previous AI analysis found.</p>
-                                </div>
-                            ) : (
-                                <div className="space-y-4">
-                                    {historyList.map((h) => (
-                                        <button
-                                            key={h.id}
-                                            onClick={() => fetchSingleAiReport(h.id)}
-                                            className="w-full text-left bg-gray-50 dark:bg-[#1E293B] p-5 rounded-2xl border border-gray-100 dark:border-gray-800 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                                        >
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="text-sm font-black text-[#0f172a] dark:text-[#F8FAFC]">
-                                                    {new Date(h.generatedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                                </span>
-                                                <span className={`text-xs font-bold px-2 py-1 rounded-full ${h.riskLevel === 'Low' ? 'bg-green-100 text-green-700' : h.riskLevel === 'Medium' ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
-                                                    {h.riskLevel} Risk
-                                                </span>
-                                            </div>
-                                            <p className="text-sm font-bold text-blue-600 dark:text-blue-400 mb-2">{h.overallStatus}</p>
-                                            <p className="text-xs font-bold text-gray-500 dark:text-gray-400">Health Score: {h.healthScore}</p>
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </motion.div>
-                    </motion.div>
-                )}
+                <AiAnalysisModals
+                    isOpen={isAiAnalysisModalOpen}
+                    onClose={() => setIsAiAnalysisModalOpen(false)}
+                    students={students.filter(s => selectedStudents.includes(s.id))}
+                    userDetails={userDetails}
+                />
             </AnimatePresence>
 
             {/* <CounsellorBottomNavigation /> */}

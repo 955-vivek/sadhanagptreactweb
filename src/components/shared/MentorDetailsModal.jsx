@@ -102,7 +102,7 @@ const MentorDetailsModal = ({ isOpen, onClose, mentor }) => {
                 <div className="w-full space-y-3">
                   
                   {/* Name Row */}
-                  <div className="flex items-center gap-4 p-3.5 bg-gray-50/80 dark:bg-[#334155]/80 hover:bg-gray-50 dark:hover:bg-[#334155] rounded-2xl transition-colors border border-gray-100/50 dark:border-[#475569]/50">
+                  <div className="flex items-center gap-4 p-3.5 bg-gray-50/80 dark:bg-[#334155]/80 hover:bg-gray-50 dark:hover:bg-[#334155] rounded-2xl transition-colors border border-gray-400/70 dark:border-[#475569]/50">
                     <div className="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400 flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                     </div>
@@ -113,7 +113,7 @@ const MentorDetailsModal = ({ isOpen, onClose, mentor }) => {
                   </div>
 
                   {/* Email Row */}
-                  <div className="flex items-center gap-4 p-3.5 bg-gray-50/80 dark:bg-[#334155]/80 hover:bg-gray-50 dark:hover:bg-[#334155] rounded-2xl transition-colors border border-gray-100/50 dark:border-[#475569]/50">
+                  <div className="flex items-center gap-4 p-3.5 bg-gray-50/80 dark:bg-[#334155]/80 hover:bg-gray-50 dark:hover:bg-[#334155] rounded-2xl transition-colors border border-gray-400/70 dark:border-[#475569]/50">
                     <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     </div>
@@ -124,7 +124,7 @@ const MentorDetailsModal = ({ isOpen, onClose, mentor }) => {
                   </div>
 
                   {/* DOB Row */}
-                  <div className="flex items-center gap-4 p-3.5 bg-gray-50/80 dark:bg-[#334155]/80 hover:bg-gray-50 dark:hover:bg-[#334155] rounded-2xl transition-colors border border-gray-100/50 dark:border-[#475569]/50">
+                  <div className="flex items-center gap-4 p-3.5 bg-gray-50/80 dark:bg-[#334155]/80 hover:bg-gray-50 dark:hover:bg-[#334155] rounded-2xl transition-colors border border-gray-400/70 dark:border-[#475569]/50">
                     <div className="w-10 h-10 rounded-full bg-purple-50 dark:bg-purple-900/30 text-purple-500 dark:text-purple-400 flex items-center justify-center flex-shrink-0">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.701 2.701 0 00-1.5-.454M9 6v2m3-8v2m3 6v2M9 11h.01M12 11h.01M15 11h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>

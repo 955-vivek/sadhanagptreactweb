@@ -78,7 +78,7 @@ const CounsellorRewardsManagement = () => {
             <h2 className="text-[18px] font-bold text-[#0f172a] mb-4">Active Rewards</h2>
             <div className="space-y-4">
               {activeRewards.map(reward => (
-                <div key={reward.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-50 flex flex-col relative group">
+                <div key={reward.id} className="bg-white rounded-3xl p-5 shadow-sm border border-gray-400/70 flex flex-col relative group">
                   <div className="flex items-start gap-4">
                     <div className={`w-14 h-14 rounded-full ${reward.iconBg} flex items-center justify-center ${reward.iconColor} shrink-0`}>
                       {reward.id === 1 ? (
@@ -114,7 +114,7 @@ const CounsellorRewardsManagement = () => {
           {/* Add New Reward Form */}
           <section>
             <h2 className="text-[18px] font-bold text-[#0f172a] mb-4">Add New Reward</h2>
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-50 space-y-6">
+            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-400/70 space-y-6">
               
               {/* Reward Name */}
               <div>
@@ -125,7 +125,7 @@ const CounsellorRewardsManagement = () => {
                   value={formData.rewardName}
                   onChange={handleChange}
                   placeholder="e.g. Early Riser Badge" 
-                  className="w-full border border-gray-100 rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] outline-none transition-all"
+                  className="w-full border border-gray-300 rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] outline-none transition-all"
                 />
               </div>
 
@@ -137,7 +137,7 @@ const CounsellorRewardsManagement = () => {
                     name="activity"
                     value={formData.activity}
                     onChange={handleChange}
-                    className="w-full border border-gray-100 rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] appearance-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] outline-none transition-all bg-white"
+                    className="w-full border border-gray-300 rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] appearance-none focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] outline-none transition-all bg-white"
                   >
                     <option value="Chanting (Japa)">Chanting (Japa)</option>
                     <option value="Reading">Reading</option>
@@ -160,7 +160,7 @@ const CounsellorRewardsManagement = () => {
                       value={formData.count}
                       onChange={handleChange}
                       placeholder="Count" 
-                      className="w-full border border-gray-100 rounded-2xl px-5 pl-5 pr-14 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] outline-none transition-all"
+                      className="w-full border border-gray-300 rounded-2xl px-5 pl-5 pr-14 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] outline-none transition-all"
                     />
                     <span className="absolute right-4 top-[14px] text-[12px] text-gray-400 font-medium">Daily</span>
                   </div>
@@ -171,7 +171,7 @@ const CounsellorRewardsManagement = () => {
                       value={formData.days}
                       onChange={handleChange}
                       placeholder="Days" 
-                      className="w-full border border-gray-100 rounded-2xl px-5 pl-5 pr-20 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] outline-none transition-all"
+                      className="w-full border border-gray-300 rounded-2xl px-5 pl-5 pr-20 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] outline-none transition-all"
                     />
                     <span className="absolute right-4 top-[14px] text-[12px] text-gray-400 font-medium">Duration</span>
                   </div>
@@ -188,7 +188,7 @@ const CounsellorRewardsManagement = () => {
                   value={formData.threshold}
                   onChange={handleChange}
                   placeholder="e.g. Minimum 10 rounds daily" 
-                  className="w-full border border-gray-100 rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] outline-none transition-all"
+                  className="w-full border border-gray-300 rounded-2xl px-5 py-3.5 text-[15px] text-[#0f172a] placeholder:text-gray-300 focus:border-[#1a73e8] focus:ring-1 focus:ring-[#1a73e8] outline-none transition-all"
                 />
               </div>
 
@@ -196,7 +196,7 @@ const CounsellorRewardsManagement = () => {
               <div className="flex gap-4 pt-4">
                 <button 
                   onClick={() => navigate(-1)}
-                  className="w-1/2 py-4 rounded-full border border-gray-200 text-[#0f172a] font-bold text-[16px] hover:bg-gray-50 active:scale-95 transition-all text-center"
+                  className="w-1/2 py-4 rounded-full border border-gray-300 text-[#0f172a] font-bold text-[16px] hover:bg-gray-50 active:scale-95 transition-all text-center"
                 >
                   Cancel
                 </button>

@@ -74,7 +74,7 @@ const UnderConstruction = () => {
         >
           <button
             onClick={() => navigate(-1)}
-            className="flex-1 bg-white dark:bg-[#1E293B] border-2 border-gray-100 dark:border-[#334155] hover:border-gray-200 dark:hover:border-[#475569] hover:bg-gray-50 dark:hover:bg-[#334155] text-[#475569] dark:text-[#CBD5E1] font-bold py-3.5 px-4 rounded-xl transition-all active:scale-95 shadow-sm outline-none flex items-center justify-center gap-2"
+            className="flex-1 bg-white dark:bg-[#1E293B] border-2 border-gray-400/70 dark:border-[#334155] hover:border-gray-400/70 dark:hover:border-[#475569] hover:bg-gray-50 dark:hover:bg-[#334155] text-[#475569] dark:text-[#CBD5E1] font-bold py-3.5 px-4 rounded-xl transition-all active:scale-95 shadow-sm outline-none flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
             Go Back

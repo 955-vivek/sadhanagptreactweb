@@ -29,8 +29,3 @@ export const processResponse = (response) => {
   };
 };
 
-export const flattenMessage = (message) => {
-  if (!message) return "";
-  if (Array.isArray(message)) return message[0];
-  return String(message);
-};

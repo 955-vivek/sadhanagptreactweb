@@ -107,7 +107,7 @@ const MarkdownMessage = ({ text }) => {
             const num = line.match(/^(\d+)\./)[1];
             const content = line.replace(/^\d+\.\s+/, '');
             return (
-                <div key={idx} className="bg-white border border-gray-100 rounded-[20px] p-4 my-3 shadow-sm flex items-start gap-3">
+                <div key={idx} className="bg-white border border-gray-400/70 rounded-[20px] p-4 my-3 shadow-sm flex items-start gap-3">
                     <span className="w-6 h-6 rounded-lg bg-[#1a73e8] text-white text-[11px] font-black flex items-center justify-center shrink-0">
                         {num}
                     </span>
@@ -269,7 +269,7 @@ const AIChat = () => {
             <div className="w-full max-w-md mx-auto relative min-h-screen flex flex-col">
 
                 {/* Header */}
-                <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-6 py-5 max-w-md mx-auto shadow-sm">
+                <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-xl border-b border-gray-300 flex items-center justify-between px-6 py-5 max-w-md mx-auto shadow-sm">
                     <div className="flex items-center gap-4">
                         <button onClick={() => navigate(-1)} className="w-10 h-10 rounded-full flex items-center justify-center text-[#0f172a] hover:bg-gray-50 active:scale-90 transition-all border border-gray-100">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
@@ -306,7 +306,7 @@ const AIChat = () => {
                                 <div className={`max-w-[85%] rounded-[24px] shadow-sm ${
                                     msg.role === 'user'
                                         ? 'bg-[#1a73e8] rounded-tr-none px-5 py-4'
-                                        : 'bg-white border border-gray-100 rounded-tl-none px-5 py-4'
+                                        : 'bg-white border border-gray-300 rounded-tl-none px-5 py-4'
                                 }`}>
                                     {msg.role === 'user' ? (
                                         <p className="text-[15px] leading-relaxed font-semibold text-white">{msg.text}</p>
@@ -330,9 +330,9 @@ const AIChat = () => {
                              exit={{ opacity: 0, scale: 0.9 }}
                              className="flex items-center gap-3">
     <div className="w-9 h-9 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0">
-     <div className="w-4 h-4 border-2 border-gray-200 border-t-blue-500 rounded-full animate-spin"></div>
+     <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
      </div>
-     <div className="bg-white border border-gray-100 px-5 py-4 rounded-[24px] rounded-tl-none">
+     <div className="bg-white border border-gray-400/70 px-5 py-4 rounded-[24px] rounded-tl-none">
      <div className="flex gap-1.5">
       <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"></div>
     <div className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce delay-100"></div>
@@ -352,7 +352,7 @@ const AIChat = () => {
                             <button
                                 key={chip}
                                 onClick={() => handleSendMessage(null, chip)}
-                                className="px-4 py-2 bg-white border border-gray-100 rounded-full text-[12px] font-black text-gray-500 whitespace-nowrap shadow-sm hover:border-blue-200 hover:text-[#1a73e8] transition-all"
+                                className="px-4 py-2 bg-white border border-gray-300 rounded-full text-[12px] font-black text-gray-500 whitespace-nowrap shadow-sm hover:border-blue-200 hover:text-[#1a73e8] transition-all"
                             >
                                 {chip}
                             </button>
@@ -361,7 +361,7 @@ const AIChat = () => {
                 )}
 
                 {/* Input Bar */}
-                <div className="bg-white/80 backdrop-blur-md border-t border-gray-100 px-4 py-4 pb-28">
+                <div className="bg-white/80 backdrop-blur-md border-t border-gray-300 px-4 py-4 pb-28">
                     <form onSubmit={handleSendMessage} className="relative max-w-md mx-auto">
                         <input
                             type="text"
