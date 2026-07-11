@@ -5,6 +5,7 @@ import NotificationsPanel from '../../components/shared/NotificationsPanel';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 import BottomNavigation from '../../components/student/BottomNavigation';
 import { getRequest } from '../../services/api';
+import AIAnalysisModal from '../../components/AiAnalysis/AiAnalysisModals';
 
 // Helper to convert time string (05:00 AM) to numeric minutes for graphing
 const timeToMinutes = (timeStr) => {
@@ -291,6 +292,7 @@ const Analytics = () => {
   const { userDetails } = useOutletContext();
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState('7 Days');
+  const [isAiAnalysisModalOpen, setIsAiAnalysisModalOpen] = useState(false);
 
   const todayDate = new Date().toISOString().split('T')[0];
   const lastWeekDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -305,7 +307,6 @@ const Analytics = () => {
   const fetchAnalytics = () => {
     if (!userDetails?.user_id) return;
     setIsLoading(true);
-
     const filterMap = {
       '7 Days': '7days',
       '30 Days': '30days',
@@ -426,7 +427,7 @@ const Analytics = () => {
           <div className="flex flex-col items-center">
             <h1 className="text-[20px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight">Analytics</h1>
             <button
-              onClick={() => navigate('/student/ai-chat')}
+              onClick={() => setIsAiAnalysisModalOpen(true)}
               className="mt-1 flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full text-[10px] font-black text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
             >
               <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
@@ -452,11 +453,10 @@ const Analytics = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 py-3 rounded-[20px] text-[15px] font-bold transition-all ${
-                  activeTab === tab 
-                    ? 'bg-[#1a73e8] text-white shadow-md shadow-blue-500/20' 
+                className={`flex-1 py-3 rounded-[20px] text-[15px] font-bold transition-all ${activeTab === tab
+                    ? 'bg-[#1a73e8] text-white shadow-md shadow-blue-500/20'
                     : 'text-gray-400 dark:text-[#94A3B8] hover:text-gray-600 dark:hover:text-[#CBD5E1]'
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -527,8 +527,8 @@ const Analytics = () => {
                 {/* Badge */}
                 <div className="absolute top-8 right-8">
                   <span className={`px-4 py-1.5 rounded-full text-[12px] font-extrabold flex items-center gap-1.5 ${activity.trend === 'Stable'
-                      ? 'bg-[#f0f7ff] text-[#1a73e8]'
-                      : 'bg-[#f0fdf4] text-[#16a34a]'
+                    ? 'bg-[#f0f7ff] text-[#1a73e8]'
+                    : 'bg-[#f0fdf4] text-[#16a34a]'
                     }`}>
                     {activity.trend !== 'Stable' && (
                       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" /></svg>
@@ -568,6 +568,11 @@ const Analytics = () => {
       {/* Overlays */}
       <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
 
+      <AIAnalysisModal
+        isOpen={isAiAnalysisModalOpen}
+        onClose={() => setIsAiAnalysisModalOpen(false)}
+        userDetails={userDetails}
+      />
       <BottomNavigation />
     </div>
   );

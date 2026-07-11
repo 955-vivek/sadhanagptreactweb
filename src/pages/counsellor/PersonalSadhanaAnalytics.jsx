@@ -5,6 +5,7 @@ import NotificationsPanel from '../../components/shared/NotificationsPanel';
 import CounsellorBottomNavigation from '../../components/counsellor/CounsellorBottomNavigation';
 import { getRequest } from '../../services/api';
 import ThemeToggle from '../../components/shared/ThemeToggle';
+import AIAnalysisModal from '../../components/AiAnalysis/AiAnalysisModals';
 
 // Helper to convert time string (05:00 AM) to numeric minutes for graphing
 const timeToMinutes = (timeStr) => {
@@ -291,6 +292,7 @@ const PersonalSadhanaAnalytics = () => {
   const { userDetails } = useOutletContext();
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState('7 Days');
+  const [isAiAnalysisModalOpen, setIsAiAnalysisModalOpen] = useState(false);
   
   const todayDate = new Date().toISOString().split('T')[0];
   const lastWeekDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -415,6 +417,15 @@ const PersonalSadhanaAnalytics = () => {
           
           <div className="flex flex-col items-center">
             <h1 className="text-[20px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight mt-1 transition-colors duration-300">My Sadhana</h1>
+
+            <button
+            onClick={() => setIsAiAnalysisModalOpen(true)} 
+              className="mt-1 flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full text-[10px] font-black text-white shadow-lg shadow-blue-500/20 active:scale-95 transition-all"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></div>
+              <span>AI ANALYSIS</span>
+            </button>
+          
           </div>
           
           <div className="flex items-center gap-3">
@@ -552,6 +563,12 @@ const PersonalSadhanaAnalytics = () => {
 
       {/* Overlays */}
       <NotificationsPanel isOpen={showNotifications} onClose={() => setShowNotifications(false)} />
+      
+      <AIAnalysisModal
+        isOpen={isAiAnalysisModalOpen}
+        onClose={() => setIsAiAnalysisModalOpen(false)}
+        userDetails={userDetails}
+      />
       
       <CounsellorBottomNavigation />
     </div>

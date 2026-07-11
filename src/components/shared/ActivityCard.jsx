@@ -129,7 +129,7 @@ const ActivityCard = ({ activity, onProgressUpdate, onEdit, selectedDate }) => {
         activity_id: activity.id,
         count: finalVal,
         activity_date: formattedDate,
-
+        unit: unitToSender,
         user_id: userDetails.user_id
       };
 
@@ -219,7 +219,16 @@ const ActivityCard = ({ activity, onProgressUpdate, onEdit, selectedDate }) => {
     const x = Math.max(0, Math.min(clientX - rect.left, rect.width));
     const percentage = x / rect.width;
 
-    let newVal = Math.round(percentage * maxVal);
+    let newVal;
+    const isHours = activity.unit && (activity.unit.toLowerCase() === 'hours' || activity.unit.toLowerCase() === 'hrs' || activity.unit.toLowerCase() === 'hour');
+    if ((activity.type === 'DURATION' || activity.type === 'duration') && isHours) {
+      // Round to nearest 0.5 for duration activities with hours unit
+      newVal = Math.round((percentage * maxVal) * 2) / 2;
+    } else {
+      // Round to nearest integer for counts (like Chanting rounds)
+      newVal = Math.round(percentage * maxVal);
+    }
+
     currentValRef.current = newVal; // Sync immediately to prevent pointerUp race condition
     setCurrentVal(newVal);
 

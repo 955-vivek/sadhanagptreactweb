@@ -10,6 +10,35 @@ import { postRequest, getRequest } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 
+const MedalIcon = ({ rank }) => {
+  const isGold = rank === 1;
+  const isSilver = rank === 2;
+  
+  const colors = isGold 
+    ? { grad1: '#FDE68A', grad2: '#F59E0B', stroke: '#D97706', text: '#78350F' }
+    : isSilver
+    ? { grad1: '#F1F5F9', grad2: '#94A3B8', stroke: '#64748B', text: '#1E293B' }
+    : { grad1: '#FDBA74', grad2: '#C2410C', stroke: '#9A3412', text: '#7C2D12' };
+
+  return (
+    <svg viewBox="0 0 24 24" className="w-full h-full drop-shadow">
+      <defs>
+        <linearGradient id={`medal-${rank}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor={colors.grad1} />
+          <stop offset="100%" stopColor={colors.grad2} />
+        </linearGradient>
+      </defs>
+      <polygon points="4,2 10,2 13,12 7,12" fill="#2563EB" />
+      <polygon points="20,2 14,2 11,12 17,12" fill="#3B82F6" />
+      <circle cx="12" cy="15" r="8" fill={`url(#medal-${rank})`} stroke={colors.stroke} strokeWidth="1" />
+      <circle cx="12" cy="15" r="6" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="0.5" />
+      <text x="12" y="18.5" textAnchor="middle" fill={colors.text} fontSize="10" fontWeight="900" fontFamily="sans-serif">
+        {rank}
+      </text>
+    </svg>
+  );
+};
+
 const CounsellorAnalytics = () => {
   const navigate = useNavigate();
   const { userDetails } = useOutletContext();
@@ -17,6 +46,7 @@ const CounsellorAnalytics = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [isLabelsModalOpen, setIsLabelsModalOpen] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [groups, setGroups] = useState([]);
   const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
@@ -24,6 +54,25 @@ const CounsellorAnalytics = () => {
   const [irregularCount, setIrregularCount] = useState(0);
   const carouselRef = useRef(null);
   const [totalMenteesCount, setTotalMenteesCount] = useState(0);
+  const [studentRanks, setStudentRanks] = useState([]);
+  const [followUpStudents, setFollowUpStudents] = useState([]);
+  const [viewAllModal, setViewAllModal] = useState({ isOpen: false, type: '', data: [], title: '' });
+  const [modalGroupFilter, setModalGroupFilter] = useState('all');
+
+  const handleModalGroupFilterChange = (newVal, modalType) => {
+    setModalGroupFilter(newVal);
+    const type = modalType || viewAllModal.type;
+    if (!type) return;
+
+    const endpoint = type === 'rank' ? '/student-rank' : '/student-followup';
+    const payload = newVal === 'all' ? { user_id: userDetails.user_id } : { center_id: newVal };
+    getRequest(endpoint, payload, (response) => {
+        if (response.data?.status === 1 || response.data?.code === 200) {
+            const dataKey = type === 'rank' ? 'ranks' : 'students';
+            setViewAllModal(prev => ({ ...prev, data: response.data.data?.[dataKey] || [] }));
+        }
+    });
+  };
 
   const [toastState, setToastState] = useState({ show: false, message: '', type: 'success' });
   const showToast = (message, type = 'success') => {
@@ -128,6 +177,20 @@ const CounsellorAnalytics = () => {
           setIrregularCount(total);
         }
       });
+
+      // Fetch student ranks for last week
+      getRequest('/student-rank', { user_id: userDetails.user_id }, (response) => {
+        if (response.data?.status === 1 || response.data?.code === 200) {
+          setStudentRanks(response.data.data?.ranks || []);
+        }
+      });
+
+      // Fetch students needing follow-up for last week
+      getRequest('/student-followup', { user_id: userDetails.user_id }, (response) => {
+        if (response.data?.status === 1 || response.data?.code === 200) {
+          setFollowUpStudents(response.data.data?.students || []);
+        }
+      });
     }
   }, [userDetails?.user_id]);
 
@@ -195,15 +258,37 @@ const CounsellorAnalytics = () => {
                 </div>
                 <h3 className="font-bold text-[14px] text-gray-800 dark:text-gray-100 leading-tight">Students Rank</h3>
               </div>
-              <ul className="space-y-3 mb-4 flex-1">
-                {[1, 2, 3, 4, 5].map(num => (
-                  <li key={num} className="flex items-center gap-4 text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <span className="w-4 text-center">{num}</span>
-                    <span className="text-gray-400 dark:text-gray-500">—</span>
+              <ul className="space-y-3 mb-4 flex-1 overflow-hidden">
+                {[0, 1, 2].map(index => {
+                  const rankData = studentRanks[index];
+                  return (
+                  <li key={index} className="flex items-center justify-between gap-4 text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <div className="flex items-center gap-4 truncate">
+                      <div className="w-6 flex justify-center items-center shrink-0">
+                        {rankData ? (
+                          rankData.rank <= 3 ? (
+                            <div className="w-[20px] h-[25px] flex items-center justify-center">
+                              <MedalIcon rank={rankData.rank} />
+                            </div>
+                          ) : (
+                            <span className="w-4 text-[13px] text-center font-bold text-gray-500 dark:text-gray-400">{rankData.rank}</span>
+                          )
+                        ) : (
+                          <span className="w-4 text-[13px] text-center font-bold text-gray-400">{index + 1}</span>
+                        )}
+                      </div>
+                      <span className={`truncate ${!rankData ? 'text-gray-400 dark:text-gray-500' : 'capitalize'}`}>
+                        {rankData ? rankData.student_name : '—'}
+                      </span>
+                    </div>
+                    {rankData && <span className="text-[11px] text-gray-500 dark:text-gray-400 font-bold whitespace-nowrap">{rankData.percentage}%</span>}
                   </li>
-                ))}
+                )})}
               </ul>
-              <button className="w-full py-2 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-800/40 text-blue-700 dark:text-blue-300 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors">
+              <button onClick={() => {
+                setModalGroupFilter('all');
+                setViewAllModal({ isOpen: true, type: 'rank', data: studentRanks, title: 'Students Rank' });
+              }} className="w-full py-2 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-800/40 text-blue-700 dark:text-blue-300 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors">
                 View All <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -216,15 +301,25 @@ const CounsellorAnalytics = () => {
                 </div>
                 <h3 className="font-bold text-[14px] text-red-800 dark:text-red-300 leading-tight">Students Need Follow-up</h3>
               </div>
-              <ul className="space-y-3 mb-4 flex-1">
-                {[1, 2, 3, '.'].map(num => (
-                  <li key={num} className="flex items-center gap-4 text-sm font-medium text-red-700 dark:text-red-500">
-                    <span className="w-4 text-center">{num}</span>
-                    <span className="text-red-400 dark:text-red-400">—</span>
+              <ul className="space-y-3 mb-4 flex-1 overflow-hidden">
+                {[0, 1, 2].map(index => {
+                  const followUpData = followUpStudents[index];
+                  return (
+                  <li key={index} className="flex items-center justify-between gap-4 text-sm font-medium text-red-700 dark:text-red-500">
+                    <div className="flex items-center gap-4 truncate">
+                      <span className="w-4 text-center shrink-0">{followUpData ? followUpData.rank : index + 1}</span>
+                      <span className={`truncate ${!followUpData ? 'text-red-400 dark:text-red-400' : 'capitalize'}`}>
+                        {followUpData ? followUpData.student_name : '—'}
+                      </span>
+                    </div>
+                    {followUpData && <span className="text-[11px] text-red-500/80 dark:text-red-400/80 font-bold whitespace-nowrap">{followUpData.percentage}%</span>}
                   </li>
-                ))}
+                )})}
               </ul>
-              <button className="w-full py-2 bg-red-100 dark:bg-red-600/50 hover:bg-red-200 dark:hover:bg-red-500 text-red-700 dark:text-red-200 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors mt-auto">
+              <button onClick={() => {
+                setModalGroupFilter('all');
+                setViewAllModal({ isOpen: true, type: 'followup', data: followUpStudents, title: 'Students Need Follow-up' });
+              }} className="w-full py-2 bg-red-100 dark:bg-red-600/50 hover:bg-red-200 dark:hover:bg-red-500 text-red-700 dark:text-red-200 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors mt-auto">
                 View All <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -282,15 +377,7 @@ const CounsellorAnalytics = () => {
 
             <div className="grid grid-cols-5 gap-2">
               <div
-                onClick={() => {
-                  const encoded = btoa(userDetails.user_id);
-                  const link = `https://sadhanagpt.com?ref=${encoded}`;
-                  navigator.clipboard.writeText(link).then(() => {
-                    toast.success("Referral link copied!");
-                  }).catch(() => {
-                    toast.error("Failed to copy link");
-                  });
-                }}
+                onClick={() => setIsInviteModalOpen(true)}
                 className="bg-blue-50/80 dark:bg-blue-900/20 border border-blue-300 dark:border-blue-800/50 rounded-xl p-2 flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
               >
                 <svg className="w-6 h-6 text-blue-500 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
@@ -476,6 +563,179 @@ const CounsellorAnalytics = () => {
               </div>
 
               <div className="h-4"></div>
+            </motion.div>
+          </>
+        )}
+
+        {isInviteModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsInviteModalOpen(false)}
+              className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
+              animate={{ opacity: 1, scale: 1, y: '-50%', x: '-50%' }}
+              exit={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed top-1/2 left-1/2 w-[90%] max-w-sm bg-gradient-to-br from-[#12a37f] to-[#0c7c60] rounded-[24px] z-[70] p-6 shadow-2xl"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setIsInviteModalOpen(false)}
+                className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white shrink-0">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                </div>
+                <div className="mt-1">
+                  <h2 className="text-[19px] font-extrabold text-white leading-tight tracking-wide">Invite Students</h2>
+                  <p className="text-white/80 text-[13.5px] mt-0.5 font-medium">Share your referral link</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    const encoded = btoa(userDetails.user_id);
+                    const link = `https://sadhanagpt.com?ref=${encoded}`;
+                    navigator.clipboard.writeText(link).then(() => {
+                      toast.success("Referral link copied!");
+                      setIsInviteModalOpen(false);
+                    }).catch(() => {
+                      toast.error("Failed to copy link");
+                    });
+                  }}
+                  className="flex-1 bg-white/20 hover:bg-white/30 text-white py-3.5 rounded-xl font-bold text-[14.5px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                  Copy Link
+                </button>
+
+                <button
+                  onClick={async () => {
+                    const encoded = btoa(userDetails.user_id);
+                    const link = `https://sadhanagpt.com?ref=${encoded}`;
+                    const shareText = `Join me on SadhanaGPT! ${link}`;
+                    
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({
+                          title: 'Join SadhanaGPT',
+                          text: 'Join me on SadhanaGPT!',
+                          url: link,
+                        });
+                      } catch (err) {
+                        // Fallback if user cancels or native share fails
+                        if (err.name !== 'AbortError') {
+                          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+                        }
+                      }
+                    } else {
+                      // Fallback for devices without native share support
+                      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
+                    }
+                  }}
+                  className="flex-1 bg-white text-[#0c7c60] hover:bg-gray-50 py-3.5 rounded-xl font-bold text-[14.5px] flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-lg shadow-black/10"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                  Share
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+
+        {/* View All Modal */}
+        {viewAllModal.isOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setViewAllModal({ ...viewAllModal, isOpen: false })}
+              className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
+              animate={{ opacity: 1, scale: 1, y: '-50%', x: '-50%' }}
+              exit={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className={`fixed top-1/2 left-1/2 w-[90%] max-w-sm rounded-[24px] z-[70] p-6 shadow-2xl flex flex-col max-h-[80vh] ${
+                viewAllModal.type === 'rank' ? 'bg-gradient-to-br from-white to-blue-50 dark:from-slate-800 dark:to-slate-900 border border-blue-100 dark:border-blue-900/50' : 'bg-gradient-to-br from-white to-red-50 dark:from-slate-800 dark:to-slate-900 border border-red-100 dark:border-red-900/50'
+              }`}
+            >
+              <button
+                onClick={() => setViewAllModal({ ...viewAllModal, isOpen: false })}
+                className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+
+              <div className="flex items-center justify-between gap-3 mb-5 pr-4">
+                <div className="flex items-center gap-2">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    viewAllModal.type === 'rank' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                  }`}>
+                    {viewAllModal.type === 'rank' ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10M17 4v8a5 5 0 0 1 -10 0v-8M5 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M19 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /></svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24"><path d="M12 9v2m0 4v.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                    )}
+                  </div>
+                  <h2 className={`text-[16px] font-extrabold leading-tight ${viewAllModal.type === 'rank' ? 'text-blue-900 dark:text-blue-100' : 'text-red-900 dark:text-red-100'}`}>{viewAllModal.title}</h2>
+                </div>
+                
+                <select 
+                  className={`text-[11px] font-bold rounded-lg border px-2 py-1.5 focus:outline-none max-w-[100px] truncate ${viewAllModal.type === 'rank' ? 'bg-blue-50/50 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-200' : 'bg-red-50/50 text-red-800 border-red-200 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200'}`}
+                  value={modalGroupFilter}
+                  onChange={(e) => handleModalGroupFilterChange(e.target.value)}
+                >
+                  <option className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100" value="all">All Groups</option>
+                  {groups.map(g => <option className="bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100" key={g.id} value={g.id}>{g.name}</option>)}
+                </select>
+              </div>
+
+              <div className="overflow-y-auto flex-1 pr-1 custom-scrollbar space-y-2">
+                {viewAllModal.data.length === 0 ? (
+                   <div className="text-center py-6 text-sm text-gray-500">No students found</div>
+                ) : (
+                  viewAllModal.data.map((student, idx) => (
+                    <div key={idx} className={`flex items-center justify-between p-3 rounded-xl border ${
+                      viewAllModal.type === 'rank' ? 'border-blue-100/50 dark:border-blue-900/30 bg-white dark:bg-slate-800' : 'border-red-100/50 dark:border-red-900/30 bg-white dark:bg-slate-800'
+                    }`}>
+                      <div className="flex items-center gap-3 truncate">
+                        <div className="w-7 flex justify-center shrink-0">
+                          {viewAllModal.type === 'rank' ? (
+                            student.rank <= 3 ? (
+                              <div className="w-[22px] h-[30px] flex items-center justify-center">
+                                <MedalIcon rank={student.rank} />
+                              </div>
+                            ) : (
+                              <span className="font-bold text-[14px] text-gray-500 dark:text-gray-400">{student.rank}</span>
+                            )
+                          ) : (
+                            <span className="font-bold text-[14px] text-red-500 dark:text-red-400">{student.rank}</span>
+                          )}
+                        </div>
+                        <span className="font-semibold text-gray-700 dark:text-gray-200 text-[14px] capitalize truncate">
+                          {student.student_name}
+                        </span>
+                      </div>
+                      <span className={`text-[12px] font-extrabold whitespace-nowrap pl-2 ${viewAllModal.type === 'rank' ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                        {student.percentage}%
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
             </motion.div>
           </>
         )}

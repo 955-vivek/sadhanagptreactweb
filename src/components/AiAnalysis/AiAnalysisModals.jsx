@@ -3,6 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getRequest, postRequest } from '../../services/api';
 
 const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
+  const targetStudents = students.length > 0 ? students : (userDetails ? [{
+    id: userDetails?.user_id,
+    name: userDetails?.name || 'My',
+    avatar: userDetails?.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(userDetails?.name || 'Me')}&background=random`
+  }] : []);
+
   const getInitialDates = (range) => {
     const today = new Date();
     
@@ -56,9 +62,9 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
     setIsPreviewModalOpen(true);
     onClose(); // Close the Setup modal
 
-    postRequest('/api/ai/student-analysis', {
+    postRequest('/ai/student-analysis', {
       user_id: userDetails?.user_id,
-      student_ids: students.map(s => s.id),
+      student_ids: targetStudents.map(s => s.id),
       rangeType: aiRangeType,
       dateFrom: aiDateFrom,
       dateTo: aiDateTo
@@ -73,12 +79,12 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
   };
 
   const fetchAiHistory = () => {
-    if (students.length !== 1) return;
+    if (targetStudents.length !== 1) return;
     setIsHistoryModalOpen(true);
     setIsFetchingHistory(true);
     onClose(); // Close Setup modal
 
-    getRequest(`/api/ai/student-analysis/history/${students[0].id}`, { user_id: userDetails?.user_id }, (response) => {
+    getRequest(`/ai/student-analysis/history/${targetStudents[0].id}`, { user_id: userDetails?.user_id }, (response) => {
       setIsFetchingHistory(false);
       if (response?.data?.status === 1) {
         setHistoryList(response.data.data || []);
@@ -95,7 +101,7 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
     setPreviewData(null);
     setIsPreviewModalOpen(true);
     
-    getRequest(`/api/ai/student-analysis/report/${reportId}`, { user_id: userDetails?.user_id }, (response) => {
+    getRequest(`/ai/student-analysis/report/${reportId}`, { user_id: userDetails?.user_id }, (response) => {
       setIsGeneratingAI(false);
       if (response?.data?.status === 1) {
         setPreviewData(response.data.data);
@@ -122,10 +128,10 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md flex items-end justify-center">
             <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
               <h2 className="text-2xl font-black mb-2 text-[#0f172a] dark:text-[#F8FAFC]">AI Analysis Setup</h2>
-              <p className="text-gray-400 dark:text-[#94A3B8] font-bold mb-6">Analyzing {students.length} students</p>
+              <p className="text-gray-400 dark:text-[#94A3B8] font-bold mb-6">Analyzing {targetStudents.length} students</p>
 
               <div className="flex gap-2 overflow-x-auto pb-4 mb-6 hide-scrollbar">
-                {students.map(s => (
+                {targetStudents.map(s => (
                   <div key={s.id} className="flex flex-col items-center min-w-[60px]">
                     <img src={s.avatar} className="w-10 h-10 rounded-full border border-gray-300 dark:border-[#334155]" />
                     <span className="text-[10px] font-bold mt-1 text-gray-400 dark:text-[#94A3B8] truncate w-full text-center">{s.name?.split(' ')[0]}</span>
@@ -156,7 +162,7 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
                 <div><label className="text-[10px] font-black uppercase text-gray-400 dark:text-[#64748b] mb-2 block tracking-widest">Date To</label><input type="date" value={aiDateTo} disabled={aiRangeType !== 'CUSTOM'} onChange={e => setAiDateTo(e.target.value)} className={`w-full p-4 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold border-none outline-none [color-scheme:light] dark:[color-scheme:dark] transition-opacity ${aiRangeType !== 'CUSTOM' ? 'opacity-50 cursor-not-allowed' : ''}`} /></div>
                 <div className="space-y-3">
                   <button onClick={handleAiAnalysis} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black shadow-xl">Generate AI Insights</button>
-                  {students.length === 1 && (
+                  {targetStudents.length === 1 && (
                     <button onClick={fetchAiHistory} className="w-full bg-gray-100 dark:bg-[#1E293B] text-gray-500 dark:text-[#94A3B8] py-4 rounded-2xl font-black shadow-sm hover:bg-gray-200 dark:hover:bg-[#334155] transition-colors">View AI History</button>
                   )}
                 </div>
