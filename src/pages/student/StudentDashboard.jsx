@@ -55,6 +55,7 @@ const StudentDashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isPushEnabled, setIsPushEnabled] = useState(true); // Default true to avoid flash
+  const [dateColors, setDateColors] = useState({});
 
   useEffect(() => {
     const checkSubscription = async () => {
@@ -62,7 +63,7 @@ const StudentDashboard = () => {
         setIsPushEnabled(true); // hide if not supported
         return;
       }
-      
+
       try {
         const registration = await navigator.serviceWorker.getRegistration();
         const browserSubscription = registration ? await registration.pushManager.getSubscription() : null;
@@ -70,7 +71,7 @@ const StudentDashboard = () => {
         if (userDetails?.user_id) {
           getRequest('/check-push-status', { user_id: userDetails.user_id }, async (response) => {
             const backendHasSub = response.data?.isSubscribed;
-            
+
             if (browserSubscription && !backendHasSub) {
               // DB deleted it, force unsubscribe on browser
               await browserSubscription.unsubscribe();
@@ -134,6 +135,13 @@ const StudentDashboard = () => {
           return;
         }
         const res = response.data;
+        if (res?.data) {
+          const colorForDate = res.data.color || '#EF4444';
+          setDateColors(prev => ({
+            ...prev,
+            [formattedDate]: colorForDate
+          }));
+        }
         if (res?.data?.daily_reports && Array.isArray(res.data.daily_reports)) {
           const reports = res.data.daily_reports;
           setActivities(prev => (prev || []).map(act => {
@@ -283,6 +291,36 @@ const StudentDashboard = () => {
     setDates(generatedDates);
   }, []);
 
+  // Fetch status colors for the generated 30 days range in a single request
+  useEffect(() => {
+    if (userDetails?.user_id && dates.length > 0) {
+      const formatDateString = (dateObj) => {
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+
+      const startDateStr = formatDateString(dates[0].fullDate);
+      const endDateStr = formatDateString(dates[dates.length - 1].fullDate);
+
+      const payload = {
+        user_id: userDetails.user_id,
+        start_date: startDateStr,
+        end_date: endDateStr
+      };
+
+      postRequest('/report-colors-range', payload, (response) => {
+        if (response.data?.status === 1 && response.data?.data?.colors) {
+          setDateColors(prev => ({
+            ...prev,
+            ...response.data.data.colors
+          }));
+        }
+      });
+    }
+  }, [userDetails?.user_id, dates.length]);
+
   // Auto-scroll to the right so "Today" is visible on mount
   useEffect(() => {
     if (dates.length > 0 && !hasScrolledRef.current && dateContainerRef.current) {
@@ -293,6 +331,8 @@ const StudentDashboard = () => {
 
   const handleProgressUpdate = (id, newProps) => {
     setActivities(prev => prev.map(act => act.id === id ? { ...act, ...newProps } : act));
+    const activeDateObj = dates?.find(d => d.active)?.fullDate || new Date();
+    fetchDailyReport(activeDateObj);
   };
 
   const handleDateSelect = (id) => {
@@ -429,10 +469,10 @@ const StudentDashboard = () => {
         subscription: subscription
       }, (response) => {
         const { message, type } = processResponse(response.data);
-         if (type === 'success' || response.data?.status === 1) {
-             toast.success('Push notifications enabled!');
-             setIsPushEnabled(true);
-         } else {
+        if (type === 'success' || response.data?.status === 1) {
+          toast.success('Push notifications enabled!');
+          setIsPushEnabled(true);
+        } else {
           toast.error(message || 'Failed to save subscription.');
         }
       });
@@ -468,19 +508,70 @@ const StudentDashboard = () => {
 
         {/* Date Selector */}
         <div ref={dateContainerRef} className="flex gap-4 px-6 overflow-x-auto pb-4 hide-scrollbar scroll-smooth">
-          {dates.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleDateSelect(item.id)}
-              className={`flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all shadow-sm select-none ${item.active
-                ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md'
-                : 'bg-white text-[#0f172a] hover:bg-gray-50'
-                }`}
-            >
-              <span className={`text-[24px] font-extrabold leading-none mb-1 ${item.active ? 'text-white' : 'text-[#0f172a]'}`}>{item.date}</span>
-              <span className={`text-[12px] font-bold uppercase tracking-wider ${item.active ? 'text-white/90' : 'text-[#94a3b8]'}`}>{item.month}</span>
-            </button>
-          ))}
+          {dates.map((item) => {
+            const yyyy = item.fullDate.getFullYear();
+            const mm = String(item.fullDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(item.fullDate.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+            const color = dateColors[dateStr];
+
+            let fillClass = '';
+            let bgClass = 'bg-white';
+            let borderClass = 'border border-slate-200/80';
+            let textColor = 'text-[#1e293b]';
+            let monthColor = 'text-[#94a3b8]';
+
+            if (color === '#10B981') {
+              fillClass = 'bg-[#d1fae5] h-full';
+              bgClass = 'bg-[#f4fdf8]';
+              borderClass = 'border border-[#a7f3d0]';
+              textColor = 'text-[#065f46]';
+              monthColor = 'text-[#047857]';
+            } else if (color === '#F59E0B') {
+              fillClass = 'bg-[#fef3c7] h-1/2';
+              bgClass = 'bg-[#fffdf5]';
+              borderClass = 'border border-[#fde68a]';
+              textColor = 'text-[#1e293b]';
+              monthColor = 'text-[#b45309]';
+            } else if (color === '#EF4444') {
+              fillClass = 'h-0';
+              bgClass = 'bg-white';
+              borderClass = 'border border-dashed border-rose-300';
+              textColor = 'text-[#475569]';
+              monthColor = 'text-[#f43f5e]';
+            } else {
+              fillClass = 'h-0';
+              bgClass = 'bg-white';
+              borderClass = 'border border-slate-200/80';
+              textColor = 'text-[#0f172a]';
+              monthColor = 'text-[#94a3b8]';
+            }
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleDateSelect(item.id)}
+                className={`relative flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all shadow-sm select-none overflow-hidden ${item.active
+                    ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md border border-[#1a73e8]'
+                    : `${bgClass} ${borderClass}`
+                  }`}
+              >
+                {!item.active && (
+                  <div 
+                    className={`absolute bottom-0 left-0 w-full transition-all duration-500 ease-out z-0 ${fillClass}`} 
+                  />
+                )}
+                <span className={`z-10 text-[24px] font-extrabold leading-none mb-1 ${item.active
+                    ? 'text-white'
+                    : textColor
+                  }`}>{item.date}</span>
+                <span className={`z-10 text-[12px] font-bold uppercase tracking-wider ${item.active
+                    ? 'text-white/90'
+                    : monthColor
+                  }`}>{item.month}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Push Notification Enable Banner */}
@@ -496,7 +587,7 @@ const StudentDashboard = () => {
                   <p className="text-gray-500 text-[11px]">Get weekly push notifications</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handleEnablePushNotifications}
                 className="px-4 py-2 bg-[#1a73e8] text-white text-xs font-bold rounded-full hover:bg-[#155fc3] transition-colors shadow-md shadow-[#1a73e8]/20"
               >
