@@ -58,6 +58,8 @@ const CounsellorDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [isPushEnabled, setIsPushEnabled] = useState(true); // Default true to avoid flash
+  const [dateColors, setDateColors] = useState({});
 
   const [dailyScore, setDailyScore] = useState(null);
   const [isScoreLoading, setIsScoreLoading] = useState(true);
@@ -116,6 +118,13 @@ const CounsellorDashboard = () => {
 
       postRequest('/report-as-per-date', payload, (response) => {
         const res = response.data;
+        if (res?.data) {
+          const colorForDate = res.data.color || '#EF4444';
+          setDateColors(prev => ({
+            ...prev,
+            [formattedDate]: colorForDate
+          }));
+        }
         if (res?.data?.daily_reports && Array.isArray(res.data.daily_reports)) {
           const reports = res.data.daily_reports;
           setActivities(prev => prev.map(act => {
@@ -254,6 +263,36 @@ const CounsellorDashboard = () => {
     setDates(generatedDates);
   }, []);
 
+  // Fetch status colors for the generated 30 days range in a single request
+  useEffect(() => {
+    if (userDetails?.user_id && dates.length > 0) {
+      const formatDateString = (dateObj) => {
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+
+      const startDateStr = formatDateString(dates[0].fullDate);
+      const endDateStr = formatDateString(dates[dates.length - 1].fullDate);
+
+      const payload = {
+        user_id: userDetails.user_id,
+        start_date: startDateStr,
+        end_date: endDateStr
+      };
+
+      postRequest('/report-colors-range', payload, (response) => {
+        if (response.data?.status === 1 && response.data?.data?.colors) {
+          setDateColors(prev => ({
+            ...prev,
+            ...response.data.data.colors
+          }));
+        }
+      });
+    }
+  }, [userDetails?.user_id, dates.length]);
+
   // Auto-scroll to the right so "Today" is visible on mount
   useEffect(() => {
     if (dates.length > 0 && !hasScrolledRef.current && dateContainerRef.current) {
@@ -264,13 +303,17 @@ const CounsellorDashboard = () => {
 
   const handleProgressUpdate = (id, newProps) => {
     setActivities(prev => prev.map(act => act.id === id ? { ...act, ...newProps } : act));
-    // Re-fetch daily score slightly delayed to allow DB save
+
+    // Re-fetch daily score and report slightly delayed to allow DB save
     setTimeout(() => {
       fetchDailyScore();
+
+      const activeDateObj = dates.find(d => d.active)?.fullDate || new Date();
+      fetchDailyReport(activeDateObj);
     }, 500);
   };
 
-const handleDateSelect = (id) => {
+  const handleDateSelect = (id) => {
     setDates(prev => {
       const newDates = prev.map(d => ({ ...d, active: d.id === id }));
       const selected = newDates.find(d => d.active);
@@ -404,78 +447,128 @@ const handleDateSelect = (id) => {
           ref={dateContainerRef}
           className="flex gap-4 px-6 overflow-x-auto pb-4 hide-scrollbar scroll-smooth snap-x snap-mandatory"
         >
-          {dates.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleDateSelect(item.id)}
-              className={`snap-center flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all duration-300 shadow-sm select-none ${item.active
-                ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md scale-105'
-                : 'bg-white dark:bg-[#1E293B] text-[#94a3b8] dark:text-[#CBD5E1] hover:bg-gray-50 dark:hover:bg-[#334155] scale-100'
-                }`}
-            >
-              <span className={`text-[24px] font-extrabold leading-none mb-1 transition-colors ${item.active ? 'text-white' : 'text-[#0f172a] dark:text-[#F8FAFC]'}`}>{item.date}</span>
-              <span className={`text-[12px] font-bold uppercase tracking-wider transition-colors ${item.active ? 'text-white/90' : 'text-[#94a3b8] dark:text-[#CBD5E1]'}`}>{item.month}</span>
-            </button>
-          ))}
-        </div>
+          {dates.map((item) => {
+            const yyyy = item.fullDate.getFullYear();
+            const mm = String(item.fullDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(item.fullDate.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+            const color = dateColors[dateStr];
 
-        {/* Enable Reminders Card */}
-        <ReminderPermissionCard
-          userId={userDetails?.user_id}
-          onGranted={(msg) => toast.success(msg || 'Push notifications enabled!')}
-          onDenied={(msg) => toast.error(msg || 'Permission for notifications was denied')}
+            let fillClass = '';
+            let bgClass = 'bg-white';
+            let borderClass = 'border border-slate-200/80';
+            let textColor = 'text-[#1e293b]';
+            let monthColor = 'text-[#94a3b8]';
+
+            if (color === '#10B981') {
+              fillClass = 'bg-[#d1fae5] h-full';
+              bgClass = 'bg-[#f4fdf8]';
+              borderClass = 'border border-[#a7f3d0]';
+              textColor = 'text-[#065f46]';
+              monthColor = 'text-[#047857]';
+            } else if (color === '#F59E0B') {
+              fillClass = 'bg-[#fef3c7] h-1/2';
+              bgClass = 'bg-[#fffdf5]';
+              borderClass = 'border border-[#fde68a]';
+              textColor = 'text-[#1e293b]';
+              monthColor = 'text-[#b45309]';
+            } else if (color === '#EF4444') {
+              fillClass = 'h-0';
+              bgClass = 'bg-white';
+              borderClass = 'border border-dashed border-rose-300';
+              textColor = 'text-[#475569]';
+              monthColor = 'text-[#f43f5e]';
+            } else {
+              fillClass = 'h-0';
+              bgClass = 'bg-white';
+              borderClass = 'border border-slate-200/80';
+              textColor = 'text-[#0f172a]';
+              monthColor = 'text-[#94a3b8]';
+            }
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleDateSelect(item.id)}
+                className={`relative flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all shadow-sm select-none overflow-hidden ${
+                  item.active
+                    ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md border border-[#1a73e8]'
+                    : `${bgClass} ${borderClass}`
+                }`}
+              >
+                {!item.active && (
+                  <div 
+                    className={`absolute bottom-0 left-0 w-full transition-all duration-500 ease-out z-0 ${fillClass}`} 
+                  />
+                )}
+                <span className={`z-10 text-[24px] font-extrabold leading-none mb-1 ${
+                  item.active ? 'text-white' : textColor
+                }`}>{item.date}</span>
+                <span className={`z-10 text-[12px] font-bold uppercase tracking-wider ${
+                  item.active ? 'text-white/90' : monthColor
+                }`}>{item.month}</span>
+              </button>
+            );
+          })}
+        </div >
+
+  {/* Enable Reminders Card */ }
+  < ReminderPermissionCard
+userId = { userDetails?.user_id }
+onGranted = {(msg) => toast.success(msg || 'Push notifications enabled!')}
+onDenied = {(msg) => toast.error(msg || 'Permission for notifications was denied')}
         />
 
-        {/* Activities List */}
-        <div className="px-6 mt-4">
-          {isLoading ? (
-            <div className="flex flex-col items-center justify-center pt-10 gap-3">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-gray-500 font-medium">Loading activities...</p>
-            </div>
-          ) : activities.length > 0 ? (
-            <>
-              {activities.map((act) => {
-                const activeDateObj = dates.find(d => d.active)?.fullDate || new Date();
-                const yyyy = activeDateObj.getFullYear();
-                const mm = String(activeDateObj.getMonth() + 1).padStart(2, '0');
-                const dd = String(activeDateObj.getDate()).padStart(2, '0');
-                const formattedDate = `${yyyy}-${mm}-${dd}`;
+{/* Activities List */ }
+<div className="px-6 mt-4">
+  {isLoading ? (
+    <div className="flex flex-col items-center justify-center pt-10 gap-3">
+      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <p className="text-gray-500 font-medium">Loading activities...</p>
+    </div>
+  ) : activities.length > 0 ? (
+    <>
+      {activities.map((act) => {
+        const activeDateObj = dates.find(d => d.active)?.fullDate || new Date();
+        const yyyy = activeDateObj.getFullYear();
+        const mm = String(activeDateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(activeDateObj.getDate()).padStart(2, '0');
+        const formattedDate = `${yyyy}-${mm}-${dd}`;
 
-                return (
-                  <ActivityCard
-                    key={act.id}
-                    activity={act}
-                    onProgressUpdate={handleProgressUpdate}
-                    onEdit={handleEditClick}
-                    selectedDate={formattedDate}
-                  />
-                );
-              })}
+        return (
+          <ActivityCard
+            key={act.id}
+            activity={act}
+            onProgressUpdate={handleProgressUpdate}
+            onEdit={handleEditClick}
+            selectedDate={formattedDate}
+          />
+        );
+      })}
 
-              <button
-                onClick={() => setIsNewActivityOpen(true)}
-                className="w-full max-w-md mx-auto mt-2 mb-4 py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                Add Log
-              </button>
-            </>
-          ) : (
-            <div className="text-center pt-10 flex flex-col items-center">
-              <p className="text-gray-500 dark:text-[#CBD5E1] font-medium text-lg mb-4">No activities found</p>
-              <button
-                onClick={() => setIsNewActivityOpen(true)}
-                className="w-full max-w-md mx-auto py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                Add Log
-              </button>
-            </div>
-          )}
-        </div>
+      <button
+        onClick={() => setIsNewActivityOpen(true)}
+        className="w-full max-w-md mx-auto mt-2 mb-4 py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+        Add Log
+      </button>
+    </>
+  ) : (
+    <div className="text-center pt-10 flex flex-col items-center">
+      <p className="text-gray-500 dark:text-[#CBD5E1] font-medium text-lg mb-4">No activities found</p>
+      <button
+        onClick={() => setIsNewActivityOpen(true)}
+        className="w-full max-w-md mx-auto py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+        Add Log
+      </button>
+    </div>
+  )}
+</div>
 
-      </div>
+      </div >
 
       <NotificationsPanel
         isOpen={showNotifications}
@@ -539,43 +632,43 @@ const handleDateSelect = (id) => {
         onDelete={handleDeleteActivity}
       />
 
-      {/* Floating Action Button (FAB) Replaced by Score Indicator */}
-      <div>
-        <DailyScoreIndicator scoreData={dailyScore} isLoading={isScoreLoading} />
-      </div>
+{/* Floating Action Button (FAB) Replaced by Score Indicator */ }
+<div>
+  <DailyScoreIndicator scoreData={dailyScore} isLoading={isScoreLoading} />
+</div>
 
-      {/* Reusable Bottom Navigation */}
-      <CounsellorBottomNavigation />
+{/* Reusable Bottom Navigation */ }
+<CounsellorBottomNavigation />
 
-      {/* Toast Notification */}
-      <AnimatePresence>
-        {toastState.show && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border w-max max-w-[90%] ${toastState.type === 'error'
-              ? 'bg-red-50 border-red-100 text-red-700'
-              : 'bg-green-50 border-green-100 text-green-700'
-              }`}
-          >
-            {toastState.type === 'error' ? (
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            ) : (
-              <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-            )}
-            <span className="text-[14px] font-bold truncate">{toastState.message}</span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+{/* Toast Notification */ }
+<AnimatePresence>
+  {toastState.show && (
+    <motion.div
+      initial={{ opacity: 0, y: 50, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 20, scale: 0.95 }}
+      className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-3 border w-max max-w-[90%] ${toastState.type === 'error'
+        ? 'bg-red-50 border-red-100 text-red-700'
+        : 'bg-green-50 border-green-100 text-green-700'
+        }`}
+    >
+      {toastState.type === 'error' ? (
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      ) : (
+        <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+      )}
+      <span className="text-[14px] font-bold truncate">{toastState.message}</span>
+    </motion.div>
+  )}
+</AnimatePresence>
 
-      {/* Push Notification Overlay */}
-      <ReminderPopup
-        userId={userDetails?.user_id}
-        onGranted={(msg) => toast.success(msg || 'Reminders enabled successfully!')}
-        onDenied={(msg) => toast.error(msg || 'Permission for notifications was denied')}
-      />
-    </div>
+{/* Push Notification Overlay */ }
+<ReminderPopup
+  userId={userDetails?.user_id}
+  onGranted={(msg) => toast.success(msg || 'Reminders enabled successfully!')}
+  onDenied={(msg) => toast.error(msg || 'Permission for notifications was denied')}
+/>
+    </div >
   );
 };
 

@@ -58,9 +58,49 @@ const StudentDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
-
   const [dailyScore, setDailyScore] = useState(null);
   const [isScoreLoading, setIsScoreLoading] = useState(true);
+
+  const [isPushEnabled, setIsPushEnabled] = useState(true); // Default true to avoid flash
+  const [dateColors, setDateColors] = useState({});
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        setIsPushEnabled(true); // hide if not supported
+        return;
+      }
+
+      try {
+        const registration = await navigator.serviceWorker.getRegistration();
+        const browserSubscription = registration ? await registration.pushManager.getSubscription() : null;
+
+        if (userDetails?.user_id) {
+          getRequest('/check-push-status', { user_id: userDetails.user_id }, async (response) => {
+            const backendHasSub = response.data?.isSubscribed;
+
+            if (browserSubscription && !backendHasSub) {
+              // DB deleted it, force unsubscribe on browser
+              await browserSubscription.unsubscribe();
+              setIsPushEnabled(false);
+            } else if (browserSubscription && backendHasSub) {
+              setIsPushEnabled(true);
+            } else {
+              setIsPushEnabled(false);
+            }
+          });
+        } else {
+          setIsPushEnabled(!!browserSubscription);
+        }
+      } catch (e) {
+        setIsPushEnabled(false);
+      }
+    };
+
+    if (userDetails?.user_id) {
+      checkSubscription();
+    }
+  }, [userDetails?.user_id]);
 
   const [toastState, setToastState] = useState({ show: false, message: '', type: 'success' });
   const showToast = (message, type = 'success') => {
@@ -102,6 +142,13 @@ const StudentDashboard = () => {
           return;
         }
         const res = response.data;
+        if (res?.data) {
+          const colorForDate = res.data.color || '#EF4444';
+          setDateColors(prev => ({
+            ...prev,
+            [formattedDate]: colorForDate
+          }));
+        }
         if (res?.data?.daily_reports && Array.isArray(res.data.daily_reports)) {
           const reports = res.data.daily_reports;
           setActivities(prev => (prev || []).map(act => {
@@ -273,6 +320,36 @@ const StudentDashboard = () => {
     setDates(generatedDates);
   }, []);
 
+  // Fetch status colors for the generated 30 days range in a single request
+  useEffect(() => {
+    if (userDetails?.user_id && dates.length > 0) {
+      const formatDateString = (dateObj) => {
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+      };
+
+      const startDateStr = formatDateString(dates[0].fullDate);
+      const endDateStr = formatDateString(dates[dates.length - 1].fullDate);
+
+      const payload = {
+        user_id: userDetails.user_id,
+        start_date: startDateStr,
+        end_date: endDateStr
+      };
+
+      postRequest('/report-colors-range', payload, (response) => {
+        if (response.data?.status === 1 && response.data?.data?.colors) {
+          setDateColors(prev => ({
+            ...prev,
+            ...response.data.data.colors
+          }));
+        }
+      });
+    }
+  }, [userDetails?.user_id, dates.length]);
+
   // Auto-scroll to the right so "Today" is visible on mount
   useEffect(() => {
     if (dates.length > 0 && !hasScrolledRef.current && dateContainerRef.current) {
@@ -283,9 +360,12 @@ const StudentDashboard = () => {
 
   const handleProgressUpdate = (id, newProps) => {
     setActivities(prev => prev.map(act => act.id === id ? { ...act, ...newProps } : act));
-    // Re-fetch daily score slightly delayed to allow DB save
+    // Re-fetch daily score and report slightly delayed to allow DB save
     setTimeout(() => {
       fetchDailyScore();
+
+      const activeDateObj = dates?.find(d => d.active)?.fullDate || new Date();
+      fetchDailyReport(activeDateObj);
     }, 500);
   };
 
@@ -377,6 +457,7 @@ const StudentDashboard = () => {
 
 
 
+
   return (
     <div className="min-h-screen bg-gradient-to-tr from-[#f1f5f9] via-[#f8fafc] to-[#eef2f6] dark:from-[#0F172A] dark:via-[#1E293B] dark:to-[#0F172A] font-sans pb-28 relative overflow-x-hidden">
       <div className="w-full max-w-md mx-auto">
@@ -405,27 +486,72 @@ const StudentDashboard = () => {
 
         {/* Date Selector */}
         <div ref={dateContainerRef} className="flex gap-4 px-6 overflow-x-auto pb-4 hide-scrollbar scroll-smooth snap-x snap-mandatory">
-          {dates.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => handleDateSelect(item.id)}
-              className={`snap-center flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all duration-300 shadow-sm select-none ${item.active
-                ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md scale-105'
-                : 'bg-white dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] hover:bg-gray-50 dark:hover:bg-[#334155] scale-100'
+          {dates.map((item) => {
+            const yyyy = item.fullDate.getFullYear();
+            const mm = String(item.fullDate.getMonth() + 1).padStart(2, '0');
+            const dd = String(item.fullDate.getDate()).padStart(2, '0');
+            const dateStr = `${yyyy}-${mm}-${dd}`;
+            const color = dateColors[dateStr];
+
+            let fillClass = '';
+            let bgClass = 'bg-white dark:bg-[#1E293B]';
+            let borderClass = 'border border-slate-200/80 dark:border-slate-700/80';
+            let textColor = 'text-[#1e293b] dark:text-[#F8FAFC]';
+            let monthColor = 'text-[#94a3b8] dark:text-[#CBD5E1]';
+
+            if (color === '#10B981') {
+              fillClass = 'bg-[#d1fae5] dark:bg-[#10B981]/20 h-full';
+              bgClass = 'bg-[#f4fdf8] dark:bg-[#1E293B]';
+              borderClass = 'border border-[#a7f3d0] dark:border-[#10B981]/50';
+              textColor = 'text-[#065f46] dark:text-[#34D399]';
+              monthColor = 'text-[#047857] dark:text-[#10B981]';
+            } else if (color === '#F59E0B') {
+              fillClass = 'bg-[#fef3c7] dark:bg-[#F59E0B]/20 h-1/2';
+              bgClass = 'bg-[#fffdf5] dark:bg-[#1E293B]';
+              borderClass = 'border border-[#fde68a] dark:border-[#F59E0B]/50';
+              textColor = 'text-[#1e293b] dark:text-[#FCD34D]';
+              monthColor = 'text-[#b45309] dark:text-[#F59E0B]';
+            } else if (color === '#EF4444') {
+              fillClass = 'h-0';
+              bgClass = 'bg-white dark:bg-[#1E293B]';
+              borderClass = 'border border-dashed border-rose-300 dark:border-rose-500/50';
+              textColor = 'text-[#475569] dark:text-[#F8FAFC]';
+              monthColor = 'text-[#f43f5e] dark:text-rose-400';
+            } else {
+              fillClass = 'h-0';
+              bgClass = 'bg-white dark:bg-[#1E293B]';
+              borderClass = 'border border-slate-200/80 dark:border-slate-700/80';
+              textColor = 'text-[#0f172a] dark:text-[#F8FAFC]';
+              monthColor = 'text-[#94a3b8] dark:text-[#CBD5E1]';
+            }
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleDateSelect(item.id)}
+                className={`snap-center relative flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all shadow-sm select-none overflow-hidden ${
+                  item.active
+                    ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md border border-[#1a73e8] scale-105'
+                    : `${bgClass} ${borderClass} hover:bg-gray-50 dark:hover:bg-[#334155] scale-100`
                 }`}
-            >
-              <span className={`text-[24px] font-extrabold leading-none mb-1 transition-colors ${item.active ? 'text-white' : 'text-[#0f172a] dark:text-[#F8FAFC]'}`}>{item.date}</span>
-              <span className={`text-[12px] font-bold uppercase tracking-wider transition-colors ${item.active ? 'text-white/90' : 'text-[#94a3b8] dark:text-[#CBD5E1]'}`}>{item.month}</span>
-            </button>
-          ))}
+              >
+                {!item.active && (
+                  <div 
+                    className={`absolute bottom-0 left-0 w-full transition-all duration-500 ease-out z-0 ${fillClass}`} 
+                  />
+                )}
+                <span className={`z-10 text-[24px] font-extrabold leading-none mb-1 ${
+                  item.active ? 'text-white' : textColor
+                }`}>{item.date}</span>
+                <span className={`z-10 text-[12px] font-bold uppercase tracking-wider ${
+                  item.active ? 'text-white/90' : monthColor
+                }`}>{item.month}</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Enable Reminders Card */}
-        <ReminderPermissionCard
-          userId={userDetails?.user_id}
-          onGranted={(msg) => toast.success(msg || 'Push notifications enabled!')}
-          onDenied={(msg) => toast.error(msg || 'Permission for notifications was denied')}
-        />
+
 
         {/* Activities List */}
         <div className="px-6 mt-4">
