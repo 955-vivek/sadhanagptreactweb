@@ -74,7 +74,7 @@ const DailyScoreIndicator = ({ scoreData, isLoading }) => {
                 strokeLinecap="round"
               />
             </svg>
-            
+
             {/* Percentage Text */}
             <div className="relative z-10 flex flex-col items-center justify-center mt-0.5">
               <span className={`text-[18px] lg:text-[20px] font-black leading-none ${colorClass}`}>

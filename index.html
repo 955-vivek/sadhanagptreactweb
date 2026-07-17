@@ -11,6 +11,12 @@
 
 <body>
   <div id="root"></div>
+  <div id="error-log" style="color: red; font-family: monospace; position: fixed; top: 0; left: 0; z-index: 999999; background: white; padding: 10px;"></div>
+  <script>
+    window.onerror = function(message, source, lineno, colno, error) {
+      document.getElementById('error-log').innerHTML += '<p>' + message + ' at ' + source + ':' + lineno + ':' + colno + '<br/>' + (error ? error.stack : '') + '</p>';
+    };
+  </script>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

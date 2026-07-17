@@ -540,7 +540,7 @@ const handleDateSelect = (id) => {
       />
 
       {/* Floating Action Button (FAB) Replaced by Score Indicator */}
-      <div onClick={() => setIsNewActivityOpen(true)}>
+      <div>
         <DailyScoreIndicator scoreData={dailyScore} isLoading={isScoreLoading} />
       </div>
 

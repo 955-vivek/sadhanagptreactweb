@@ -8,7 +8,6 @@ import SchemeActivityPickerModal from './SchemeActivityPickerModal';
 import SchemeNameModal from './SchemeNameModal';
 import EditChoiceModal from './EditChoiceModal';
 import ConfirmModal from '../../components/shared/ConfirmModal';
-import { initialScheme } from './DefaultSchemeDetail';
 
 const MarkingScheme = () => {
   const navigate = useNavigate();
@@ -81,15 +80,8 @@ const MarkingScheme = () => {
 
   const handleEditInitiate = async (scheme) => {
     if (scheme.isSystemDefault) {
-      // Build the full 14-item array from the canonical source
-      const defaultActivitiesArray = Object.entries(initialScheme).map(([key, data]) => ({
-        id: key,
-        title: data.title,
-        icon: data.icon,
-        maxMarks: data.maxMarks,
-        badge: 'Daily',
-        rows: JSON.parse(JSON.stringify(data.rows)) // Deep copy rows
-      }));
+      // Use the cached activities for the system default scheme
+      const defaultActivitiesArray = schemeActivitiesCache[scheme.id] || [];
       
       const res = await saveScheme('', defaultActivitiesArray, null, true); // Provisional clone
       const newClone = res.scheme;

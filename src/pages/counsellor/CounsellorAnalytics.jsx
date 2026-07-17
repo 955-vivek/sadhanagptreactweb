@@ -9,6 +9,7 @@ import { useOutletContext } from 'react-router-dom';
 import { postRequest, getRequest } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
 import ThemeToggle from '../../components/shared/ThemeToggle';
+import CreateNewActivity from './activites/CreateNewActivity';
 
 const MedalIcon = ({ rank }) => {
   const isGold = rank === 1;
@@ -48,16 +49,14 @@ const CounsellorAnalytics = () => {
   const [isLabelsModalOpen, setIsLabelsModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [groups, setGroups] = useState([]);
-  const [isLoadingGroups, setIsLoadingGroups] = useState(true);
   const [isLoadingLabels, setIsLoadingLabels] = useState(false);
-  const [pagination, setPagination] = useState({ page: 1, total_page: 1, total: 0 });
-  const [irregularCount, setIrregularCount] = useState(0);
   const carouselRef = useRef(null);
   const [totalMenteesCount, setTotalMenteesCount] = useState(0);
   const [studentRanks, setStudentRanks] = useState([]);
   const [followUpStudents, setFollowUpStudents] = useState([]);
   const [viewAllModal, setViewAllModal] = useState({ isOpen: false, type: '', data: [], title: '' });
   const [modalGroupFilter, setModalGroupFilter] = useState('all');
+  const [isCreateCustomActivityOpen, setIsCreateCustomActivityOpen] = useState(false);
 
   const handleModalGroupFilterChange = (newVal, modalType) => {
     setModalGroupFilter(newVal);
@@ -121,7 +120,6 @@ const CounsellorAnalytics = () => {
 
   const fetchGroups = async (page = 1) => {
     try {
-      setIsLoadingGroups(true);
       const payload = {
         user_id: userDetails.user_id,
         page_no: page
@@ -141,21 +139,14 @@ const CounsellorAnalytics = () => {
           }));
 
           setGroups(fetchedGroups);
-          setPagination({
-            page: page,
-            total_page: res.total_page || 1,
-            total: res.total || 0
-          });
 
           if (fetchedGroups.length > 0 && !selectedGroupForLabels) {
             setSelectedGroupForLabels(fetchedGroups[0].id);
           }
         }
-        setIsLoadingGroups(false);
       });
     } catch (error) {
       console.error("Error fetching groups:", error);
-      setIsLoadingGroups(false);
     }
   };
 
@@ -169,15 +160,6 @@ const CounsellorAnalytics = () => {
           setTotalMenteesCount(response.data.total || 0);
         }
       });
-
-      // Fetch irregular mentees count
-      getRequest('/irregular-mentees', { user_id: userDetails.user_id }, (response) => {
-        if (response.data?.status === 1 || response.data?.code === 200) {
-          const total = response.data.total || (Array.isArray(response.data.data) ? response.data.data.length : 0);
-          setIrregularCount(total);
-        }
-      });
-
       // Fetch student ranks for last week
       getRequest('/student-rank', { user_id: userDetails.user_id }, (response) => {
         if (response.data?.status === 1 || response.data?.code === 200) {
@@ -285,10 +267,9 @@ const CounsellorAnalytics = () => {
                   </li>
                 )})}
               </ul>
-              <button onClick={() => {
-                setModalGroupFilter('all');
-                setViewAllModal({ isOpen: true, type: 'rank', data: studentRanks, title: 'Students Rank' });
-              }} className="w-full py-2 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-800/40 text-blue-700 dark:text-blue-300 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors">
+              <button onClick={() => navigate('/counsellor/analytics/details', { state: { type: 'rank', groups: groups } })}
+
+              className="w-full py-2 bg-blue-50 dark:bg-blue-900/40 hover:bg-blue-100 dark:hover:bg-blue-800/40 text-blue-700 dark:text-blue-300 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors">
                 View All <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -316,10 +297,7 @@ const CounsellorAnalytics = () => {
                   </li>
                 )})}
               </ul>
-              <button onClick={() => {
-                setModalGroupFilter('all');
-                setViewAllModal({ isOpen: true, type: 'followup', data: followUpStudents, title: 'Students Need Follow-up' });
-              }} className="w-full py-2 bg-red-100 dark:bg-red-600/50 hover:bg-red-200 dark:hover:bg-red-500 text-red-700 dark:text-red-200 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors mt-auto">
+              <button onClick={() => navigate('/counsellor/analytics/details', { state: { type: 'followup', groups: groups } })} className="w-full py-2 bg-red-100 dark:bg-red-600/50 hover:bg-red-200 dark:hover:bg-red-500 text-red-700 dark:text-red-200 text-[13px] font-bold rounded-xl flex items-center justify-center gap-1 transition-colors mt-auto">
                 View All <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
               </button>
             </div>
@@ -335,7 +313,7 @@ const CounsellorAnalytics = () => {
 
             <div
               ref={carouselRef}
-              className="flex gap-3 overflow-x-auto pb-2 -mx-2 px-2 hide-scrollbar snap-x"
+              className="flex gap-3 overflow-x-auto pb-3 -mx-2 px-2 custom-scrollbar snap-x"
             >
               {groups.map(group => (
                 <div
@@ -425,6 +403,7 @@ const CounsellorAnalytics = () => {
         onClose={() => setIsSettingsOpen(false)}
         userDetails={userDetails}
         showToast={showToast}
+        groups={groups}
       />
 
       <AddGroupModal
@@ -762,6 +741,27 @@ const CounsellorAnalytics = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <CreateNewActivity
+        isOpen={isCreateCustomActivityOpen}
+        onClose={() => setIsCreateCustomActivityOpen(false)}
+        onSave={(data) => {
+          postRequest('/create-custom-activity', {
+            name: data.name,
+            activity_type: data.trackingType,
+            target: data.target,
+            counsellor_id: userDetails?.user_id
+          }, (response) => {
+            const res = response.data;
+            if (res.status === 1) {
+              toast.success("Activity Created Successfully!");
+              setIsCreateCustomActivityOpen(false);
+            } else {
+              toast.error(res.message || "Failed to create activity");
+            }
+          });
+        }}
+      />
 
       {/* Reusable Counsellor Bottom Navigation */}
       <CounsellorBottomNavigation />

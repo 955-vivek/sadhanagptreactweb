@@ -30,8 +30,9 @@ import AuthGuard from '../components/shared/AuthGuard';
 import MarkingScheme from '../pages/counsellor/MarkingScheme';
 import DefaultSchemeDetail from '../pages/counsellor/DefaultSchemeDetail';
 import SchemeDetail from '../pages/counsellor/SchemeDetail';
-
-import CustomActivities from '../pages/counsellor/mentees_module/CustomActivities';
+import ShowRankAndFollowUp from '../pages/counsellor/Ranks/showRankAndollow-up';
+import CustomActivities from "../pages/counsellor/activites/CustomActivities";
+import CustomActivitiesPage from "../pages/counsellor/activites/addActivityPage";
 
 
 const AppRoutes = () => {
@@ -62,6 +63,7 @@ const AppRoutes = () => {
           <Route path="/counsellor/marking-scheme/default" element={<DefaultSchemeDetail />} />
           <Route path="/counsellor/marking-scheme/:id" element={<SchemeDetail />} />
           <Route path="/counsellor/custom-activities" element={<CustomActivities />} />
+          <Route path="/counsellor/subgroup-activities" element={<CustomActivitiesPage />} />
 
           {/* <Route path="/counsellor/rewards" element={<CounsellorRewardsManagement />} /> */}
           <Route path="/counsellor/mentees" element={<MenteesList />} />
@@ -78,6 +80,7 @@ const AppRoutes = () => {
           <Route path="/student/inspiration" element={<Inspiration />} />
 
           <Route path="/student/ai-chat" element={<AIChat />} />
+          <Route path="/counsellor/analytics/details" element={<ShowRankAndFollowUp />} />
         </Route>
 
         {/* Catch-all route to redirect back to login */}

@@ -5,6 +5,7 @@ import CounsellorBottomNavigation from '../../../components/counsellor/Counsello
 import AiAnalysisModals from '../../../components/AiAnalysis/AiAnalysisModals';
 import { getRequest, postRequest, deleteRequest } from '../../../services/api';
 import { processResponse } from '../../../utils/apiUtils';
+import CustomActivitiesPage from '../activites/addActivityPage';
 
 const GroupMenteesList = () => {
   const navigate = useNavigate();
@@ -20,8 +21,10 @@ const GroupMenteesList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLabel, setSelectedLabel] = useState('All');
   const [selectedStudents, setSelectedStudents] = useState([]);
+  
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
   const [toastState, setToastState] = useState({ show: false, message: '', type: 'success' });
   const [actionMenuStudent, setActionMenuStudent] = useState(null);
   const [studentToRemove, setStudentToRemove] = useState(null);
@@ -53,6 +56,7 @@ const GroupMenteesList = () => {
 
   const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
   const [isAiAnalysisModalOpen, setIsAiAnalysisModalOpen] = useState(false);
+  const [aiAnalysisStudents, setAiAnalysisStudents] = useState([]);
 
     const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [uncategorizedStudents, setUncategorizedStudents] = useState([]);
@@ -61,7 +65,6 @@ const GroupMenteesList = () => {
 
 
   const SELECTION_LIMIT = 50;
-  const observerTarget = useRef(null);
 
 
   const fetchLabels = useCallback(() => {
@@ -74,12 +77,13 @@ const GroupMenteesList = () => {
     });
   }, [userDetails.user_id, centerId]);
 
-  const fetchStudents = useCallback((pageNum = 1, shouldAppend = false) => {
+  const fetchStudents = useCallback((pageNum = 1) => {
     if (!centerId) return;
     setIsLoading(true);
     const payload = {
       user_id: userDetails.user_id,
       page_no: pageNum,
+      rowSelected: limit,
       center_id: centerId,
       label_id: (selectedLabel === 'All' || selectedLabel === 'un-categorized') ? "" : selectedLabel,
       search_text: searchQuery,
@@ -101,15 +105,15 @@ const GroupMenteesList = () => {
           avatar: s.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(s.name)}&background=random`,
           activities: s.activities || []
         }));
-        setStudents(prev => shouldAppend ? [...prev, ...mappedStudents] : mappedStudents);
+        setStudents(mappedStudents);
         setTotalPages(res.total_page || 1);
       }
       setIsLoading(false);
     });
-  }, [userDetails.user_id, centerId, selectedLabel, searchQuery]);
+  }, [userDetails.user_id, centerId, selectedLabel, searchQuery, limit]);
 
   useEffect(() => { fetchLabels(); }, [fetchLabels]);
-  useEffect(() => { fetchStudents(1, false); setPage(1); }, [fetchStudents]);
+  useEffect(() => { fetchStudents(1); setPage(1); }, [fetchStudents]);
 
   // Auto-request notification permission on load if not yet granted/denied
   useEffect(() => {
@@ -118,17 +122,7 @@ const GroupMenteesList = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && !isLoading && page < totalPages) {
-        const nextPage = page + 1;
-        setPage(nextPage);
-        fetchStudents(nextPage, true);
-      }
-    }, { threshold: 0.1 });
-    if (observerTarget.current) observer.observe(observerTarget.current);
-    return () => { if (observerTarget.current) observer.unobserve(observerTarget.current); };
-  }, [page, totalPages, isLoading, fetchStudents]);
+
 
   const showError = (msg) => { setErrorMessage(msg); setTimeout(() => setErrorMessage(''), 4000); };
   const showSuccess = (msg) => { setSuccessMessage(msg); setTimeout(() => setSuccessMessage(''), 4000); };
@@ -386,16 +380,38 @@ const GroupMenteesList = () => {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setIsDownloadModalOpen(true)}
+              className="px-4 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 rounded-xl shadow-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors font-bold text-[14px]">
+              Export
+            </button>
+            <button
               onClick={() => { setIsGroupActionMenuOpen(true) }}
-              className="w-20 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 rounded-xl shadow-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors">
+              className="w-20 h-10 flex items-center justify-center bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 rounded-xl shadow-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors font-bold text-[14px]">
               Edit
             </button>
           </div>
         </div>
 
-        {/* Search */}
-        <div className="px-6 mb-4">
-          <input type="text" placeholder="Search mentees..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 focus:border-blue-500 text-gray-900 dark:text-white rounded-2xl py-3.5 px-5 text-[15px] outline-none shadow-sm transition-all" />
+        {/* Search and Filter */}
+        <div className="px-6 mb-4 flex gap-3">
+          <input 
+            type="text" 
+            placeholder="Search mentees..." 
+            value={searchQuery} 
+            onChange={(e) => setSearchQuery(e.target.value)} 
+            className="flex-1 min-w-0 bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 focus:border-blue-500 text-gray-900 dark:text-white rounded-2xl py-3.5 px-5 text-[15px] outline-none shadow-sm transition-all" 
+          />
+          <select
+            value={selectedLabel}
+            onChange={(e) => setSelectedLabel(e.target.value)}
+            className="bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 focus:border-blue-500 text-gray-900 dark:text-white rounded-2xl py-3.5 px-3 text-[14px] outline-none shadow-sm transition-all w-[140px] font-bold"
+          >
+            <option value="All">All Sub-Groups</option>
+            <option value="un-categorized">Uncategorized</option>
+            {labels.map(l => (
+              <option key={l.id} value={l.id}>{l.name}</option>
+            ))}
+          </select>
         </div>
 
         {/* Add Sub-Group */}
@@ -421,10 +437,26 @@ const GroupMenteesList = () => {
                 </div>
                 <div className="flex items-center gap-1.5">
                   {groupData.labelName !== 'N/A' && groupData.labelName !== 'Uncategorized' && (
-                    <button
-                      onClick={() => setActionMenuSubgroup({ id: groupData.labelId, name: groupData.labelName })}
-                      className="w-16 h-8 rounded-lg border border-gray-400/70 dark:border-slate-600 flex items-center justify-center text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors bg-white dark:bg-slate-800">Edit
-                    </button>
+                    <>
+                      <button
+                        onClick={() => {
+                          setAiAnalysisStudents(groupData.students);
+                          setIsAiAnalysisModalOpen(true);
+                        }}
+                        className="h-8 px-3 rounded-lg border border-purple-400/70 dark:border-purple-600 flex items-center justify-center text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors bg-white dark:bg-slate-800 text-[14px] font-bold gap-1.5"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        AI
+                      </button>
+                      <button
+                        onClick={() => setActionMenuSubgroup({ id: groupData.labelId, name: groupData.labelName })}
+                        className="w-16 h-8 rounded-lg border border-gray-400/70 dark:border-slate-600 flex items-center justify-center text-blue-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors bg-white dark:bg-slate-800 text-[14px]"
+                      >
+                        Edit
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -473,6 +505,59 @@ const GroupMenteesList = () => {
             </div>
           ))}
         </div>
+        {/* Pagination Controls */}
+        {(totalPages > 1 || students.length > 0) && (
+            <div className="flex flex-col gap-3 px-6 py-4 mt-2 mb-2">
+                <div className="flex justify-between items-center">
+                    <button 
+                        onClick={() => {
+                            const newPage = Math.max(1, page - 1);
+                            setPage(newPage);
+                            fetchStudents(newPage);
+                        }}
+                        disabled={page === 1}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors"
+                    >
+                        <span>&larr;</span> Previous
+                    </button>
+                    
+                    <span className="font-bold text-sm text-slate-600 dark:text-slate-300">
+                        Page {page} of {totalPages}
+                    </span>
+                    
+                    <button 
+                        onClick={() => {
+                            const newPage = Math.min(totalPages, page + 1);
+                            setPage(newPage);
+                            fetchStudents(newPage);
+                        }}
+                        disabled={page === totalPages || totalPages === 0}
+                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-bold text-sm transition-colors"
+                    >
+                        Next <span>&rarr;</span>
+                    </button>
+                </div>
+                
+                <div className="flex justify-center items-center mt-2">
+                    <select
+                        value={limit}
+                        onChange={(e) => {
+                            setLimit(Number(e.target.value));
+                            setPage(1);
+                        }}
+                        className="bg-white dark:bg-slate-800 border border-gray-400/70 dark:border-slate-700 focus:border-blue-500 text-gray-900 dark:text-white rounded-xl py-2 px-4 text-[13px] outline-none shadow-sm transition-all font-bold"
+                    >
+                        <option value={1}>1 student / page</option>
+                        <option value={2}> 2 students / page</option>
+                        <option value={5}> 5 students / page</option>
+                        <option value={10}> 10 students / page</option>
+                        <option value={20}> 20 students / page</option>
+                        <option value={50}> 50 students / page</option>
+                    </select>
+                </div>
+            </div>
+        )}
+
         {/* Add Member Button */}
         <div className="px-6 mt-3 mb-8">
           <button
@@ -927,6 +1012,7 @@ const GroupMenteesList = () => {
                   </div>
                   <svg className="w-5 h-5 text-gray-300 dark:text-[#475569] group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </button>
+
                 {/* Option 2: Delete Group */}
                 <button
                   onClick={() => {
@@ -1061,6 +1147,7 @@ const GroupMenteesList = () => {
                       <div className="text-[16px] font-bold text-[#0f172a] dark:text-[#F8FAFC]">Rename Sub-Group</div>
                       <div className="text-[13px] font-medium text-gray-400 dark:text-[#94A3B8]">Change the sub-group name</div>
                     </div>
+                    
                   </div>
                   <svg className="w-5 h-5 text-gray-300 dark:text-[#475569] group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </button>
@@ -1210,6 +1297,13 @@ const GroupMenteesList = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AiAnalysisModals
+        isOpen={isAiAnalysisModalOpen}
+        onClose={() => setIsAiAnalysisModalOpen(false)}
+        students={aiAnalysisStudents}
+        userDetails={userDetails}
+      />
 
       <CounsellorBottomNavigation />
     </div>

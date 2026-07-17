@@ -3,177 +3,35 @@ import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 import { saveScheme } from '../../api/markingSchemes';
 
-export const initialScheme = {
-  sleep_time: {
-    id: 101, title: "Sleep Time", icon: "😴", maxMarks: 25,
-    rows: [
-      { condition: "Up to 22:15", marks: 25 },
-      { condition: "Up to 22:30", marks: 20 },
-      { condition: "Up to 22:45", marks: 15 },
-      { condition: "Up to 23:00", marks: 10 },
-      { condition: "Up to 23:15", marks: 5 },
-      { condition: "After 23:15", marks: 0 }
-    ]
-  },
-  wake_up_time: {
-    id: 102, title: "Wake Up Time", icon: "🌅", maxMarks: 25,
-    rows: [
-      { condition: "Up to 04:00", marks: 25 },
-      { condition: "Up to 04:15", marks: 20 },
-      { condition: "Up to 04:30", marks: 15 },
-      { condition: "Up to 04:45", marks: 10 },
-      { condition: "Up to 05:00", marks: 5 },
-      { condition: "After 05:00", marks: 0 }
-    ]
-  },
-  chanting_completion_time: {
-    id: 103, title: "Chanting Completion Time", icon: "📿", maxMarks: 25,
-    rows: [
-      { condition: "Up to 07:15", marks: 25 },
-      { condition: "Up to 09:30", marks: 20 },
-      { condition: "Up to 13:00", marks: 15 },
-      { condition: "Up to 19:00", marks: 10 },
-      { condition: "Up to 21:00", marks: 5 },
-      { condition: "After 23:00", marks: 0 }
-    ]
-  },
-  japa_rounds: {
-    id: 104, title: "Japa Number of Rounds", icon: "📿", maxMarks: 25,
-    rows: [
-      { condition: "At Least 16", marks: 25 },
-      { condition: "At Least 14", marks: 20 },
-      { condition: "At Least 12", marks: 15 },
-      { condition: "At Least 10", marks: 10 },
-      { condition: "At Least 0", marks: 0 }
-    ]
-  },
-  mangal_aarti: {
-    id: 105, title: "Mangal Aarti Attended (Weekly)", icon: "🙏", maxMarks: 25,
-    rows: [
-      { condition: "At Least 7 Days", marks: 25 },
-      { condition: "At Least 6 Days", marks: 20 },
-      { condition: "At Least 5 Days", marks: 15 },
-      { condition: "At Least 4 Days", marks: 10 },
-      { condition: "At Least 3 Days", marks: 5 },
-      { condition: "At Least 0 Days", marks: 0 }
-    ]
-  },
-  day_best_duration: {
-    id: 106, title: "Day Rest Duration", icon: "⏱️", maxMarks: 25,
-    rows: [
-      { condition: "Up to 60 min", marks: 25 },
-      { condition: "Up to 75 min", marks: 20 },
-      { condition: "Up to 90 min", marks: 15 },
-      { condition: "Up to 105 min", marks: 10 },
-      { condition: "Up to 120 min", marks: 5 },
-      { condition: "Up to 135 min", marks: 0 },
-      { condition: "After 135 min", marks: -5 }
-    ]
-  },
-  hearing_duration: {
-    id: 107, title: "Hearing Duration", icon: "👂", maxMarks: 20,
-    rows: [
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  reading_duration: {
-    id: 108, title: "Reading Srila Prabhupada's Books", icon: "📖", maxMarks: 20,
-    rows: [
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  reading_misc: {
-    id: 109, title: "Reading Miscellaneous Books", icon: "📚", maxMarks: 15,
-    rows: [
-      { condition: "At least 25 min", marks: 15 },
-      { condition: "At least 20 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  book_distribution: {
-    id: 110, title: "Book Distribution", icon: "📖", maxMarks: 20,
-    rows: [
-      { condition: "Up to 60 min", marks: 25 },
-      { condition: "Up to 75 min", marks: 20 },
-      { condition: "Up to 90 min", marks: 15 },
-      { condition: "Up to 105 min", marks: 10 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  exercise_yoga: {
-    id: 111, title: "Exercise / Yoga", icon: "🧘‍♂️", maxMarks: 20,
-    rows: [
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  hearing_sm: {
-    id: 112, title: "Hearing Spiritual Master", icon: "🎧", maxMarks: 20,
-    rows: [
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  hearing_sp: {
-    id: 113, title: "Hearing Srila Prabhupada", icon: "🎧", maxMarks: 20,
-    rows: [
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  hearing_misc: {
-    id: 114, title: "Hearing Miscellaneous", icon: "🎧", maxMarks: 20,
-    rows: [
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  menial_services: {
-    id: 115, title: "Menial Services (Weekly)", icon: "🧹", maxMarks: 25,
-    rows: [
-      { condition: "At least 120 min", marks: 25 },
-      { condition: "At least 60 min", marks: 20 },
-      { condition: "At least 30 min", marks: 15 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  },
-  shloka: {
-    id: 116, title: "Shloka Memorisation (Weekly)", icon: "📜", maxMarks: 25,
-    rows: [
-      { condition: "At least 30 min", marks: 25 },
-      { condition: "At least 25 min", marks: 20 },
-      { condition: "At least 20 min", marks: 15 },
-      { condition: "At least 15 min", marks: 10 },
-      { condition: "At least 10 min", marks: 5 },
-      { condition: "At least 0 min", marks: 0 }
-    ]
-  }
+import { getRequest, postRequest } from '../../services/api';
+
+const mapDBRulesToDraftScheme = (rules) => {
+  const scheme = {};
+  rules.forEach(rule => {
+    const key = `activity_${rule.master_activity_id}`;
+    if (!scheme[key]) {
+      scheme[key] = {
+        id: rule.master_activity_id,
+        title: rule.activity_name || 'Unknown Activity',
+        icon: "✨", // Placeholder icon, we can fetch if exists
+        maxMarks: rule.is_max_marks ? rule.marks : 25,
+        rows: []
+      };
+    }
+    
+    scheme[key].rows.push({
+      condition: `${rule.condition_operator} ${rule.condition_value} ${rule.activity_unit || ''}`.trim(),
+      marks: rule.marks
+    });
+    
+    if (rule.is_max_marks) {
+        scheme[key].maxMarks = rule.marks;
+    }
+  });
+  
+  return scheme;
 };
+
 
 const parseCondition = (conditionStr) => {
   const rules = ["Before", "After", "Up To", "Up to", "At Least", "Exact Time", "Yes", "No"];
@@ -354,12 +212,29 @@ const SchemeTable = ({ activityKey, data, isEditing, onMaxChange, onRowMarkChang
 
 const DefaultSchemeDetail = () => {
   const navigate = useNavigate();
-  const [savedScheme, setSavedScheme] = useState(initialScheme);
-  const [draftScheme, setDraftScheme] = useState(initialScheme);
-
-  const [toastMessage, setToastMessage] = useState(null);
-
+  const [draftScheme, setDraftScheme] = useState({});
   const [totalMarksFlash, setTotalMarksFlash] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  
+  const [selectedActivity, setSelectedActivity] = useState(''); // Empty string for "-- Select activity --"
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch Marking Rules for Default Scheme (center_id = 0)
+  useEffect(() => {
+    setIsLoading(true);
+    const userDetailsStr = localStorage.getItem('user_details');
+    const userDetails = userDetailsStr ? JSON.parse(userDetailsStr) : {};
+    
+    postRequest('/marking-rules', { center_id: 0, user_id: userDetails.user_id }, (response) => {
+      if (response?.data?.code === 200 && Array.isArray(response.data.data)) {
+        const mapped = mapDBRulesToDraftScheme(response.data.data);
+        setDraftScheme(mapped);
+      } else {
+        setDraftScheme({});
+      }
+      setIsLoading(false);
+    });
+  }, []);
 
   const calculateTotalMarks = (scheme) => {
     return Object.values(scheme).reduce((acc, curr) => acc + curr.maxMarks, 0);
@@ -440,9 +315,23 @@ const DefaultSchemeDetail = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-[16px] sm:text-[18px] font-bold text-[#0F172A] dark:text-white leading-none tracking-tight truncate">Default-Scheme</h1>
-              <p className="text-[11px] sm:text-[12px] font-medium text-teal-600 dark:text-[#1de9b6] mt-1 truncate">Full Activity List</p>
+            <div className="flex-1 min-w-0 flex items-center gap-3">
+              <div>
+                <h1 className="text-[16px] sm:text-[18px] font-bold text-[#0F172A] dark:text-white leading-none tracking-tight truncate">Marking Scheme</h1>
+                <p className="text-[11px] sm:text-[12px] font-medium text-teal-600 dark:text-[#1de9b6] mt-1 truncate">Full Activity List</p>
+              </div>
+              <select
+                value={selectedActivity}
+                onChange={(e) => setSelectedActivity(e.target.value)}
+                className="ml-2 bg-white dark:bg-[#132B5A] border border-gray-300 dark:border-[rgba(255,255,255,0.1)] rounded-md px-3 py-1.5 text-[13px] font-medium text-[#0F172A] dark:text-white outline-none focus:ring-2 focus:ring-teal-500"
+              >
+                <option value="">-- Select activity --</option>
+                {Object.entries(draftScheme).map(([key, data]) => (
+                  <option key={key} value={key}>
+                    {data.title}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -477,16 +366,22 @@ const DefaultSchemeDetail = () => {
 
         {/* Marking Scheme Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-[24px]">
-          {Object.entries(draftScheme).map(([key, data]) => (
-            <SchemeTable
-              key={key}
-              activityKey={key}
-              data={data}
-              isEditing={false}
-              onMaxChange={handleMaxChange}
-              onRowMarkChange={handleRowMarkChange}
-            />
-          ))}
+          {selectedActivity ? (
+            draftScheme[selectedActivity] && (
+              <SchemeTable
+                key={selectedActivity}
+                activityKey={selectedActivity}
+                data={draftScheme[selectedActivity]}
+                isEditing={false}
+                onMaxChange={handleMaxChange}
+                onRowMarkChange={handleRowMarkChange}
+              />
+            )
+          ) : (
+            <div className="col-span-1 md:col-span-2 text-center py-10 text-gray-500 dark:text-gray-400">
+              Please select an activity from the dropdown above to view its marking scheme.
+            </div>
+          )}
         </div>
       </div>
 
