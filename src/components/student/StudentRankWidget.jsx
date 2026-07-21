@@ -159,6 +159,25 @@ const StudentRankWidget = ({ onClose }) => {
             )}
           </ul>
         )}
+        
+        {!isLoading && filterType === 'group' && ranks.length > topCount && (
+          <div className="mt-3 text-center border-t border-gray-100 dark:border-gray-700/50 pt-3 pb-1">
+            <button 
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="group flex items-center justify-center gap-1.5 mx-auto text-[11px] font-bold text-blue-500 dark:text-blue-400 uppercase tracking-wider transition-all duration-300 drop-shadow-[0_0_8px_rgba(59,130,246,0.3)] hover:drop-shadow-[0_0_12px_rgba(59,130,246,0.6)] hover:text-blue-600 dark:hover:text-blue-300"
+            >
+              <span>{isExpanded ? 'View Less' : 'View All'}</span>
+              <svg 
+                className={`w-3.5 h-3.5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : 'group-hover:translate-y-0.5'}`} 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
