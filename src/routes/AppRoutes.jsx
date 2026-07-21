@@ -11,6 +11,8 @@ import Analytics from '../pages/student/Analytics';
 import Inspiration from '../pages/student/Inspiration';
 import Profile from '../pages/student/Profile';
 import AIChat from '../pages/student/AIChat';
+import StudentMarkingScheme from '../pages/student/StudentMarkingScheme';
+import StudentRankDetails from '../pages/student/StudentRankDetails';
 import CounsellorDashboard from '../pages/counsellor/CounsellorDashboard';
 import CounsellorProfile from '../pages/counsellor/CounsellorProfile';
 import CounsellorAnalytics from '../pages/counsellor/CounsellorAnalytics';
@@ -78,8 +80,10 @@ const AppRoutes = () => {
           {/* <Route path="/counsellor/sub-counsellors" element={<UnderConstruction />} /> */}
           <Route path="/student/analytics" element={<Analytics />} />
           <Route path="/student/inspiration" element={<Inspiration />} />
+          <Route path="/student/marking-scheme" element={<StudentMarkingScheme />} />
 
           <Route path="/student/ai-chat" element={<AIChat />} />
+          <Route path="/student/rank-details" element={<StudentRankDetails />} />
           <Route path="/counsellor/analytics/details" element={<ShowRankAndFollowUp />} />
         </Route>
 

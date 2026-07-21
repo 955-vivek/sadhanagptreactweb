@@ -5,6 +5,7 @@ const CreateNewActivity = ({ isOpen, onClose, onSave }) => {
   const [name, setName] = useState('');
   const [trackingType, setTrackingType] = useState('Duration');
   const [target, setTarget] = useState('');
+  const [frequency, setFrequency] = useState('Daily');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const trackingTypes = [
@@ -50,7 +51,8 @@ const CreateNewActivity = ({ isOpen, onClose, onSave }) => {
       await onSave({
         name: name,
         trackingType: trackingType,
-        target: target
+        target: target,
+        frequency: frequency
       });
     }
     setIsSubmitting(false);
@@ -58,6 +60,7 @@ const CreateNewActivity = ({ isOpen, onClose, onSave }) => {
     setName('');
     setTrackingType('Duration');
     setTarget('');
+    setFrequency('Daily');
   };
 
   return (
@@ -140,6 +143,33 @@ const CreateNewActivity = ({ isOpen, onClose, onSave }) => {
                       </button>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Frequency Toggle */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-[#6b7a99] uppercase tracking-wider">Frequency</label>
+                <div className="flex bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-1">
+                  <button
+                    onClick={() => setFrequency('Daily')}
+                    className={`flex-1 py-2 text-[13px] font-bold rounded-[10px] transition-all ${
+                      frequency === 'Daily' 
+                        ? 'bg-[rgba(29,233,182,0.12)] text-[#1de9b6] shadow-sm' 
+                        : 'text-[#6b7a99] hover:text-white'
+                    }`}
+                  >
+                    Daily
+                  </button>
+                  <button
+                    onClick={() => setFrequency('Weekly')}
+                    className={`flex-1 py-2 text-[13px] font-bold rounded-[10px] transition-all ${
+                      frequency === 'Weekly' 
+                        ? 'bg-[rgba(29,233,182,0.12)] text-[#1de9b6] shadow-sm' 
+                        : 'text-[#6b7a99] hover:text-white'
+                    }`}
+                  >
+                    Weekly
+                  </button>
                 </div>
               </div>
 

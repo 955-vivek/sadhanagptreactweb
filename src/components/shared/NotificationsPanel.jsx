@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useOutletContext } from 'react-router-dom';
 import { getRequest } from '../../services/api';
+import StudentRankWidget from '../student/StudentRankWidget';
 
 const NotificationsPanel = ({ isOpen, onClose }) => {
   const { userDetails } = useOutletContext();
@@ -98,6 +99,8 @@ const NotificationsPanel = ({ isOpen, onClose }) => {
 
             {/* Notifications List */}
             <div className="flex-1 overflow-y-auto px-4 py-8 space-y-4 bg-[#fcfcfc] dark:bg-[#0F172A] custom-scrollbar">
+              {(userDetails?.user_type === 'student' || userDetails?.user_type === 'counsellor') && <StudentRankWidget onClose={onClose} />}
+
               {isLoading && page === 1 ? (
                 <div className="flex flex-col items-center justify-center pt-20 gap-3">
                    <div className="w-8 h-8 border-4 border-[#1a73e8] border-t-transparent rounded-full animate-spin"></div>

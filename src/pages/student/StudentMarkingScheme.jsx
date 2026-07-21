@@ -230,7 +230,7 @@ const SchemeTable = ({ activityKey, data, isEditing, onMaxChange, onRowMarkChang
   );
 };
 
-const DefaultSchemeDetail = () => {
+const StudentMarkingScheme = () => {
   const navigate = useNavigate();
   const [draftScheme, setDraftScheme] = useState({});
   const [totalMarksFlash, setTotalMarksFlash] = useState(false);
@@ -245,7 +245,7 @@ const DefaultSchemeDetail = () => {
     const userDetailsStr = localStorage.getItem('user_details');
     const userDetails = userDetailsStr ? JSON.parse(userDetailsStr) : {};
     
-    postRequest('/marking-rules', { center_id: 0, user_id: userDetails.user_id }, (response) => {
+    getRequest('/student-marking-rules', null, (response) => {
       if (response?.data?.code === 200 && Array.isArray(response.data.data)) {
         const mapped = mapDBRulesToDraftScheme(response.data.data);
         setDraftScheme(mapped);
@@ -256,6 +256,7 @@ const DefaultSchemeDetail = () => {
     });
   }, []);
 
+  
   const calculateTotalMarks = (scheme) => {
     return Object.values(scheme).reduce((acc, curr) => acc + curr.maxMarks, 0);
   };
@@ -296,24 +297,7 @@ const DefaultSchemeDetail = () => {
     });
   };
 
-  const handleEditInitiate = async () => {
-    // Convert initialScheme to array format for saveScheme
-    const defaultActivitiesArray = Object.entries(initialScheme).map(([key, data]) => ({
-      id: data.id || key,
-      title: data.title,
-      icon: data.icon,
-      maxMarks: data.maxMarks,
-      badge: 'Daily',
-      rows: JSON.parse(JSON.stringify(data.rows))
-    }));
-    
-    // Create provisional clone
-    const res = await saveScheme('', defaultActivitiesArray, null, true);
-    const newCloneId = res.scheme.id;
-    
-    // Navigate to the edit view of the new clone
-    navigate(`/counsellor/marking-scheme/${newCloneId}`, { state: { autoEdit: true } });
-  };
+
 
 
 
@@ -357,13 +341,6 @@ const DefaultSchemeDetail = () => {
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <ThemeToggle />
-            <button
-              onClick={handleEditInitiate}
-              className="flex items-center gap-1.5 px-[14px] py-[6px] border border-teal-500 dark:border-[#1de9b6] text-teal-600 dark:text-[#1de9b6] rounded-[8px] text-[13px] font-medium hover:bg-teal-50 dark:hover:bg-[#1de9b6]/10 active:scale-95 transition-all"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-              Edit
-            </button>
           </div>
         </div>
       </header>
@@ -393,8 +370,8 @@ const DefaultSchemeDetail = () => {
                 activityKey={selectedActivity}
                 data={draftScheme[selectedActivity]}
                 isEditing={false}
-                onMaxChange={handleMaxChange}
-                onRowMarkChange={handleRowMarkChange}
+                
+                
               />
             )
           ) : (
@@ -421,4 +398,4 @@ const DefaultSchemeDetail = () => {
   );
 };
 
-export default DefaultSchemeDetail;
+export default StudentMarkingScheme;

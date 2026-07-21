@@ -8,6 +8,7 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
   const [trackingType, setTrackingType] = useState('Duration');
   const [status, setStatus] = useState('0');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Pre-populate data when modal opens if editing an existing activity
   useEffect(() => {
@@ -37,6 +38,7 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
       else if (activityToEdit.type === 'YES/NO') setTrackingType('Yes/No');
 
       setStatus(String(activityToEdit.visibility || '0'));
+      setShowDeleteConfirm(false);
     }
   }, [isOpen, activityToEdit]);
 
@@ -124,7 +126,7 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
               <div className="w-12 h-1.5 bg-gray-200 dark:bg-[#334155] rounded-full"></div>
             </div>
 
-            <div className="px-6 pb-8 pt-2 max-h-[85vh] overflow-y-auto hide-scrollbar flex flex-col h-full">
+            <div className="px-6 pb-8 pt-2 max-h-[85vh] overflow-y-auto hide-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] flex flex-col h-full">
               
               <div className="flex-grow space-y-6">
                 <h2 className="text-[24px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC]">Edit Activity</h2>
@@ -208,46 +210,6 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
                   </div>
                 )}
 
-                {/* Visibility Options */}
-                <div className="space-y-3">
-                  <label className="text-[12px] font-bold text-gray-500 dark:text-[#CBD5E1] uppercase tracking-wider flex items-center gap-2">
-                    Visibility
-                    <div className="group relative flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 dark:bg-[#334155] text-gray-500 dark:text-[#CBD5E1] text-[10px] cursor-help">
-                      ?
-                      <div className="absolute bottom-full mb-2 w-48 p-2 bg-[#0f172a] dark:bg-[#F8FAFC] text-white dark:text-[#0F172A] text-[10px] rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-lg text-center z-50 normal-case font-medium">
-                        Private activities are unlisted and hidden from your mentor completely.
-                      </div>
-                    </div>
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      onClick={() => setStatus('0')}
-                      className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${
-                        status === '0' 
-                          ? 'border-[#1a73e8] bg-[#eff6ff] text-[#1a73e8] dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400' 
-                          : 'border-transparent bg-[#f8fafc] dark:bg-[#0F172A] text-gray-500 dark:text-[#CBD5E1] hover:bg-gray-100 dark:hover:bg-[#334155]'
-                      }`}
-                    >
-                      <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      <span className="font-bold text-[14px]">Public</span>
-                      <span className="text-[10px] font-medium opacity-80 mt-0.5 text-center">Share with Mentor</span>
-                    </button>
-
-                    <button
-                      onClick={() => setStatus('1')}
-                      className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${
-                        status === '1' 
-                          ? 'border-[#f59e0b] bg-[#fffbeb] text-[#f59e0b] dark:bg-yellow-900/30 dark:border-yellow-500 dark:text-yellow-400' 
-                          : 'border-transparent bg-[#f8fafc] dark:bg-[#0F172A] text-gray-500 dark:text-[#CBD5E1] hover:bg-gray-100 dark:hover:bg-[#334155]'
-                      }`}
-                    >
-                      <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                      <span className="font-bold text-[14px]">Private</span>
-                      <span className="text-[10px] font-medium opacity-80 mt-0.5 text-center">Unlisted / Hidden</span>
-                    </button>
-                  </div>
-                </div>
-
                 {/* Actions */}
                 <div className="flex items-center gap-4 pt-4 pb-2">
                   <button 
@@ -274,9 +236,7 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
               {/* Bottom Delete Button */}
               <div className="w-full pt-4 mt-2 mb-2 flex justify-center border-t border-gray-300 dark:border-[#334155]">
                 <button 
-                  onClick={() => {
-                    if (onDelete) onDelete(activityToEdit?.id);
-                  }}
+                  onClick={() => setShowDeleteConfirm(true)}
                   className="flex items-center gap-2 text-red-500 font-bold hover:text-red-600 transition-colors py-2 px-4 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30"
                   aria-label="Delete Activity"
                 >
@@ -287,6 +247,49 @@ const EditActivityModal = ({ isOpen, onClose, onSave, onDelete, activityToEdit }
 
             </div>
           </motion.div>
+
+          {/* Centered Delete Confirmation Popup */}
+          <AnimatePresence>
+            {showDeleteConfirm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                  className="bg-white dark:bg-[#1E293B] rounded-[24px] p-6 w-full max-w-[320px] shadow-2xl flex flex-col items-center text-center"
+                >
+                  <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center mb-4">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </div>
+                  <h3 className="text-[18px] font-black text-[#0f172a] dark:text-[#F8FAFC] mb-2">Delete Activity?</h3>
+                  <p className="text-sm font-medium text-gray-500 dark:text-[#94A3B8] mb-6">Are you sure you want to delete this activity? This action cannot be undone.</p>
+                  
+                  <div className="flex gap-3 w-full">
+                    <button 
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="flex-1 py-3.5 bg-gray-100 dark:bg-[#334155] hover:bg-gray-200 dark:hover:bg-[#475569] text-[#0f172a] dark:text-[#F8FAFC] rounded-xl font-bold transition-colors active:scale-95"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      onClick={() => {
+                        setShowDeleteConfirm(false);
+                        if (onDelete) onDelete(activityToEdit?.id);
+                      }}
+                      className="flex-1 py-3.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold shadow-lg shadow-red-500/30 transition-colors active:scale-95"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
     </AnimatePresence>

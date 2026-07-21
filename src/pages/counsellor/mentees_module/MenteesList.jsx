@@ -3,8 +3,11 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import CounsellorBottomNavigation from '../../../components/counsellor/CounsellorBottomNavigation';
 import AiAnalysisModals from '../../../components/AiAnalysis/AiAnalysisModals';
-import { getRequest, postRequest } from '../../../services/api';
+import { getRequest, postRequest, deleteRequest } from '../../../services/api';
 import { processResponse } from '../../../utils/apiUtils';
+import CustomActivitiesPage from '../activites/addActivityPage';
+import { exportBulkReportsToCSV, exportBulkReportsToExcel, exportBulkReportsToPDF } from '../../../utils/exportUtils';
+import toast from 'react-hot-toast';
 
 const MenteesList = () => {
   const navigate = useNavigate();
@@ -43,6 +46,9 @@ const MenteesList = () => {
   };
 
   const [isAiAnalysisModalOpen, setIsAiAnalysisModalOpen] = useState(false);
+  const [exportDuration, setExportDuration] = useState('7');
+  const [exportStartDate, setExportStartDate] = useState('');
+  const [exportEndDate, setExportEndDate] = useState('');
   
   const SELECTION_LIMIT = 50;
   const observerTarget = useRef(null);
@@ -166,6 +172,53 @@ const MenteesList = () => {
         showError(data?.message || 'Failed to assign students');
       }
     });
+  };
+
+  const handleExport = async (format) => {
+    const selectedData = students.filter(s => selectedStudents.includes(s.id));
+    if (selectedData.length === 0) return showError("No students selected");
+    
+    let durationLabel = exportDuration === 'all' ? 'all_time' : `${exportDuration}_days`;
+    if (exportDuration === 'custom') {
+       if(!exportStartDate || !exportEndDate) return showError("Please select both start and end dates");
+       durationLabel = `${exportStartDate}_to_${exportEndDate}`;
+    }
+
+    try {
+      const toastId = toast.loading('Fetching activities...');
+      const payload = {
+        student_ids: selectedData.map(s => s.id),
+        filter: exportDuration === 'all' ? 'custom' : exportDuration,
+        start_date: exportDuration === 'all' ? '2000-01-01' : exportStartDate,
+        end_date: exportDuration === 'all' ? new Date().toISOString().split('T')[0] : exportEndDate
+      };
+
+      const res = await postRequest('/export-bulk-student-reports', payload);
+      const data = res.data;
+      
+      toast.dismiss(toastId);
+
+      if (!data || data.status !== 1 || !data.data || data.data.length === 0) {
+         showError("No data available to export for selected students.");
+         return;
+      }
+
+      const filename = `mentees_export_${durationLabel}_${new Date().getTime()}`;
+      
+      if (format === 'Excel (.xls)') {
+         exportBulkReportsToExcel(data.data, `${filename}.xls`);
+      } else if (format === 'CSV (.csv)') {
+         exportBulkReportsToCSV(data.data, `${filename}.csv`);
+      } else if (format === 'Print PDF') {
+         exportBulkReportsToPDF(data.data, durationLabel, `${filename}.pdf`);
+      }
+      
+      setIsDownloadModalOpen(false);
+    } catch (error) {
+      console.error("Export Error:", error);
+      showError("Failed to fetch export data");
+      toast.dismiss();
+    }
   };
 
   const handleSingleAssign = () => {
@@ -296,6 +349,44 @@ const MenteesList = () => {
                    {labels.map(l => <button key={l.id} onClick={()=>{setSelectedLabel(l.id); setIsLabelPopupOpen(false)}} className={`w-full p-4 rounded-2xl text-left font-bold transition-colors ${selectedLabel === l.id ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-gray-50 dark:bg-[#1E293B] dark:text-[#F8FAFC]'}`}>{l.name}</button>)}
                 </div>
              </motion.div>
+          </motion.div>
+        )}
+
+        {isDownloadModalOpen && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsDownloadModalOpen(false)} className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center">
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} onClick={e => e.stopPropagation()} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
+              <div className="flex flex-col gap-4 mb-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-black text-[#0f172a] dark:text-[#F8FAFC]">Export Students</h2>
+                  <select 
+                    value={exportDuration}
+                    onChange={(e) => setExportDuration(e.target.value)}
+                    className="bg-gray-100 dark:bg-[#1E293B] text-gray-700 dark:text-[#F8FAFC] font-bold px-3 py-1.5 rounded-lg text-sm outline-none cursor-pointer border border-transparent hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+                  >
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">Last 30 Days</option>
+                    <option value="90">Last 90 Days</option>
+                    <option value="custom">Custom</option>
+                  </select>
+                </div>
+                {exportDuration === 'custom' && (
+                  <div className="flex gap-2 items-center text-sm font-bold bg-gray-50 dark:bg-[#1E293B] p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <input type="date" value={exportStartDate} onChange={e => setExportStartDate(e.target.value)} className="w-full bg-transparent outline-none dark:text-white dark:[color-scheme:dark]" />
+                    <span className="text-gray-400">to</span>
+                    <input type="date" value={exportEndDate} onChange={e => setExportEndDate(e.target.value)} className="w-full bg-transparent outline-none dark:text-white dark:[color-scheme:dark]" />
+                  </div>
+                )}
+              </div>
+              <div className="space-y-3">
+                {['Excel (.xls)', 'CSV (.csv)', 'Print PDF'].map(f => (
+                  <button key={f} onClick={() => handleExport(f)} className="w-full p-5 bg-gray-50 dark:bg-[#1E293B] text-[#0f172a] dark:text-[#F8FAFC] rounded-2xl font-bold flex items-center justify-between group hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors">
+                    <span className="group-hover:text-blue-600 dark:group-hover:text-blue-400">{f}</span>
+                    <svg className="w-5 h-5 text-gray-400 dark:text-[#94A3B8]" fill="currentColor" viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M13,9V3.5L18.5,9H13Z" /></svg>
+                  </button>
+                ))}
+                <button onClick={() => setIsDownloadModalOpen(false)} className="w-full py-6 text-gray-400 dark:text-[#94A3B8] hover:text-[#0f172a] dark:hover:text-[#F8FAFC] transition-colors font-bold">Close</button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
 

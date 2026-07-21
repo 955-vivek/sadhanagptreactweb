@@ -9,6 +9,16 @@ const NewActivityModal = ({ isOpen, onClose, onSave }) => {
   const [status, setStatus] = useState('0');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Reset form when modal opens
+  React.useEffect(() => {
+    if (isOpen) {
+      setName('');
+      setTrackingType('Duration');
+      setTarget('');
+      setStatus('0');
+    }
+  }, [isOpen]);
+
   const trackingTypes = [
     {
       id: 'Count',
@@ -99,7 +109,7 @@ const NewActivityModal = ({ isOpen, onClose, onSave }) => {
               <div className="w-12 h-1.5 bg-gray-200 dark:bg-[#334155] rounded-full"></div>
             </div>
 
-            <div className="px-6 pb-8 pt-2 max-h-[85vh] overflow-y-auto hide-scrollbar space-y-6">
+            <div className="px-6 pb-8 pt-2 max-h-[85vh] overflow-y-auto hide-scrollbar [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] space-y-6">
               <h2 className="text-[24px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC]">New Activity</h2>
 
               {/* Name Input */}
@@ -182,45 +192,6 @@ const NewActivityModal = ({ isOpen, onClose, onSave }) => {
                 </div>
               )}
 
-              {/* Visibility Options */}
-              <div className="space-y-3">
-                <label className="text-[12px] font-bold text-gray-500 dark:text-[#CBD5E1] uppercase tracking-wider flex items-center gap-2">
-                  Visibility
-                  <div className="group relative flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 dark:bg-[#334155] text-gray-500 dark:text-[#CBD5E1] text-[10px] cursor-help">
-                    ?
-                    <div className="absolute bottom-full mb-2 w-48 p-2 bg-gray-800 dark:bg-[#F8FAFC] text-white dark:text-[#0F172A] text-[10px] rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all shadow-lg text-center z-50 normal-case font-medium">
-                      Private activities are unlisted and hidden from your mentor completely.
-                    </div>
-                  </div>
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setStatus('0')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${
-                      status === '0' 
-                        ? 'border-[#1a73e8] bg-[#eff6ff] text-[#1a73e8] dark:bg-blue-900/30 dark:border-blue-500 dark:text-blue-400' 
-                        : 'border-transparent bg-[#f8fafc] dark:bg-[#0F172A] text-gray-500 dark:text-[#CBD5E1] hover:bg-gray-100 dark:hover:bg-[#334155]'
-                    }`}
-                  >
-                    <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <span className="font-bold text-[14px]">Public</span>
-                    <span className="text-[10px] font-medium opacity-80 mt-0.5 text-center">Share with Mentor</span>
-                  </button>
-
-                  <button
-                    onClick={() => setStatus('1')}
-                    className={`flex flex-col items-center justify-center p-3 rounded-2xl border-2 transition-all ${
-                      status === '1' 
-                        ? 'border-[#f59e0b] bg-[#fffbeb] text-[#f59e0b] dark:bg-yellow-900/30 dark:border-yellow-500 dark:text-yellow-400' 
-                        : 'border-transparent bg-[#f8fafc] dark:bg-[#0F172A] text-gray-500 dark:text-[#CBD5E1] hover:bg-gray-100 dark:hover:bg-[#334155]'
-                    }`}
-                  >
-                    <svg className="w-5 h-5 mb-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
-                    <span className="font-bold text-[14px]">Private</span>
-                    <span className="text-[10px] font-medium opacity-80 mt-0.5 text-center">Unlisted / Hidden</span>
-                  </button>
-                </div>
-              </div>
 
               {/* Actions */}
               <div className="flex items-center gap-4 pt-4 pb-4">

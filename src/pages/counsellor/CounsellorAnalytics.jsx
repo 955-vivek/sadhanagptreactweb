@@ -8,8 +8,10 @@ import ReportSettingsModal from '../../components/counsellor/ReportSettingsModal
 import { useOutletContext } from 'react-router-dom';
 import { postRequest, getRequest } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
+import { exportBulkReportsToCSV, exportBulkReportsToExcel, exportBulkReportsToPDF } from '../../utils/exportUtils';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 import CreateNewActivity from './activites/CreateNewActivity';
+import ExportAnalyticsModal from '../../components/shared/ExportAnalyticsModal';
 
 const MedalIcon = ({ rank }) => {
   const isGold = rank === 1;
@@ -45,6 +47,8 @@ const CounsellorAnalytics = () => {
   const { userDetails } = useOutletContext();
   const [showNotifications, setShowNotifications] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+  const [exportConfig, setExportConfig] = useState(null);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [isLabelsModalOpen, setIsLabelsModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -57,6 +61,67 @@ const CounsellorAnalytics = () => {
   const [viewAllModal, setViewAllModal] = useState({ isOpen: false, type: '', data: [], title: '' });
   const [modalGroupFilter, setModalGroupFilter] = useState('all');
   const [isCreateCustomActivityOpen, setIsCreateCustomActivityOpen] = useState(false);
+
+  const handleBulkExport = async (format, options = null) => {
+    try {
+      // If we got explicit options from ExportAnalyticsModal, use them.
+      // If it passed null, we use our exportConfig!
+      const effectiveOptions = options || exportConfig?.durationOptions;
+      
+      const exportFilter = effectiveOptions 
+         ? (effectiveOptions.duration === 'custom' ? 'custom' : `${effectiveOptions.duration}days`) 
+         : '7days';
+      
+      const startD = effectiveOptions?.duration === 'custom' ? effectiveOptions.startDate : '2000-01-01';
+      const endD = effectiveOptions?.duration === 'custom' ? effectiveOptions.endDate : new Date().toISOString().split('T')[0];
+
+      showToast('Fetching activities for export...', 'success');
+      
+      const payload = {
+        filter: exportFilter,
+        start_date: startD,
+        end_date: endD
+      };
+
+      // Determine the scope based on exportConfig or default to all mentees
+      if (exportConfig?.groupId && exportConfig.groupId !== 'all') {
+        payload.center_id = exportConfig.groupId;
+        if (exportConfig.subGroupId && exportConfig.subGroupId !== 'all') {
+          payload.label_id = exportConfig.subGroupId;
+        }
+      } else {
+        // Fetch all students for this counsellor
+        payload.counsellor_id = userDetails.user_id;
+      }
+
+      const res = await postRequest('/export-bulk-student-reports', payload);
+      const data = res.data;
+
+      if (!data || data.status !== 1 || !data.data || data.data.length === 0) {
+         showToast("No data available to export.", 'error');
+         return;
+      }
+
+      const durationLabel = effectiveOptions ? effectiveOptions.duration : '7';
+      const filename = `counsellor_export_${durationLabel}days_${new Date().getTime()}`;
+      
+      if (format === 'csv') {
+         exportBulkReportsToCSV(data.data, `${filename}.csv`);
+         showToast("CSV Downloaded!", 'success');
+      } else if (format === 'excel') {
+         exportBulkReportsToExcel(data.data, `${filename}.xls`);
+         showToast("Excel Downloaded!", 'success');
+      } else if (format === 'pdf') {
+         exportBulkReportsToPDF(data.data, `${filename}.pdf`);
+         showToast("PDF Downloaded!", 'success');
+      } else {
+        showToast(`Format ${format} not fully implemented yet.`, 'error');
+      }
+    } catch (error) {
+      console.error(error);
+      showToast('Failed to export data', 'error');
+    }
+  };
 
   const handleModalGroupFilterChange = (newVal, modalType) => {
     setModalGroupFilter(newVal);
@@ -214,7 +279,7 @@ const CounsellorAnalytics = () => {
         <div className="mx-4 border border-gray-400/70 dark:border-[#334155] rounded-3xl p-4 bg-white dark:bg-[#1E293B] shadow-sm mb-6">
           {/* Controls: Title, Theme & Bell */}
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-[20px] font-bold underline underline-offset-4 decoration-2 text-gray-900 dark:text-white">Analytics</h1>
+            <h1 className="text-[20px] font-bold underline underline-offset-4 decoration-2 text-gray-900 dark:text-white">Dashboard</h1>
             <div className="flex items-center gap-3">
               <ThemeToggle />
               <button
@@ -404,12 +469,29 @@ const CounsellorAnalytics = () => {
         userDetails={userDetails}
         showToast={showToast}
         groups={groups}
+        onExportClick={(groupId, subGroupId, durationOptions) => {
+          setIsSettingsOpen(false);
+          setExportConfig({ groupId, subGroupId, durationOptions });
+          setIsExportModalOpen(true);
+        }}
       />
 
       <AddGroupModal
         isOpen={isAddGroupOpen}
         onClose={() => setIsAddGroupOpen(false)}
         onSave={handleAddGroup}
+      />
+
+      <ExportAnalyticsModal
+        isOpen={isExportModalOpen}
+        hideDuration={!!exportConfig}
+        onClose={() => {
+          setIsExportModalOpen(false);
+          setTimeout(() => setExportConfig(null), 300); // Clear after animation
+        }}
+        onExportCSV={(options) => handleBulkExport('csv', options)}
+        onExportExcel={(options) => handleBulkExport('excel', options)}
+        onExportPDF={(options) => handleBulkExport('pdf', options)}
       />
 
       {/* Mentee Labels Modal */}
@@ -460,7 +542,8 @@ const CounsellorAnalytics = () => {
                 </div>
 
                 <div>
-                  <label className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Available Labels</label>
+                  <label className="text-[12px] font-black text-gray-400 uppercase tracking-widest mb-3 block">Available Sub-Groups
+                  </label>
                   {isLoadingLabels ? (
                     <div className="flex items-center gap-2 py-4">
                       <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

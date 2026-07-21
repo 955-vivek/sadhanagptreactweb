@@ -14,21 +14,40 @@ const getBadgeStyles = (type) => {
 };
 
 const parseCondition = (conditionStr) => {
+  const opMap = {
+    '>=': 'At least',
+    '<=': 'Upto',
+    '>': 'After',
+    '<': 'Before'
+  };
+
+  const str = (conditionStr || '').trim();
+  
+  for (const [op, text] of Object.entries(opMap)) {
+    if (str.startsWith(op)) {
+      let remainder = str.substring(op.length).trim();
+      remainder = remainder.replace(/\bboolean\b/gi, 'days');
+      return { value: remainder, rule: text };
+    }
+  }
+
+  // Fallback for word-based rules if they already exist
   const rules = ["Before", "After", "Up To", "Up to", "At Least", "Exact Time", "Yes", "No"];
-  const lowerStr = (conditionStr || '').toLowerCase();
+  const lowerStr = str.toLowerCase();
   
   for (const rule of rules) {
     const lowerRule = rule.toLowerCase();
     if (lowerStr.startsWith(lowerRule)) {
-      const remainder = conditionStr.substring(rule.length).trim();
+      let remainder = str.substring(rule.length).trim();
+      remainder = remainder.replace(/\bboolean\b/gi, 'days');
       let titleCaseRule = rule.toLowerCase() === "up to" ? "Up To" : rule;
       titleCaseRule = titleCaseRule.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
-      return { value: remainder || conditionStr, rule: titleCaseRule };
+      return { value: remainder || str, rule: titleCaseRule };
     }
   }
   
-  if (conditionStr) console.warn(`Unrecognized condition format: "${conditionStr}"`);
-  return { value: conditionStr, rule: "" };
+  if (str) console.warn(`Unrecognized condition format: "${str}"`);
+  return { value: str.replace(/\bboolean\b/gi, 'days'), rule: "" };
 };
 
 const CONDITION_OPTIONS = {

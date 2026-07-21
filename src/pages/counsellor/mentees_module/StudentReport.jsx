@@ -298,7 +298,7 @@ const StudentReport = () => {
         <AiAnalysisModals
           isOpen={isAiAnalysisModalOpen}
           onClose={() => setIsAiAnalysisModalOpen(false)}
-          students={studentInfo ? [studentInfo] : []}
+          students={studentInfo ? [{ ...studentInfo, id: studentInfo.user_id || id, avatar: studentInfo.image || studentInfo.avatar }] : []}
           userDetails={userDetails}
         />
       </AnimatePresence>

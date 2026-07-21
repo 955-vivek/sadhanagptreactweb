@@ -126,7 +126,7 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
       <AnimatePresence>
         {isOpen && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md flex items-end justify-center">
-            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300">
+            <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} className="bg-white dark:bg-[#0F172A] w-full max-w-md p-10 rounded-t-[48px] transition-colors duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
               <h2 className="text-2xl font-black mb-2 text-[#0f172a] dark:text-[#F8FAFC]">AI Analysis Setup</h2>
               <p className="text-gray-400 dark:text-[#94A3B8] font-bold mb-6">Analyzing {targetStudents.length} students</p>
 
@@ -244,11 +244,6 @@ const AiAnalysisModals = ({ isOpen, onClose, students = [], userDetails }) => {
                       </div>
                     </div>
                   )}
-
-                  <div className="pt-6 border-t border-gray-300 dark:border-gray-800 space-y-1">
-                    <p className="text-xs font-bold text-gray-400">Generated Using: GPT OSS 120B</p>
-                    <p className="text-xs font-bold text-gray-400">Generated At: {new Date().toLocaleString('en-GB')}</p>
-                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">

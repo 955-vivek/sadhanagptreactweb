@@ -149,8 +149,9 @@ const MenteesList = () => {
             if (data?.status === 1) {
                 showSuccess(data.message || 'Students assigned successfully');
                 setIsBulkAssignOpen(false);
-                setSelectedStudents([]);
+                
                 fetchStudents(1, false);
+                setSelectedStudents([]);
             } else {
                 showError(data?.message || 'Failed to assign students');
             }
@@ -170,8 +171,9 @@ const MenteesList = () => {
             const data = res.data;
             if (data?.status === 1) {
                 showSuccess(data.message || 'Activities removed successfully');
-                setSelectedForRemoval([]);
+                
                 fetchStudents(1, false);
+                setSelectedForRemoval([]);
             } else {
                 showError(data?.message || 'Failed to remove activities');
             }
@@ -183,7 +185,8 @@ const MenteesList = () => {
             counsellor_id: userDetails.user_id,
             name: activityData.name,
             activity_type: activityData.trackingType,
-            target: activityData.target || 0
+            target: activityData.target || 0,
+            frequency: activityData.frequency || 'Daily'
         };
         postRequest('/create-custom-activity', payload, (res) => {
             const data = res.data;

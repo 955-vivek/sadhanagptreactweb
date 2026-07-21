@@ -79,7 +79,14 @@ const ReminderPermissionCard = ({ userId, onGranted, onDenied }) => {
     }
   } catch (error) {
     console.error('Push notification error:', error);
-    onDenied?.(error.message || 'Failed to subscribe');
+    let errorMessage = error.message || 'Failed to subscribe';
+    
+    // Handle browser-specific push service blocks (e.g., Brave Browser, Ungoogled Chromium, Incognito)
+    if (errorMessage.toLowerCase().includes('push service error')) {
+      errorMessage = 'Browser blocked push service. If using Brave, please enable "Use Google services for push messaging" in Settings > Privacy, or try Chrome/Edge.';
+    }
+    
+    onDenied?.(errorMessage);
   } finally {
     setLoading(false);
   }

@@ -22,7 +22,7 @@ const BottomNavigation = () => {
       )
     },
     {
-      name: 'Analytics',
+      name: 'Dashboard',
       path: '/counsellor/analytics',
       icon: (
         <svg className="w-7 h-7 mb-1" fill="currentColor" viewBox="0 0 20 20">

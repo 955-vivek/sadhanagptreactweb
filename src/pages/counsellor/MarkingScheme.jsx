@@ -82,15 +82,15 @@ const MarkingScheme = () => {
     if (scheme.isSystemDefault) {
       // Use the cached activities for the system default scheme
       const defaultActivitiesArray = schemeActivitiesCache[scheme.id] || [];
-      
+
       const res = await saveScheme('', defaultActivitiesArray, null, true); // Provisional clone
       const newClone = res.scheme;
-      
+
       console.log('DEBUG handleEditInitiate:', { defaultActivitiesArray, newClone });
-      
+
       setSchemes(prev => [...prev, newClone]);
       setSchemeActivitiesCache(prev => ({ ...prev, [newClone.id]: defaultActivitiesArray }));
-      
+
       // Pass the fully constructed draft directly to avoid async state lag
       handleEditClick(newClone.id, 'mutate', defaultActivitiesArray);
     } else {
@@ -302,7 +302,7 @@ const MarkingScheme = () => {
                         </button>
                       )}
                       {(scheme.isSystemDefault || isEnabled) && (
-                        <button onClick={() => handleEditInitiate(scheme)} className="text-[11px] font-medium text-[#6b7a99] hover:text-[#1de9b6] transition-colors p-1 ml-1">
+                        <button disabled onClick={() => handleEditInitiate(scheme)} className="text-[11px] font-medium text-[#6b7a99] hover:text-[#1de9b6] transition-colors p-1 ml-1">
                           Edit
                         </button>
                       )}
@@ -311,7 +311,7 @@ const MarkingScheme = () => {
                 </div>
 
                 {/* Application Chip Row */}
-                <div className="flex items-center justify-between bg-slate-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-300 dark:border-[rgba(255,255,255,0.05)] rounded-[8px] p-[8px] mb-[16px]">
+                {/* <div className="flex items-center justify-between bg-slate-50 dark:bg-[rgba(255,255,255,0.03)] border border-gray-300 dark:border-[rgba(255,255,255,0.05)] rounded-[8px] p-[8px] mb-[16px]">
                   <div className={`flex items-center gap-2 ${scheme.isSystemDefault ? 'text-teal-600 dark:text-[#1de9b6]' : 'text-slate-500 dark:text-[#6b7a99]'}`}>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
                     <span className="text-[12px] font-semibold">Applied to {scheme.appliedGroupCount || 0} groups</span>
@@ -324,7 +324,7 @@ const MarkingScheme = () => {
                       {expandedSchemeId === scheme.id ? 'Hide groups' : 'View groups'}
                     </button>
                   )}
-                </div>
+                </div> */}
 
                 {/* Scheme Groups Panel Inline */}
                 {!isEditing && isEnabled && expandedSchemeId === scheme.id && (
@@ -397,6 +397,8 @@ const MarkingScheme = () => {
                 </svg>
                 <p className="text-[11px] font-normal text-gray-500 dark:text-[#6b7a99] text-center max-w-[180px]">
                   Build a personalized scheme to match your goals
+                  <br />
+                  <span className="text-amber-500 font-bold mt-2 inline-block">Coming Soon!</span>
                 </p>
               </div>
 
@@ -405,8 +407,7 @@ const MarkingScheme = () => {
                   New
                 </span>
                 {editSchemeId === null && (
-                  <button
-                    onClick={() => handleEditClick('new', 'fork')}
+                  <button disabled onClick={() => handleEditClick('new', 'fork')}
                     className="flex items-center font-medium text-[12px] text-[#1de9b6] hover:opacity-80 transition-opacity"
                   >
                     + Create

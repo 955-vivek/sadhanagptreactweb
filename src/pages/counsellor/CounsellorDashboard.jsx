@@ -12,6 +12,7 @@ import ReminderPermissionCard from '../../components/shared/ReminderPermissionCa
 import ReminderPopup from '../../components/shared/ReminderPopup';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 import DailyScoreIndicator from '../../components/shared/DailyScoreIndicator';
+import { useDragScroll } from '../../hooks/useDragScroll';
 
 // Dummy data for notifications (Shared temporarily until context/API is built)
 const dummyNotifications = [
@@ -77,6 +78,7 @@ const CounsellorDashboard = () => {
   };
 
   const dateContainerRef = useRef(null);
+  const dragScroll = useDragScroll(dateContainerRef);
   const hasScrolledRef = useRef(false);
 
   const fetchDailyScore = (targetDate) => {
@@ -100,15 +102,15 @@ const CounsellorDashboard = () => {
     });
   };
 
-  const fetchDailyReport = async (dateObj, currentActivities) => {
+  const fetchDailyReport = async (dateObj, currentActivities, isBackground = false) => {
     const resolveActivities = currentActivities || activities;
     if (!resolveActivities || resolveActivities.length === 0) {
-      setIsLoading(false);
+      if (!isBackground) setIsLoading(false);
       return;
     }
 
     try {
-      setIsLoading(true);
+      if (!isBackground) setIsLoading(true);
       const yyyy = dateObj.getFullYear();
       const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
       const dd = String(dateObj.getDate()).padStart(2, '0');
@@ -164,11 +166,11 @@ const CounsellorDashboard = () => {
             };
           }));
         }
-        setIsLoading(false);
+        if (!isBackground) setIsLoading(false);
       });
     } catch (e) {
       console.error(e);
-      setIsLoading(false);
+      if (!isBackground) setIsLoading(false);
     }
   };
 
@@ -309,7 +311,7 @@ const CounsellorDashboard = () => {
       fetchDailyScore();
 
       const activeDateObj = dates.find(d => d.active)?.fullDate || new Date();
-      fetchDailyReport(activeDateObj);
+      fetchDailyReport(activeDateObj, undefined, true); // true for isBackground
     }, 500);
   };
 
@@ -378,8 +380,6 @@ const CounsellorDashboard = () => {
   };
 
   const handleDeleteActivity = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this activity?")) return;
-
     try {
       const payload = {
         activity_id: id,
@@ -445,6 +445,7 @@ const CounsellorDashboard = () => {
         {/* Dynamic Date Selector (Native Smooth Swiping) */}
         <div
           ref={dateContainerRef}
+          {...dragScroll}
           className="flex gap-4 px-6 overflow-x-auto pb-4 hide-scrollbar scroll-smooth snap-x snap-mandatory"
         >
           {dates.map((item) => {
@@ -455,45 +456,45 @@ const CounsellorDashboard = () => {
             const color = dateColors[dateStr];
 
             let fillClass = '';
-            let bgClass = 'bg-white';
-            let borderClass = 'border border-slate-200/80';
-            let textColor = 'text-[#1e293b]';
-            let monthColor = 'text-[#94a3b8]';
+            let bgClass = 'bg-white dark:bg-slate-800';
+            let borderClass = 'border border-slate-200/80 dark:border-slate-700/80';
+            let textColor = 'text-slate-800 dark:text-slate-50';
+            let monthColor = 'text-slate-400 dark:text-slate-300';
 
             if (color === '#10B981') {
-              fillClass = 'bg-[#d1fae5] h-full';
-              bgClass = 'bg-[#f4fdf8]';
-              borderClass = 'border border-[#a7f3d0]';
-              textColor = 'text-[#065f46]';
-              monthColor = 'text-[#047857]';
+              fillClass = 'bg-emerald-100 dark:bg-emerald-500/20 h-full';
+              bgClass = 'bg-emerald-50 dark:bg-slate-800';
+              borderClass = 'border border-emerald-200 dark:border-emerald-500/50';
+              textColor = 'text-emerald-800 dark:text-emerald-400';
+              monthColor = 'text-emerald-700 dark:text-emerald-500';
             } else if (color === '#F59E0B') {
-              fillClass = 'bg-[#fef3c7] h-1/2';
-              bgClass = 'bg-[#fffdf5]';
-              borderClass = 'border border-[#fde68a]';
-              textColor = 'text-[#1e293b]';
-              monthColor = 'text-[#b45309]';
+              fillClass = 'bg-amber-100 dark:bg-amber-500/20 h-1/2';
+              bgClass = 'bg-amber-50 dark:bg-slate-800';
+              borderClass = 'border border-amber-200 dark:border-amber-500/50';
+              textColor = 'text-slate-800 dark:text-amber-300';
+              monthColor = 'text-amber-700 dark:text-amber-500';
             } else if (color === '#EF4444') {
               fillClass = 'h-0';
-              bgClass = 'bg-white';
-              borderClass = 'border border-dashed border-rose-300';
-              textColor = 'text-[#475569]';
-              monthColor = 'text-[#f43f5e]';
+              bgClass = 'bg-white dark:bg-slate-800';
+              borderClass = 'border border-dashed border-rose-300 dark:border-rose-500/50';
+              textColor = 'text-slate-600 dark:text-slate-50';
+              monthColor = 'text-rose-500 dark:text-rose-400';
             } else {
               fillClass = 'h-0';
-              bgClass = 'bg-white';
-              borderClass = 'border border-slate-200/80';
-              textColor = 'text-[#0f172a]';
-              monthColor = 'text-[#94a3b8]';
+              bgClass = 'bg-white dark:bg-slate-800';
+              borderClass = 'border border-slate-200/80 dark:border-slate-700/80';
+              textColor = 'text-slate-800 dark:text-slate-50';
+              monthColor = 'text-slate-400 dark:text-slate-300';
             }
 
             return (
               <button
                 key={item.id}
                 onClick={() => handleDateSelect(item.id)}
-                className={`relative flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all shadow-sm select-none overflow-hidden ${
+                className={`snap-center relative flex-shrink-0 flex flex-col items-center justify-center w-[72px] h-[90px] rounded-[20px] transition-all shadow-sm select-none overflow-hidden ${
                   item.active
-                    ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md border border-[#1a73e8]'
-                    : `${bgClass} ${borderClass}`
+                    ? 'bg-[#1a73e8] text-white shadow-[#1a73e8]/30 shadow-md border border-[#1a73e8] scale-105'
+                    : `${bgClass} ${borderClass} hover:bg-gray-50 dark:hover:bg-[#334155] scale-100`
                 }`}
               >
                 {!item.active && (
@@ -551,7 +552,7 @@ onDenied = {(msg) => toast.error(msg || 'Permission for notifications was denied
         className="w-full max-w-md mx-auto mt-2 mb-4 py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-        Add Log
+        Add Activity
       </button>
     </>
   ) : (
@@ -562,7 +563,7 @@ onDenied = {(msg) => toast.error(msg || 'Permission for notifications was denied
         className="w-full max-w-md mx-auto py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-        Add Log
+        Add Activity
       </button>
     </div>
   )}

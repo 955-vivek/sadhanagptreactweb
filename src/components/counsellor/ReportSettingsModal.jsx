@@ -2,17 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { postRequest, getRequest } from '../../services/api';
 import { processResponse } from '../../utils/apiUtils';
+import ExportAnalyticsModal from '../shared/ExportAnalyticsModal';
 
-const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups = [] }) => {
+const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups = [], onExportClick }) => {
   const [autoReportStatus, setAutoReportStatus] = useState(1);
-  const [reportFrequencyDays, setReportFrequencyDays] = useState(7);
-  const [isCustomFrequency, setIsCustomFrequency] = useState(false);
+  const [emailFrequencyDays, setEmailFrequencyDays] = useState(7);
+  const [emailStartDate, setEmailStartDate] = useState('');
+  const [emailEndDate, setEmailEndDate] = useState('');
+  
+  const [exportDuration, setExportDuration] = useState('7');
+  const [exportStartDate, setExportStartDate] = useState('');
+  const [exportEndDate, setExportEndDate] = useState('');
+  
   const [reportGroupId, setReportGroupId] = useState('all');
   const [reportSubgroupId, setReportSubgroupId] = useState('all');
   const [labels, setLabels] = useState([]);
   
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPushEnabled, setIsPushEnabled] = useState(false);
 
   // New States for Activity Reminders
   const [reminderEnabled, setReminderEnabled] = useState(false);
@@ -26,14 +32,13 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups =
         if (res?.code === 200 || res?.status === 1 || res?.success) {
           const profile = res.data?.user || {};
           setAutoReportStatus(profile.auto_report_status === 1);
-          
-          const freq = profile.report_frequency_days || 7;
-          if ([2, 7, 30, 90].includes(freq)) {
-            setReportFrequencyDays(freq);
-            setIsCustomFrequency(false);
+          const freq = profile.report_frequency_days;
+          if (freq === -1) {
+            setEmailFrequencyDays('custom');
+            if (profile.email_start_date) setEmailStartDate(profile.email_start_date.split('T')[0]);
+            if (profile.email_end_date) setEmailEndDate(profile.email_end_date.split('T')[0]);
           } else {
-            setReportFrequencyDays(freq);
-            setIsCustomFrequency(true);
+            setEmailFrequencyDays(freq || 7);
           }
 
           setReportGroupId(profile.report_group_id || 'all');
@@ -61,44 +66,6 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups =
       setLabels([]);
     }
   }, [reportGroupId, userDetails]);
-
-  // Push Notification Subscription Check
-  useEffect(() => {
-    const checkSubscription = async () => {
-      if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-        setIsPushEnabled(true); // hide if not supported
-        return;
-      }
-
-      try {
-        const registration = await navigator.serviceWorker.getRegistration();
-        const browserSubscription = registration ? await registration.pushManager.getSubscription() : null;
-
-        if (userDetails?.user_id) {
-          getRequest('/check-push-status', { user_id: userDetails.user_id }, async (response) => {
-            const backendHasSub = response.data?.isSubscribed;
-
-            if (browserSubscription && !backendHasSub) {
-              await browserSubscription.unsubscribe();
-              setIsPushEnabled(false);
-            } else if (browserSubscription && backendHasSub) {
-              setIsPushEnabled(true);
-            } else {
-              setIsPushEnabled(false);
-            }
-          });
-        } else {
-          setIsPushEnabled(!!browserSubscription);
-        }
-      } catch (e) {
-        setIsPushEnabled(false);
-      }
-    };
-
-    if (userDetails?.user_id && isOpen) {
-      checkSubscription();
-    }
-  }, [userDetails?.user_id, isOpen]);
 
   const handleToggleActivityReminders = async () => {
     const turningOn = !reminderEnabled;
@@ -129,75 +96,15 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups =
     }
   };
 
-  const handleEnablePushNotifications = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-      showToast('Push notifications are not supported by your browser.', 'error');
-      return;
-    }
-
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        showToast('Permission for notifications was denied', 'error');
-        return;
-      }
-
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      const publicVapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-
-      if (!publicVapidKey) {
-        showToast('VAPID Public Key is missing in .env', 'error');
-        return;
-      }
-
-      function urlBase64ToUint8Array(base64String) {
-        const padding = '='.repeat((4 - base64String.length % 4) % 4);
-        const base64 = (base64String + padding)
-          .replace(/\-/g, '+')
-          .replace(/_/g, '/');
-
-        const rawData = window.atob(base64);
-        const outputArray = new Uint8Array(rawData.length);
-
-        for (let i = 0; i < rawData.length; ++i) {
-          outputArray[i] = rawData.charCodeAt(i);
-        }
-        return outputArray;
-      }
-
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicVapidKey)
-      });
-
-      // Send to backend
-      postRequest('/notifications-subscribe', {
-        user_id: userDetails.user_id,
-        subscription: subscription
-      }, (response) => {
-        const { message, type } = processResponse(response.data);
-        if (type === 'success' || response.data?.status === 1) {
-          showToast('Push notifications enabled!', 'success');
-          setIsPushEnabled(true);
-          setReminderEnabled(true); // Sync the toggle visually
-        } else {
-          showToast(message || 'Failed to save subscription.', 'error');
-        }
-      });
-
-    } catch (error) {
-      console.error(error);
-      showToast('Error enabling push notifications', 'error');
-    }
-  };
-
   const handleSave = () => {
     setIsSubmitting(true);
 
     const emailPayload = {
       user_id: userDetails.user_id,
       auto_report_status: autoReportStatus ? 1 : 0,
-      report_frequency_days: Number(reportFrequencyDays),
+      report_frequency_days: emailFrequencyDays === 'custom' ? -1 : Number(emailFrequencyDays),
+      email_start_date: emailFrequencyDays === 'custom' ? emailStartDate : null,
+      email_end_date: emailFrequencyDays === 'custom' ? emailEndDate : null,
       report_group_id: reportGroupId,
       report_subgroup_id: reportSubgroupId
     };
@@ -255,50 +162,10 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups =
             </button>
           </div>
 
-          <div className="p-6 flex flex-col gap-5">
+          <div className="p-6 flex flex-col gap-5 overflow-y-auto max-h-[75vh] custom-scrollbar">
 
-            {/* Push Notifications Enable Banner */}
-            {!isPushEnabled && (
-              <div className="bg-gradient-to-r from-[#1a73e8] to-[#2563eb] rounded-2xl p-4 shadow-md text-white mb-2">
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-[15px] mb-0.5">Enable Reminders</h3>
-                    <p className="text-blue-100 text-[12px] leading-tight">Get push notifications for mentee updates.</p>
-                  </div>
-                  <button
-                    onClick={handleEnablePushNotifications}
-                    className="bg-white text-[#1a73e8] font-bold px-4 py-2 rounded-xl text-[12px] shadow-sm active:scale-95 transition-all whitespace-nowrap"
-                  >
-                    Allow
-                  </button>
-                </div>
-              </div>
-            )}
-
-
-
-            {/* Toggle Switch Area */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-[#0f172a] dark:text-[#F8FAFC] font-bold">Email Reports</h3>
-                <p className="text-sm text-gray-500 dark:text-[#94A3B8]">Receive automated CSV mentee logs</p>
-              </div>
-              <button
-                type="button"
-                className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${autoReportStatus ? 'bg-[#1a73e8]' : 'bg-gray-200 dark:bg-[#334155]'}`}
-                onClick={() => setAutoReportStatus(prev => !prev)}
-              >
-                <span className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoReportStatus ? 'translate-x-5' : 'translate-x-0'}`} />
-              </button>
-            </div>
-
-            {/* Filter Area */}
-            <div className={`transition-opacity duration-300 ${!autoReportStatus ? 'opacity-40 pointer-events-none' : 'opacity-100'} space-y-4`}>
+            {/* Filter Area - Now always active */}
+            <div className="space-y-4">
               
               {/* Group Select */}
               <div>
@@ -331,51 +198,94 @@ const ReportSettingsModal = ({ isOpen, onClose, userDetails, showToast, groups =
                 </div>
               )}
 
-              {/* Frequency Selector */}
+              {/* Frequency Selector for Export */}
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-[#0f172a] dark:text-[#F8FAFC] font-bold text-sm">Report Duration</label>
-                  <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
-                    {reportFrequencyDays} Days
-                  </span>
-                </div>
+                <label className="block text-[#0f172a] dark:text-[#F8FAFC] font-bold text-sm mb-1.5">Report Duration</label>
                 <select
-                  value={isCustomFrequency ? 'custom' : reportFrequencyDays}
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === 'custom') {
-                      setIsCustomFrequency(true);
-                      setReportFrequencyDays(1);
-                    } else {
-                      setIsCustomFrequency(false);
-                      setReportFrequencyDays(Number(val));
-                    }
-                  }}
+                  value={exportDuration}
+                  onChange={(e) => setExportDuration(e.target.value)}
                   className="w-full bg-gray-50 dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] text-gray-900 dark:text-[#F8FAFC] text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none transition-colors duration-300 mb-2"
                 >
-                  <option value={2}>2 Days</option>
-                  <option value={7}>7 Days</option>
-                  <option value={30}>30 Days</option>
-                  <option value={90}>90 Days</option>
-                  <option value="custom">Custom</option>
+                  <option value="7">Last 7 Days</option>
+                  <option value="30">Last 30 Days</option>
+                  <option value="90">Last 90 Days</option>
+                  <option value="custom">Custom Range</option>
                 </select>
 
-                {isCustomFrequency && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <input
-                      type="number"
-                      min="1"
-                      value={reportFrequencyDays}
-                      onChange={(e) => setReportFrequencyDays(Number(e.target.value) || 1)}
-                      className="flex-1 bg-gray-50 dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] text-gray-900 dark:text-[#F8FAFC] text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none transition-colors duration-300"
-                      placeholder="Enter custom days"
-                    />
-                    <span className="text-sm font-bold text-gray-500">Days</span>
+                {exportDuration === 'custom' && (
+                  <div className="flex gap-2 items-center bg-gray-50 dark:bg-[#1E293B] p-2 rounded-xl border border-gray-300 dark:border-[#334155] mt-2">
+                    <input type="date" value={exportStartDate} onChange={e => setExportStartDate(e.target.value)} className="w-full bg-transparent outline-none dark:text-white dark:[color-scheme:dark] text-sm" />
+                    <span className="text-gray-400 font-bold text-sm">to</span>
+                    <input type="date" value={exportEndDate} onChange={e => setExportEndDate(e.target.value)} className="w-full bg-transparent outline-none dark:text-white dark:[color-scheme:dark] text-sm text-right" />
                   </div>
                 )}
-                <p className="text-xs text-gray-500 mt-2">
-                  This determines how many days backwards the report logs look, starting from yesterday (e.g., 2 days means yesterday and the day before).
-                </p>
+              </div>
+            </div>
+
+            {/* Export Button based on Filters */}
+            <button
+              onClick={() => onExportClick && onExportClick(reportGroupId, reportSubgroupId, { duration: exportDuration, startDate: exportStartDate, endDate: exportEndDate })}
+              className="mt-6 w-full flex items-center justify-center gap-2 bg-white dark:bg-[#1E293B] border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 text-[#0f172a] dark:text-[#F8FAFC] font-bold py-3.5 rounded-xl shadow-sm transition-all active:scale-[0.98]"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+              Export Report Data
+            </button>
+
+            {/* Email Reports Toggle - Moved Below Export Button */}
+            <div className="flex flex-col mt-6 pt-6 border-t border-gray-200 dark:border-gray-800/60 gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-[#0f172a] dark:text-[#F8FAFC] font-bold">Email Reports</h3>
+                  <p className="text-sm text-gray-500 dark:text-[#94A3B8]">Receive automated CSV mentee logs</p>
+                </div>
+                <button
+                  type="button"
+                  className={`relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${autoReportStatus ? 'bg-[#1a73e8]' : 'bg-gray-200 dark:bg-[#334155]'}`}
+                  onClick={() => setAutoReportStatus(prev => !prev ? 1 : 0)}
+                >
+                  <span className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${autoReportStatus ? 'translate-x-5' : 'translate-x-0'}`} />
+                </button>
+              </div>
+
+              {/* Email Report Duration */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-[#0f172a] dark:text-[#F8FAFC] font-bold text-sm">Automated Report Duration</label>
+                  <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-wider">
+                    {emailFrequencyDays === 'custom' ? 'Custom' : `${emailFrequencyDays} Days`}
+                  </span>
+                </div>
+                <div className="space-y-3">
+                  <select
+                    value={emailFrequencyDays}
+                    onChange={(e) => setEmailFrequencyDays(e.target.value === 'custom' ? 'custom' : Number(e.target.value))}
+                    className="w-full bg-gray-50 dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] text-gray-900 dark:text-[#F8FAFC] text-sm rounded-xl focus:ring-[#1a73e8] focus:border-[#1a73e8] block p-3 font-medium outline-none transition-colors duration-300"
+                  >
+                    <option value={2}>2 Days</option>
+                    <option value={7}>7 Days</option>
+                    <option value={30}>30 Days</option>
+                    <option value={90}>90 Days</option>
+                    <option value="custom">Custom Date Range</option>
+                  </select>
+
+                  {emailFrequencyDays === 'custom' && (
+                    <div className="flex gap-2 items-center bg-gray-50 dark:bg-[#1E293B] border border-gray-300 dark:border-[#334155] rounded-xl p-2.5">
+                      <input 
+                        type="date" 
+                        value={emailStartDate} 
+                        onChange={e => setEmailStartDate(e.target.value)} 
+                        className="w-full bg-transparent outline-none dark:text-white dark:[color-scheme:dark] text-sm" 
+                      />
+                      <span className="text-gray-400 font-bold text-sm">to</span>
+                      <input 
+                        type="date" 
+                        value={emailEndDate} 
+                        onChange={e => setEmailEndDate(e.target.value)} 
+                        className="w-full bg-transparent outline-none dark:text-white dark:[color-scheme:dark] text-sm text-right" 
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

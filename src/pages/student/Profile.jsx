@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import BottomNavigation from '../../components/student/BottomNavigation';
 import AddMentorModal from '../../components/shared/AddMentorModal';
+import MarkingSchemeProfileCard from '../../components/shared/MarkingSchemeProfileCard';
 import EditPersonalInfoModal from '../../components/shared/EditPersonalInfoModal';
 import ConfirmModal from '../../components/shared/ConfirmModal';
 import MentorDetailsModal from '../../components/shared/MentorDetailsModal';
@@ -432,9 +433,9 @@ const Profile = () => {
                   <div className="w-12 h-12 rounded-2xl bg-[#fcf8ed] dark:bg-orange-900/20 flex items-center justify-center text-[#94a3b8] dark:text-orange-400">
                     <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-black text-gray-300 dark:text-[#CBD5E1] uppercase tracking-widest mb-1 transition-colors duration-300">Email</p>
-                    <p className="text-[16px] font-bold text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300">{userInfo.email}</p>
+                    <p className="text-[16px] font-bold text-[#1e293b] dark:text-[#F8FAFC] transition-colors duration-300 break-all">{userInfo.email}</p>
                   </div>
                 </div>
 
@@ -606,6 +607,9 @@ const Profile = () => {
                 </div>
               </section>
             )}
+
+            {/* Marking Scheme Section */}
+            <MarkingSchemeProfileCard role="student" />
 
             {/* App Feedback Section */}
             <section className="px-8 mb-10">

@@ -12,6 +12,7 @@ import { processResponse } from '../../utils/apiUtils';
 import ReminderPopup from '../../components/shared/ReminderPopup';
 import ReminderPermissionCard from '../../components/shared/ReminderPermissionCard';
 import DailyScoreIndicator from '../../components/shared/DailyScoreIndicator';
+import { useDragScroll } from '../../hooks/useDragScroll';
 
 // Dummy data for notifications (Shared with Student view)
 const dummyNotifications = [
@@ -115,20 +116,21 @@ const StudentDashboard = () => {
   };
 
   const dateContainerRef = useRef(null);
+  const dragScroll = useDragScroll(dateContainerRef);
   const hasScrolledRef = useRef(false);
 
   // Exact Match to Mentor Logic: fetchDailyReport inside fetchActivities chain
-  const fetchDailyReport = async (dateObj, currentActivities) => {
+  const fetchDailyReport = async (dateObj, currentActivities, isBackground = false) => {
     const resolveActivities = currentActivities || activities;
     if (!resolveActivities || !Array.isArray(resolveActivities) || resolveActivities.length === 0) {
-      setIsLoading(false);
+      if (!isBackground) setIsLoading(false);
       return;
     }
 
     if (!userDetails?.user_id) return;
 
     try {
-      setIsLoading(true);
+      if (!isBackground) setIsLoading(true);
       const yyyy = dateObj.getFullYear();
       const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
       const dd = String(dateObj.getDate()).padStart(2, '0');
@@ -170,7 +172,12 @@ const StudentDashboard = () => {
               newStatus = count ? 'Completed' : 'Pending'; // Time activities are complete if they have any logged time
             } else {
               newProgress = `${count} / ${target}`;
-              newStatus = count >= target ? 'Completed' : 'Pending';
+              const numericTarget = Number(target);
+              if (numericTarget === 0) {
+                newStatus = count > 0 ? 'Completed' : 'Pending';
+              } else {
+                newStatus = count >= numericTarget ? 'Completed' : 'Pending';
+              }
             }
 
             return { ...act, progress: newProgress, status: newStatus };
@@ -188,11 +195,12 @@ const StudentDashboard = () => {
             };
           }));
         }
-        setIsLoading(false);
+
+        if (!isBackground) setIsLoading(false);
       });
-    } catch (e) {
-      console.error(e);
-      setIsLoading(false);
+    } catch (error) {
+      console.error("Fetch Report Error:", error);
+      if (!isBackground) setIsLoading(false);
     }
   };
 
@@ -233,7 +241,8 @@ const StudentDashboard = () => {
               unit: act.unit,
               description: act.description,
               target: act.target,
-              visibility: act.status
+              visibility: act.status,
+              frequency: act.frequency
             };
           });
 
@@ -365,7 +374,7 @@ const StudentDashboard = () => {
       fetchDailyScore();
 
       const activeDateObj = dates?.find(d => d.active)?.fullDate || new Date();
-      fetchDailyReport(activeDateObj);
+      fetchDailyReport(activeDateObj, null, true);
     }, 500);
   };
 
@@ -407,7 +416,8 @@ const StudentDashboard = () => {
         target: activityType === 'yes_no' ? 0 : (updatedActivityData.target ? (activityType === 'time' ? updatedActivityData.target : Number(updatedActivityData.target)) : null),
         unit: unit,
         activity_type: activityType,
-        status: updatedActivityData.status || '0'
+        status: updatedActivityData.status || '0',
+        description: updatedActivityData.description || 'daily'
       };
 
       postRequest('/edit-acitivity', payload, (response) => {
@@ -431,8 +441,6 @@ const StudentDashboard = () => {
   };
 
   const handleDeleteActivity = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this activity?")) return;
-
     try {
       const payload = {
         activity_id: id,
@@ -465,7 +473,7 @@ const StudentDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-10 pb-6">
           <h1 className="text-[28px] font-extrabold text-[#0f172a] dark:text-[#F8FAFC] tracking-tight">Activities</h1>
-          <div className="flex items-center">
+          <div className="flex items-center gap-2">
             <ThemeToggle />
             <button
               onClick={() => {
@@ -485,7 +493,11 @@ const StudentDashboard = () => {
         </div>
 
         {/* Date Selector */}
-        <div ref={dateContainerRef} className="flex gap-4 px-6 overflow-x-auto pb-4 hide-scrollbar scroll-smooth snap-x snap-mandatory">
+        <div 
+          ref={dateContainerRef} 
+          {...dragScroll}
+          className="flex gap-4 px-6 overflow-x-auto pb-4 hide-scrollbar scroll-smooth snap-x snap-mandatory"
+        >
           {dates.map((item) => {
             const yyyy = item.fullDate.getFullYear();
             const mm = String(item.fullDate.getMonth() + 1).padStart(2, '0');
@@ -494,35 +506,35 @@ const StudentDashboard = () => {
             const color = dateColors[dateStr];
 
             let fillClass = '';
-            let bgClass = 'bg-white dark:bg-[#1E293B]';
+            let bgClass = 'bg-white dark:bg-slate-800';
             let borderClass = 'border border-slate-200/80 dark:border-slate-700/80';
-            let textColor = 'text-[#1e293b] dark:text-[#F8FAFC]';
-            let monthColor = 'text-[#94a3b8] dark:text-[#CBD5E1]';
+            let textColor = 'text-slate-800 dark:text-slate-50';
+            let monthColor = 'text-slate-400 dark:text-slate-300';
 
             if (color === '#10B981') {
-              fillClass = 'bg-[#d1fae5] dark:bg-[#10B981]/20 h-full';
-              bgClass = 'bg-[#f4fdf8] dark:bg-[#1E293B]';
-              borderClass = 'border border-[#a7f3d0] dark:border-[#10B981]/50';
-              textColor = 'text-[#065f46] dark:text-[#34D399]';
-              monthColor = 'text-[#047857] dark:text-[#10B981]';
+              fillClass = 'bg-emerald-100 dark:bg-emerald-500/20 h-full';
+              bgClass = 'bg-emerald-50 dark:bg-slate-800';
+              borderClass = 'border border-emerald-200 dark:border-emerald-500/50';
+              textColor = 'text-emerald-800 dark:text-emerald-400';
+              monthColor = 'text-emerald-700 dark:text-emerald-500';
             } else if (color === '#F59E0B') {
-              fillClass = 'bg-[#fef3c7] dark:bg-[#F59E0B]/20 h-1/2';
-              bgClass = 'bg-[#fffdf5] dark:bg-[#1E293B]';
-              borderClass = 'border border-[#fde68a] dark:border-[#F59E0B]/50';
-              textColor = 'text-[#1e293b] dark:text-[#FCD34D]';
-              monthColor = 'text-[#b45309] dark:text-[#F59E0B]';
+              fillClass = 'bg-amber-100 dark:bg-amber-500/20 h-1/2';
+              bgClass = 'bg-amber-50 dark:bg-slate-800';
+              borderClass = 'border border-amber-200 dark:border-amber-500/50';
+              textColor = 'text-slate-800 dark:text-amber-300';
+              monthColor = 'text-amber-700 dark:text-amber-500';
             } else if (color === '#EF4444') {
               fillClass = 'h-0';
-              bgClass = 'bg-white dark:bg-[#1E293B]';
+              bgClass = 'bg-white dark:bg-slate-800';
               borderClass = 'border border-dashed border-rose-300 dark:border-rose-500/50';
-              textColor = 'text-[#475569] dark:text-[#F8FAFC]';
-              monthColor = 'text-[#f43f5e] dark:text-rose-400';
+              textColor = 'text-slate-600 dark:text-slate-50';
+              monthColor = 'text-rose-500 dark:text-rose-400';
             } else {
               fillClass = 'h-0';
-              bgClass = 'bg-white dark:bg-[#1E293B]';
+              bgClass = 'bg-white dark:bg-slate-800';
               borderClass = 'border border-slate-200/80 dark:border-slate-700/80';
-              textColor = 'text-[#0f172a] dark:text-[#F8FAFC]';
-              monthColor = 'text-[#94a3b8] dark:text-[#CBD5E1]';
+              textColor = 'text-slate-800 dark:text-slate-50';
+              monthColor = 'text-slate-400 dark:text-slate-300';
             }
 
             return (
@@ -551,7 +563,12 @@ const StudentDashboard = () => {
           })}
         </div>
 
-
+        {/* Enable Reminders Card */}
+        <ReminderPermissionCard
+          userId={userDetails?.user_id}
+          onGranted={(msg) => toast.success(msg || 'Push notifications enabled!')}
+          onDenied={(msg) => toast.error(msg || 'Permission for notifications was denied')}
+        />
 
         {/* Activities List */}
         <div className="px-6 mt-4">
@@ -586,7 +603,7 @@ const StudentDashboard = () => {
                 className="w-full max-w-md mx-auto mt-2 mb-4 py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                Add Log
+                Add Activity
               </button>
             </>
           ) : (
@@ -597,7 +614,7 @@ const StudentDashboard = () => {
                 className="w-full max-w-md mx-auto py-4 rounded-2xl border-2 border-dashed border-[#1a73e8]/40 dark:border-blue-400/40 bg-[#1a73e8]/5 dark:bg-blue-400/5 text-[#1a73e8] dark:text-blue-400 font-extrabold flex items-center justify-center gap-2 transition-all hover:bg-[#1a73e8]/10 dark:hover:bg-blue-400/10 active:scale-[0.98]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                Add Log
+                Add Activity
               </button>
             </div>
           )}
@@ -627,7 +644,8 @@ const StudentDashboard = () => {
               target: activityType === 'yes_no' ? 0 : (activityData.target ? (activityType === 'time' ? activityData.target : Number(activityData.target)) : null),
               unit: unit,
               activity_type: activityType,
-              status: activityData.status || '0'
+              status: activityData.status || '0',
+              description: 'daily'
             };
 
             postRequest('/add-acitivity', payload, (response) => {

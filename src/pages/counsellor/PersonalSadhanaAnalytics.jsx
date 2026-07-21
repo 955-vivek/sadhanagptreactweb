@@ -3,9 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import NotificationsPanel from '../../components/shared/NotificationsPanel';
 import CounsellorBottomNavigation from '../../components/counsellor/CounsellorBottomNavigation';
-import { getRequest } from '../../services/api';
+import { getRequest, postRequest } from '../../services/api';
 import ThemeToggle from '../../components/shared/ThemeToggle';
 import AIAnalysisModal from '../../components/AiAnalysis/AiAnalysisModals';
+import { exportBulkReportsToCSV, exportBulkReportsToExcel, exportBulkReportsToPDF } from '../../utils/exportUtils';
+import ExportAnalyticsModal from '../../components/shared/ExportAnalyticsModal';
+import { processResponse } from '../../utils/apiUtils';
+import toast from 'react-hot-toast';
 
 // Helper to convert time string (05:00 AM) to numeric minutes for graphing
 const timeToMinutes = (timeStr) => {
@@ -293,6 +297,7 @@ const PersonalSadhanaAnalytics = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [activeTab, setActiveTab] = useState('7 Days');
   const [isAiAnalysisModalOpen, setIsAiAnalysisModalOpen] = useState(false);
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   
   const todayDate = new Date().toISOString().split('T')[0];
   const lastWeekDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -303,7 +308,51 @@ const PersonalSadhanaAnalytics = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const tabs = ['7 Days', '30 Days', 'Custom'];
-  
+
+  const handleBulkExport = async (format, options = null) => {
+    try {
+      const exportFilter = options 
+         ? (options.duration === 'custom' ? 'custom' : `${options.duration}days`) 
+         : (activeTab === '7 Days' ? '7days' : activeTab === '30 Days' ? '30days' : 'custom');
+      
+      const startD = options ? (options.duration === 'custom' ? options.startDate : '2000-01-01') : fromDate;
+      const endD = options ? (options.duration === 'custom' ? options.endDate : new Date().toISOString().split('T')[0]) : toDate;
+
+      const toastId = toast.loading('Fetching activities...');
+      const payload = {
+        student_ids: [userDetails.user_id],
+        filter: exportFilter,
+        start_date: startD,
+        end_date: endD
+      };
+
+      const res = await postRequest('/export-bulk-student-reports', payload);
+      const data = res.data;
+      
+      toast.dismiss(toastId);
+
+      if (!data || data.status !== 1 || !data.data || data.data.length === 0) {
+         toast.error("No data available to export.");
+         return;
+      }
+
+      const durationLabel = options ? options.duration : activeTab.toLowerCase().replace(' ', '_');
+      const filename = `my_export_${durationLabel}_${new Date().getTime()}`;
+      
+      if (format === 'Excel (.xls)') {
+         exportBulkReportsToExcel(data.data, `${filename}.xls`);
+      } else if (format === 'CSV (.csv)') {
+         exportBulkReportsToCSV(data.data, `${filename}.csv`);
+      } else if (format === 'Print PDF') {
+         exportBulkReportsToPDF(data.data, durationLabel, `${filename}.pdf`);
+      }
+    } catch (error) {
+      console.error("Export Error:", error);
+      toast.error("Failed to fetch export data");
+      toast.dismiss();
+    }
+  };
+
   const fetchAnalytics = () => {
     if (!userDetails?.user_id) return;
     setIsLoading(true);
@@ -496,12 +545,24 @@ const PersonalSadhanaAnalytics = () => {
 
         {/* Date Range Label (Shown when not in custom mode or as header) */}
         {activeTab !== 'Custom' && (
-          <div className="text-center mb-8">
+          <div className="text-center mb-4">
             <span className="text-[16px] font-bold text-gray-400 dark:text-[#64748b]">
                {activeTab === '7 Days' ? 'Last 7 Days' : 'Last 30 Days'}
             </span>
           </div>
         )}
+
+        {/* Export Button Section */}
+        <div className="px-6 flex justify-center mb-8">
+          <button
+            onClick={() => setIsExportModalOpen(true)}
+            disabled={activitiesData.length === 0}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-[#1E293B] border border-gray-200 dark:border-gray-700 rounded-full shadow-sm text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Export
+          </button>
+        </div>
 
         {/* Cards List */}
         <div className="px-6 space-y-8 min-h-[50vh]">
@@ -568,6 +629,14 @@ const PersonalSadhanaAnalytics = () => {
         isOpen={isAiAnalysisModalOpen}
         onClose={() => setIsAiAnalysisModalOpen(false)}
         userDetails={userDetails}
+      />
+      
+      <ExportAnalyticsModal 
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        onExportCSV={() => handleBulkExport('CSV (.csv)')}
+        onExportExcel={() => handleBulkExport('Excel (.xls)')}
+        onExportPDF={() => handleBulkExport('Print PDF')}
       />
       
       <CounsellorBottomNavigation />
