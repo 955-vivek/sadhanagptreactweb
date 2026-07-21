@@ -71,45 +71,49 @@ const StudentRankWidget = ({ onClose }) => {
   return (
     <>
       <div className="border border-gray-200 dark:border-gray-700 rounded-2xl p-4 flex flex-col bg-white dark:bg-slate-800 shadow-sm mb-6">
-        <div className="flex items-center justify-between gap-2 mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10M17 4v8a5 5 0 0 1 -10 0v-8M5 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M19 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /></svg>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h3 className="font-bold text-[14px] text-gray-800 dark:text-gray-100 leading-tight">
-                Your Rank
-              </h3>
-              <div className="relative inline-block w-fit">
-                <select 
-                  value={rankPeriod}
-                  onChange={(e) => setRankPeriod(e.target.value)}
-                  className="text-[10px] text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 outline-none cursor-pointer px-2 py-0.5 rounded flex items-center font-bold appearance-none pr-5 border border-gray-200 dark:border-gray-600"
-                >
-                  <option value="current_week">This Week</option>
-                  <option value="last_week">Last Week</option>
-                </select>
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400">
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+        <div className="mb-4 border-b border-gray-100 dark:border-gray-700 pb-3 flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 flex items-center justify-center">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10M17 4v8a5 5 0 0 1 -10 0v-8M5 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0M19 9m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" /></svg>
+              </div>
+              <div className="flex flex-col gap-1">
+                <h3 className="font-bold text-[14px] text-gray-800 dark:text-gray-100 leading-tight">
+                  Your Rank
+                </h3>
+                <div className="relative inline-block w-fit">
+                  <select 
+                    value={rankPeriod}
+                    onChange={(e) => setRankPeriod(e.target.value)}
+                    className="text-[10px] text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 outline-none cursor-pointer px-2 py-0.5 rounded flex items-center font-bold appearance-none pr-5 border border-gray-200 dark:border-gray-600"
+                  >
+                    <option value="current_week">This Week</option>
+                    <option value="last_week">Last Week</option>
+                  </select>
+                  <div className="absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500 dark:text-gray-400">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  </div>
                 </div>
               </div>
             </div>
+            
+            <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+              <button
+                onClick={() => setFilterType('global')}
+                className={`px-3 py-1 text-[11px] font-bold rounded-md transition-colors ${filterType === 'global' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}
+              >
+                Global
+              </button>
+              <button
+                onClick={() => setFilterType('group')}
+                className={`px-3 py-1 text-[11px] font-bold rounded-md transition-colors ${filterType === 'group' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}
+              >
+                Group
+              </button>
+            </div>
           </div>
           
-          <div className="flex bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
-            <button
-              onClick={() => setFilterType('global')}
-              className={`px-3 py-1 text-[11px] font-bold rounded-md transition-colors ${filterType === 'global' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}
-            >
-              Global
-            </button>
-            <button
-              onClick={() => setFilterType('group')}
-              className={`px-3 py-1 text-[11px] font-bold rounded-md transition-colors ${filterType === 'group' ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'}`}
-            >
-              Group
-            </button>
-          </div>
+          <p className="text-[11px] font-semibold text-red-500 dark:text-red-400 italic px-1 mt-1">Note: Rank updates every morning</p>
         </div>
 
         {isLoading ? (
