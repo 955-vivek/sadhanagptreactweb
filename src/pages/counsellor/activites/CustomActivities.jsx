@@ -206,6 +206,7 @@ const MenteesList = () => {
             user_id: userDetails.user_id,
             student_ids: [editingStudent.id],
             center_id: editGroup,
+            
             label_id: editLabel
         };
         postRequest('/assign-student-center-label', payload, (res) => {
